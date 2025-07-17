@@ -22,6 +22,9 @@ app.use('/api', boatRoutes);
 const reservationRoutes = require('./src/routes/reservationRoutes');
 app.use('/api', reservationRoutes);
 
+const reviewRoutes = require('./src/routes/reviewRoutes');
+app.use('/api', reviewRoutes);
+
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');
   });
