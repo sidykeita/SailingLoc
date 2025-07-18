@@ -28,6 +28,8 @@ app.use('/api', reviewRoutes);
 const photoRoutes = require('./src/routes/photoRoutes');
 app.use('/api', photoRoutes);
 
+const paymentRoutes = require('./src/routes/paymentRoutes');
+app.use('/api', paymentRoutes);
 
 
 app.get('/', (req, res) => {
