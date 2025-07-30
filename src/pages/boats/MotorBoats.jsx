@@ -405,8 +405,8 @@ const MotorBoats = () => {
           <div className="footer-bottom-container">
             <p> SailingLoc 2025</p>
             <div className="footer-links">
-              <a href="#">Mentions légales</a>
-              <a href="#">CGU / CGV</a>
+              <a href="javascript:void(0)" onClick={() => window.location.href = '/legal-notices'}>Mentions légales</a>
+              <a href="javascript:void(0)" onClick={() => window.location.href = '/cgu-cgv'}>CGU / CGV</a>
               <a href="#">Partenaires</a>
               <a href="#">Contact</a>
             </div>
