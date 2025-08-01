@@ -13,8 +13,46 @@ exports.createBoat = async (req, res) => {
 // Obtenir tous les bateaux
 exports.getBoats = async (req, res) => {
   try {
-    const boats = await Boat.find();
+   const filters = {};
+
+    if (req.query.name) {
+      filters.name = { $regex: req.query.name, $options: 'i' }; // recherche partielle insensible à la casse
+    }
+    if (req.query.type) {
+      filters.type = req.query.type;
+    }
+    if (req.query.length_min || req.query.length_max) {
+      filters.length = {};
+      if (req.query.length_min) filters.length.$gte = Number(req.query.length_min);
+      if (req.query.length_max) filters.length.$lte = Number(req.query.length_max);
+    }
+    if (req.query.capacity) {
+      filters.capacity = Number(req.query.capacity);
+    }
+    if (req.query.cabins) {
+      filters.cabins = Number(req.query.cabins);
+    }
+    if (req.query.licenseRequired) {
+      if (req.query.licenseRequired === 'true' || req.query.licenseRequired === 'false') {
+        filters.licenseRequired = req.query.licenseRequired === 'true';
+      }
+    }
+    if (req.query.dailyPrice_min || req.query.dailyPrice_max) {
+      filters.dailyPrice = {};
+      if (req.query.dailyPrice_min) filters.dailyPrice.$gte = Number(req.query.dailyPrice_min);
+      if (req.query.dailyPrice_max) filters.dailyPrice.$lte = Number(req.query.dailyPrice_max);
+    }
+    if (req.query.owner) {
+      filters.owner = req.query.owner; // ici tu filtres par ID du propriétaire
+    }
+
+    // Optionnel : pour debug
+    console.log("Filters used:", filters);
+
+    const boats = await Boat.find(filters);
     res.json(boats);
+
+  res.json(boats);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

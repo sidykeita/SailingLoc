@@ -11,16 +11,17 @@ exports.getAllUsers = async (req, res) => {
 };
 
 
-exports.createUser = async (req, res) => {
-    try {
-      const { name, email, password } = req.body;
-      const user = new User({ name, email, password });
-      await user.save();
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  };
+  exports.createUser = async (req, res) => {
+    console.log("DATA REÇUE PAR LE SERVEUR :", req.body);
+      try {
+        const {firstName, lastName,email,password, phone, role, createdAt} = req.body;
+        const user = new User({ firstName, lastName,email,password, phone, role, createdAt });
+        await user.save();
+        res.status(201).json(user);
+      } catch (error) {
+        res.status(400).json({ error: error.message });
+      }
+    };
 
 // GET one user by ID
 exports.getUserById = async (req, res) => {

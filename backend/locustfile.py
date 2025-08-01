@@ -1,26 +1,27 @@
+from locust import HttpUser, task, between
 import random
 import string
-from locust import HttpUser, task
+import time
 
-
-class WebsiteUser(HttpUser):
-    @task
-    def get_users(self):
-        self.client.get("/auth/users")
-    
 def random_email():
-    return f"jean{random.randint(1, 1000000)}@test.com"
+    millis = int(time.time() * 1000)
+    rand = ''.join(random.choices(string.ascii_lowercase, k=8))
+    return f"{rand}{millis}@test.com"
 
-class WebsiteUser(HttpUser):
+class SailingLocUser(HttpUser):
+    wait_time = between(1, 2)
+
     @task
-    def postUser(self):
-        payload = {
-            "name": "Jean Dupont",
+    def create_user(self):
+        password = "azerty123"
+        data = {
+            "name": "Test User",
             "email": random_email(),
-            "password": "123456"
+            "password": password,
+            "confirmPassword": password
         }
-        # Attention ici : bien utiliser `json=payload`
-        with self.client.post("/auth/users", json=payload, catch_response=True) as response:
-            print(response.text)   # <--- AJOUTE CETTE LIGNE pour debug
-            if response.status_code != 201:
-                response.failure(f"POST failed: {response.text}")
+        with self.client.post("/api/users", json=data, catch_response=True) as resp:
+            if resp.status_code != 201:
+                resp.failure(f"POST failed: {resp.text}")
+            else:
+                resp.success()
