@@ -6,7 +6,7 @@ import {
   faChevronRight, 
   faUser 
 } from '@fortawesome/free-solid-svg-icons';
-import '../../pages/home/Home.css';
+import '../../assets/css/Home.css';
 
 // Import des images
 import logo from '../../assets/images/logo-blc.png';

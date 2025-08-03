@@ -20,7 +20,7 @@ import {
   faMapMarkerAlt,
   faClock
 } from '@fortawesome/free-solid-svg-icons';
-import './SailingBoatDetail.css'; // Import du fichier CSS
+import '../../assets/css/SailingBoatDetail.css'; // Import du fichier CSS
 
 // Importation des images (utilisation d'images existantes)
 import voilier1 from '../../assets/images/AdobeStock_198032487.jpeg';

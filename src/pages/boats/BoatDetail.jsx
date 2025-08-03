@@ -18,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import HomeNavigation from '../../components/navigation/HomeNavigation';
 import { useAuth } from '../../contexts/AuthContext';
-import './BoatDetail.css';
+import '../../assets/css/BoatDetail.css';
 
 // Importation des images
 import moteur4 from '../../assets/images/moteur4.jpeg';
@@ -527,61 +527,8 @@ const BoatDetail = () => {
       )}
     </div>
       
-    {/* Footer */}
-    <footer className="site-footer">
-      <div className="footer-container">
-        <div className="footer-section">
-          <h3>Nous faire confiance</h3>
-          <div className="rating-info">
-            <p><strong>Note : 4.8 / 5</strong> calculée à partir de <br/>5 000 avis</p>
-            <p>Une communauté passionnée</p>
-          </div>
-        </div>
-
-        <div className="footer-section">
-          <h3>Besoin de conseils ?</h3>
-          <p>Nous sommes joignables :</p>
-          <p>Du lundi au vendredi : 9h00 à 20h00</p>
-          <p>Samedi et Dimanche : 10h00 à 18h00</p>
-        </div>
-
-        <div className="footer-section">
-          <h3>Réseaux sociaux</h3>
-          <div className="social-icons">
-            <a href="#" className="social-icon">
-              <img src={facebookIcon} alt="Facebook" />
-            </a>
-            <a href="#" className="social-icon">
-              <img src={instaIcon} alt="Instagram" />
-            </a>
-            <a href="#" className="social-icon">
-              <img src={tiktokIcon} alt="TikTok" />
-            </a>
-          </div>
-        </div>
-
-        <div className="footer-section">
-          <h3>Paiement vérifié par</h3>
-          <div className="payment-icons">
-            <img src={mastercardIcon} alt="Mastercard" className="payment-icon" />
-            <img src={visaIcon} alt="Visa" className="payment-icon" />
-            <img src={applepayIcon} alt="Apple Pay" className="payment-icon" />
-          </div>
-        </div>
-      </div>
-
-      <div className="footer-bottom">
-        <div className="footer-bottom-container">
-          <p> SailingLoc 2025</p>
-          <div className="footer-links">
-            <a href="javascript:void(0)" onClick={() => window.location.href = '/legal-notices'}>Mentions légales</a>
-            <a href="javascript:void(0)" onClick={() => window.location.href = '/cgu-cgv'}>CGU / CGV</a>
-            <a href="#">Partenaires</a>
-            <a href="#">Contact</a>
-          </div>
-        </div>
-      </div>
-    </footer>
+ 
+    
   </div>
   );
 };

@@ -15,8 +15,8 @@ import {
   faTimes,
   faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
-import HomeNavigation from '../../components/navigation/HomeNavigation';
-import './MotorBoats.css'; // Import du nouveau fichier CSS
+import Layout from '../../Layout';
+import '../../assets/css/MotorBoats.css'; // Import du fichier CSS
 
 // Importation des images
 import moteur4 from '../../assets/images/moteur4.jpeg';
@@ -25,15 +25,10 @@ import moteur6 from '../../assets/images/moteur6.jpeg';
 import moteur7 from '../../assets/images/moteur7.jpeg';
 import moteur8 from '../../assets/images/moteur8.jpeg';
 import moteur9 from '../../assets/images/moteur9.jpeg';
-import logoBlc from '../../assets/images/logo-blc.png';
+// Suppression de l'import du logo
 
 // Images pour le footer
-import facebookIcon from '../../assets/images/picto-facebook.png';
-import instaIcon from '../../assets/images/picto-insta.png';
-import tiktokIcon from '../../assets/images/picto-tiktok.png';
-import mastercardIcon from '../../assets/images/mastercard.png';
-import visaIcon from '../../assets/images/visa.png';
-import applepayIcon from '../../assets/images/applepay.png';
+// Suppression des imports pour les icônes du footer
 
 const MotorBoats = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -154,59 +149,16 @@ const MotorBoats = () => {
     return matchesSearch && matchesPrice && matchesCapacity;
   });
 
-  // Fonction pour afficher un en-tête personnalisé sans modifier les autres pages
-  const CustomHeader = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    
-    const toggleMenu = () => {
-      setMenuOpen(!menuOpen);
-    };
-    
-    return (
-      <header className="motor-boats-header">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="logo">
-            <Link to="/">
-              <img src={logoBlc} alt="SAILING.LOC" className="h-10" />
-            </Link>
-          </div>
-          
-          {/* Bouton hamburger pour mobile */}
-          <button 
-            className="hamburger-button" 
-            onClick={toggleMenu}
-            aria-label="Menu principal"
-          >
-            <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
-          </button>
-          
-          {/* Navigation */}
-          <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
-            <ul>
-              <li><Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
-              <li><Link to="/boats/motor" className="nav-link" onClick={() => setMenuOpen(false)}>Bateaux à moteur</Link></li>
-              <li><Link to="/boats/sailing" className="nav-link" onClick={() => setMenuOpen(false)}>Voiliers</Link></li>
-              <li><Link to="/about" className="nav-link" onClick={() => setMenuOpen(false)}>À propos</Link></li>
-              <li><Link to="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>Contact</Link></li>
-              <li><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}><FontAwesomeIcon icon={faUser} /></Link></li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-    );
-  };
-
   return (
-    <div className="motor-boats-container">
-      {/* Utilisation de l'en-tête personnalisé au lieu de HomeNavigation */}
-      <CustomHeader />
-      <div className="container mx-auto px-4 py-8 content-container">
-      <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de bateaux à moteur</h1>
-      <p className="text-[#333333] mb-8">Découvrez notre flotte de bateaux à moteur disponibles à la location</p>
-      
-      {/* Filtres et recherche */}
-      <div className="filters-section">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <Layout>
+      <div className="motor-boats-page">
+        <div className="page-content container mx-auto px-4 py-8 content-container">
+          <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de bateaux à moteur</h1>
+          <p className="text-[#333333] mb-8">Découvrez notre flotte de bateaux à moteur disponibles à la location</p>
+          
+          {/* Filtres et recherche */}
+          <div className="filters-section">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Barre de recherche */}
           <div>
             <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
@@ -358,62 +310,8 @@ const MotorBoats = () => {
         </button>
       )}
       
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="footer-container">
-          <div className="footer-section">
-            <h3>Nous faire confiance</h3>
-            <div className="rating-info">
-              <p><strong>Note : 4.8 / 5</strong> calculée à partir de <br/>5 000 avis</p>
-              <p>Une communauté passionnée</p>
-            </div>
-          </div>
-
-          <div className="footer-section">
-            <h3>Besoin de conseils ?</h3>
-            <p>Nous sommes joignables :</p>
-            <p>Du lundi au vendredi : 9h00 à 20h00</p>
-            <p>Samedi et Dimanche : 10h00 à 18h00</p>
-          </div>
-
-          <div className="footer-section">
-            <h3>Réseaux sociaux</h3>
-            <div className="social-icons">
-              <a href="#" className="social-icon">
-                <img src={facebookIcon} alt="Facebook" />
-              </a>
-              <a href="#" className="social-icon">
-                <img src={instaIcon} alt="Instagram" />
-              </a>
-              <a href="#" className="social-icon">
-                <img src={tiktokIcon} alt="TikTok" />
-              </a>
-            </div>
-          </div>
-
-          <div className="footer-section">
-            <h3>Paiement vérifié par</h3>
-            <div className="payment-icons">
-              <img src={mastercardIcon} alt="Mastercard" className="payment-icon" />
-              <img src={visaIcon} alt="Visa" className="payment-icon" />
-              <img src={applepayIcon} alt="Apple Pay" className="payment-icon" />
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <div className="footer-bottom-container">
-            <p> SailingLoc 2025</p>
-            <div className="footer-links">
-              <a href="javascript:void(0)" onClick={() => window.location.href = '/legal-notices'}>Mentions légales</a>
-              <a href="javascript:void(0)" onClick={() => window.location.href = '/cgu-cgv'}>CGU / CGV</a>
-              <a href="#">Partenaires</a>
-              <a href="#">Contact</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </Layout>
   );
 };
 

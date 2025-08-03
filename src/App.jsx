@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BackgroundImage from './components/BackgroundImage';
+import Layout from './Layout';
 
 // Pages d'authentification
 import Login from './pages/auth/Login';
@@ -20,6 +21,15 @@ import MotorBoats from './pages/boats/MotorBoats';
 import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
 import SailingBoatDetail from './pages/boats/SailingBoatDetail';
+
+// Pages des destinations
+import Marseille from './pages/destinations/Marseille';
+import PortoCristo from './pages/destinations/PortoCristo';
+import Bastia from './pages/destinations/Bastia';
+import Alicante from './pages/destinations/Alicante';
+import Corfou from './pages/destinations/Corfou';
+import VilleneuveLoubet from './pages/destinations/VilleneuveLoubet';
+import DestinationDetail from './pages/destinations/DestinationDetail';
 
 // Page d'accueil
 import Home from './pages/home/Home';
@@ -56,52 +66,43 @@ function App() {
   }
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      minHeight: '100vh',
-      position: 'relative',
-      backgroundImage: 'url("/admin.jpeg")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
-    }}>
-      {/* Overlay semi-transparent */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-        zIndex: 0
-      }}></div>
-      <main style={{ flex: 1, position: 'relative', zIndex: 1 }}>
+    <div className="app-container">
+      <BackgroundImage />
+      <main>
         <Routes>
           {/* Routes publiques */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />  {/* Home contient déjà Layout */}
           <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />
           
-          {/* Routes des bateaux */}
-          <Route path="/boats/motor" element={<MotorBoats />} />
-          <Route path="/boats/sailing" element={<SailingBoats />} />
-          <Route path="/boats/sailing/:id" element={<SailingBoatDetail />} />
-          <Route path="/boats/:id" element={<BoatDetail />} />
+          {/* Routes des bateaux - avec Layout */}
+          <Route path="/boats/motor" element={<Layout><MotorBoats /></Layout>} />
+          <Route path="/boats/sailing" element={<Layout><SailingBoats /></Layout>} />
+          <Route path="/boats/sailing/:id" element={<Layout><SailingBoatDetail /></Layout>} />
+          <Route path="/boats/:id" element={<Layout><BoatDetail /></Layout>} />
           
-          {/* Pages légales */}
-          <Route path="/legal-notices" element={<LegalNotices />} />
-          <Route path="/cgu-cgv" element={<CGUCGV />} />
+          {/* Pages légales - avec Layout */}
+          <Route path="/legal-notices" element={<Layout><LegalNotices /></Layout>} />
+          <Route path="/cgu-cgv" element={<Layout><CGUCGV /></Layout>} />
           
-          {/* Pages d'aide */}
-          <Route path="/help" element={<Help />} />
-          <Route path="/help/boat-rental" element={<BoatRental />} />
-          <Route path="/help/payments" element={<Payments />} />
-          <Route path="/help/account" element={<Account />} />
-          <Route path="/help/emergency" element={<Emergency />} />
-          <Route path="/help/faq" element={<FAQ />} />
+          {/* Pages d'aide - avec Layout */}
+          <Route path="/help" element={<Layout><Help /></Layout>} />
+          <Route path="/help/boat-rental" element={<Layout><BoatRental /></Layout>} />
+          <Route path="/help/payments" element={<Layout><Payments /></Layout>} />
+          <Route path="/help/account" element={<Layout><Account /></Layout>} />
+          <Route path="/help/emergency" element={<Layout><Emergency /></Layout>} />
+          <Route path="/help/faq" element={<Layout><FAQ /></Layout>} />
           
-          {/* Page de contact */}
-          <Route path="/contact" element={<Contact />} />
+          {/* Page de contact - avec Layout */}
+          <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          
+          {/* Routes des destinations - avec Layout */}
+          <Route path="/destinations/marseille" element={<Layout><Marseille /></Layout>} />
+          <Route path="/destinations/porto-cristo" element={<Layout><PortoCristo /></Layout>} />
+          <Route path="/destinations/bastia" element={<Layout><Bastia /></Layout>} />
+          <Route path="/destinations/alicante" element={<Layout><Alicante /></Layout>} />
+          <Route path="/destinations/corfou" element={<Layout><Corfou /></Layout>} />
+          <Route path="/destinations/villeneuve-loubet" element={<Layout><VilleneuveLoubet /></Layout>} />
+          <Route path="/destinations/:destinationId" element={<Layout><DestinationDetail /></Layout>} />
           
           {/* Routes d'inscription */}
           <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />

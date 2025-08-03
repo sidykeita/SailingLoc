@@ -3,9 +3,29 @@ import { Link } from 'react-router-dom';
 
 function CGUCGV() {
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', backgroundColor: '#66C7C7', minHeight: '100vh' }}>
-      <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-        <h1 style={{ color: '#274991', marginBottom: '20px', textAlign: 'center' }}>Conditions Générales d'Utilisation et de Vente</h1>
+    <div style={{ padding: '20px', paddingTop: '100px', width: '100%', backgroundColor: '#66C7C7', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+        <h1 style={{ 
+          color: '#274991', 
+          marginBottom: '20px', 
+          textAlign: 'center',
+          position: 'relative',
+          paddingBottom: '15px'
+        }}>
+          Conditions Générales d'Utilisation et de Vente
+          <span style={{
+            content: '""',
+            position: 'absolute',
+            bottom: '0',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '80px',
+            height: '3px',
+            backgroundColor: '#66C7C7',
+            display: 'block'
+          }}></span>
+        </h1>
         
         <div style={{ marginBottom: '20px' }}>
           <Link to="/" style={{ color: '#274991', textDecoration: 'none' }}>
@@ -128,6 +148,7 @@ function CGUCGV() {
           <Link to="/legal-notices" style={{ color: '#274991', margin: '0 10px' }}>Mentions légales</Link>
           <Link to="/cgu-cgv" style={{ color: '#274991', margin: '0 10px', fontWeight: 'bold' }}>CGU / CGV</Link>
         </div>
+      </div>
       </div>
     </div>
   );

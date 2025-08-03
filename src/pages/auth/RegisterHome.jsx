@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserFriends, faShip, faHome } from '@fortawesome/free-solid-svg-icons';
-import './RegisterHome.css';
+import '../../assets/css/RegisterHome.css';
 
 const RegisterHome = () => {
   const tenantCardRef = useRef(null);

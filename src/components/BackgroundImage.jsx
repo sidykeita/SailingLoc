@@ -1,4 +1,5 @@
 import React from 'react';
+import adminBackground from '../assets/images/admin.jpeg';
 
 const BackgroundImage = () => {
   return (
@@ -11,10 +12,10 @@ const BackgroundImage = () => {
       width: '100%',
       height: '100%',
       zIndex: -1,
-      backgroundColor: '#f0f8ff', /* Couleur de fond de secours */
+      backgroundColor: '#ffffff', /* Fond blanc au lieu de bleu clair */
     }}>
       <img 
-        src="/admin.jpeg" 
+        src={adminBackground} 
         alt="Background" 
         style={{
           width: '100%',

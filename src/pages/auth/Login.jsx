@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import './Login.css';
+// L'image de fond est maintenant gérée directement par le CSS
+import '../../assets/css/Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('c.line2110@hotmail.com');

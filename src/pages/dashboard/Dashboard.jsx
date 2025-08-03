@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import './DashboardBackground.css';
+import '../../assets/css/DashboardBackground.css';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
