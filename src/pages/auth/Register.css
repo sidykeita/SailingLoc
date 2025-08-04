@@ -1,0 +1,208 @@
+/* Register.css - Styles spécifiques à la page d'inscription */
+
+@import '../../styles/variables.css';
+@import '../../styles/auth-common.css';
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  background-image: url('../../assets/images/boat_aerial_view.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.register-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+}
+
+.register-box {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.register-form-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.register-title {
+  font-family: var(--font-heading);
+  font-weight: bold;
+  color: var(--primary-blue);
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+  font-family: var(--font-primary);
+  color: var(--dark-gray);
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.error-alert {
+  background-color: #FED7D7;
+  border: 1px solid #F56565;
+  color: #C53030;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-primary);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  color: var(--dark-gray);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-primary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--gray);
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  background-color: #f0f4f8;
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-family: var(--font-primary);
+}
+
+.role-selection {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-primary);
+}
+
+.role-option input {
+  margin-right: 0.5rem;
+}
+
+.submit-button {
+  width: 100%;
+  background-color: var(--secondary-blue);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-blue);
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-link {
+  text-align: center;
+  font-family: var(--font-primary);
+  color: var(--dark-gray);
+  margin-top: 1rem;
+}
+
+.login-link a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.terms {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--dark-gray);
+  font-family: var(--font-primary);
+}
+
+.terms a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}
+
+/* Styles pour les cases à cocher */
+.checkbox-group {
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.checkbox-container label {
+  font-family: var(--font-primary);
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  line-height: 1.4;
+}
+
+/* Styles spécifiques pour les formulaires propriétaire/locataire */
+.submit-button.owner-button {
+  background-color: var(--turquoise);
+}
+
+.submit-button.owner-button:hover {
+  background-color: #55b7b5;
+}
