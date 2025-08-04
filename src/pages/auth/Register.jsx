@@ -8,9 +8,10 @@ import '../../assets/css/Register.css';
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('tenant');
+  const [role, setRole] = useState('locataire'); // valeur par défaut conforme backend
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
@@ -48,7 +49,7 @@ const Register = () => {
     }
     
     // Validation des champs
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError('Veuillez remplir tous les champs');
       return;
     }
@@ -73,15 +74,16 @@ const Register = () => {
         firstName: name.split(' ')[0],
         lastName: name.split(' ').slice(1).join(' '),
         email,
+        phone,
         password,
-        role
+        role // 'locataire' ou 'propriétaire' uniquement
       };
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
       
       // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
-      if (user.role === 'owner') {
+      if (user.role === 'propriétaire') {
         navigate('/owner/dashboard');
       } else {
         navigate('/dashboard');
@@ -141,6 +143,18 @@ const Register = () => {
                 className="form-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone" className="form-label">Numéro de téléphone</label>
+              <input
+                type="tel"
+                id="phone"
+                className="form-input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
               />
             </div>

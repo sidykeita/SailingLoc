@@ -1,9 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-// Import du service d'authentification simulé pour le développement
-import mockAuthService from '../services/mockAuth.service';
-
-// Utiliser le service simulé pendant le développement
-const authService = mockAuthService;
+// Import du vrai service d'authentification
+import authService from '../services/auth.service';
 
 // Création du contexte d'authentification
 const AuthContext = createContext();

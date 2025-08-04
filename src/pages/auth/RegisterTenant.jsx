@@ -8,6 +8,7 @@ import '../../assets/css/Register.css';
 const RegisterTenant = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ const RegisterTenant = () => {
     }
     
     // Validation des champs
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       setError('Veuillez remplir tous les champs');
       return;
     }
@@ -72,14 +73,13 @@ const RegisterTenant = () => {
         firstName: name.split(' ')[0],
         lastName: name.split(' ').slice(1).join(' '),
         email,
+        phone,
         password,
-        role: 'tenant' // Rôle fixé à locataire
+        role: 'locataire' // Rôle fixé à locataire
       };
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
-      
-      // Redirection vers le dashboard locataire
       navigate('/dashboard');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
@@ -137,6 +137,18 @@ const RegisterTenant = () => {
                 className="form-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
+              <input
+                type="tel"
+                id="phone"
+                className="form-input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
               />
             </div>
