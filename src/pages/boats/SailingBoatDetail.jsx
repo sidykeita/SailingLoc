@@ -22,13 +22,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/SailingBoatDetail.css'; // Import du fichier CSS
 
-// Importation des images (utilisation d'images existantes)
-import voilier1 from '../../assets/images/AdobeStock_198032487.jpeg';
-import voilier2 from '../../assets/images/AdobeStock_315021887.jpeg';
-import voilier3 from '../../assets/images/AdobeStock_1028777944.jpeg';
-import voilier4 from '../../assets/images/AdobeStock_1165484620.jpeg';
-import voilier5 from '../../assets/images/AdobeStock_1218649634.jpeg';
-import voilier6 from '../../assets/images/AdobeStock_622498772.jpeg';
+// Importation des nouvelles images des voiliers
+import voilier1 from '../../assets/images/voilier1.jpeg';
+import voilier2 from '../../assets/images/voilier2.jpeg';
+import voilier3 from '../../assets/images/voilier3.jpeg';
+import voilier4 from '../../assets/images/voilier4.jpeg';
+import voilier5 from '../../assets/images/voilier5.jpeg';
+import voilier6 from '../../assets/images/voilier6.jpeg';
 import logoBlc from '../../assets/images/logo-blc.png';
 
 // Images pour le footer
@@ -42,7 +42,7 @@ import applepayIcon from '../../assets/images/applepay.png';
 // Images supplémentaires pour la galerie (utilisation d'images existantes)
 import voilier1Detail1 from '../../assets/images/AdobeStock_177675231.jpeg';
 import voilier1Detail2 from '../../assets/images/AdobeStock_177675261.jpeg';
-import voilier1Detail3 from '../../assets/images/AdobeStock_124406431.jpeg';
+import voilier1Detail3 from '../../assets/images/voilier3.jpeg'; // Remplacé par une image existante
 
 const SailingBoatDetail = () => {
   const { id } = useParams();

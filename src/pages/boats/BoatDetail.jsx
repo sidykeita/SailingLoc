@@ -16,7 +16,7 @@ import {
   faUtensils,
   faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
-import HomeNavigation from '../../components/navigation/HomeNavigation';
+import Layout from '../../Layout';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/BoatDetail.css';
 
@@ -300,11 +300,9 @@ const BoatDetail = () => {
   }
 
   return (
-    <div className="boat-detail-container">
-      <header className="boat-detail-header">
-        <HomeNavigation />
-      </header>
-      <div className="container mx-auto px-4 py-8 content-container">
+    <Layout>
+      <div className="boat-detail-container">
+        <div className="container mx-auto px-4 py-8 content-container">
       {/* Bouton retour */}
       <div className="mb-6">
         <Link to="/boats/motor" className="back-button">
@@ -525,11 +523,9 @@ const BoatDetail = () => {
           <FontAwesomeIcon icon={faChevronUp} />
         </button>
       )}
-    </div>
-      
- 
-    
-  </div>
+        </div>
+      </div>
+    </Layout>
   );
 };
 

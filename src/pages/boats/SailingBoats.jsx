@@ -17,13 +17,13 @@ import {
 import Layout from '../../Layout';
 import '../../assets/css/SailingBoats.css'; // Import du fichier CSS depuis le nouveau chemin
 
-// Importation des images (utilisation d'images existantes)
-import voilier1 from '../../assets/images/AdobeStock_198032487.jpeg';
-import voilier2 from '../../assets/images/AdobeStock_315021887.jpeg';
-import voilier3 from '../../assets/images/AdobeStock_1028777944.jpeg';
-import voilier4 from '../../assets/images/AdobeStock_1165484620.jpeg';
-import voilier5 from '../../assets/images/AdobeStock_1218649634.jpeg';
-import voilier6 from '../../assets/images/AdobeStock_622498772.jpeg';
+// Importation des nouvelles images des voiliers
+import voilier1 from '../../assets/images/voilier1.jpeg';
+import voilier2 from '../../assets/images/voilier2.jpeg';
+import voilier3 from '../../assets/images/voilier3.jpeg';
+import voilier4 from '../../assets/images/voilier4.jpeg';
+import voilier5 from '../../assets/images/voilier5.jpeg';
+import voilier6 from '../../assets/images/voilier6.jpeg';
 
 const SailingBoats = () => {
   const [searchTerm, setSearchTerm] = useState('');

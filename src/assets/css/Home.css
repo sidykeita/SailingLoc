@@ -54,10 +54,11 @@ p, div, span, a, button, input, select, textarea {
   background-color: var(--secondary-blue);
   padding: 30px;
   border-radius: 10px;
-  width: 400px; /* Réduction de la largeur */
+  width: 400px; /* Largeur par défaut */
   color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   margin-top: 80px;
+  max-width: 90%; /* Empêche le débordement sur petits écrans */
 }
 
 .home-page .hero-section .search-container h1 {
@@ -372,6 +373,8 @@ p, div, span, a, button, input, select, textarea {
   padding: 10px 15px;
   font-weight: 600;
   font-size: 18px;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .view-all-destinations {
@@ -807,6 +810,37 @@ p, div, span, a, button, input, select, textarea {
   color: #ffcc00;
 }
 
+/* Responsive adjustments pour search-container */
+@media (max-width: 768px) {
+  .home-page .hero-section .search-container {
+    width: 90%;
+    padding: 20px;
+    margin-top: 40px;
+  }
+  
+  .home-page .hero-section .search-container h1 {
+    font-size: 20px;
+  }
+  
+  .home-page .hero-section .search-container p {
+    font-size: 12px;
+  }
+  
+  .search-box {
+    flex-direction: column;
+  }
+  
+  .search-input-group {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .search-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   /* Tablette */
@@ -815,18 +849,24 @@ p, div, span, a, button, input, select, textarea {
     justify-content: center;
   }
   
+  .destination-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 30px;
+  }
+  
   .destination-card {
-    width: 45%;
+    width: 100%;
     margin-bottom: 20px;
   }
   
-  .testimonials-container {
-    flex-wrap: wrap;
-    justify-content: center;
+  .testimonial-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 30px;
   }
   
   .testimonial-card {
-    flex-basis: 45%;
     margin-bottom: 20px;
   }
   
@@ -863,6 +903,37 @@ p, div, span, a, button, input, select, textarea {
   
   .boat-cards {
     grid-template-columns: 1fr;
+  }
+  
+  /* Destinations responsive pour mobile */
+  .destination-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+  }
+  
+  .destination-card {
+    height: 200px;
+  }
+  
+  .destination-title {
+    font-size: 1.2rem;
+  }
+  
+  /* Testimonials responsive pour mobile */
+  .testimonial-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+  }
+  
+  .testimonial-card {
+    margin-bottom: 15px;
+  }
+  
+  .cursive-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
   }
   
   /* Mobile */

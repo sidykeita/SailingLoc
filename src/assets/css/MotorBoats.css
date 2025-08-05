@@ -15,6 +15,11 @@
   min-height: 100vh;
 }
 
+/* Style pour app-container avec padding-top */
+.app-container {
+  padding-top: 100px;
+}
+
 /* Style pour le conteneur de contenu avec marge pour le header fixe */
 .content-container {
   margin-top: 6rem; /* Espace pour le header fixe */
@@ -297,11 +302,12 @@ h2::after {
 
 /* Style pour les filtres */
 .filters-section {
-  background-color: #D9D9D9; /* Gris clair de la charte */
+  background-color: #66C7C7; /* Turquoise de la charte */
   padding: 1.5rem;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
   border-left: 4px solid #3C83C4; /* Bordure gauche bleu moyen */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-grid {

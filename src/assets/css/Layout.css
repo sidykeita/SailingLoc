@@ -7,10 +7,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #ffffff;
 }
 
 .main-content {
   flex: 1;
+  background-color: #ffffff !important;
 }
 
 /* Header */
@@ -25,6 +27,13 @@
   padding: 0.8rem 2rem;
   z-index: 1000;
   transition: background-color 0.3s ease;
+}
+
+/* Nouveau conteneur pour aligner la navigation et le bouton Mon compte */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .site-header.scrolled {
@@ -135,13 +144,18 @@
   flex-direction: column;
 }
 
-.submenu-list li {
+.submenu-list li, .submenu-item {
   margin: 0.3rem 0;
   display: block !important;
   width: 100% !important;
   clear: both !important;
   padding: 0.3rem 0.5rem;
   transition: background-color 0.2s ease;
+}
+
+.submenu-item {
+  display: block;
+  margin: 5px 0;
 }
 
 .submenu-list li:hover {
@@ -326,14 +340,110 @@
   color: #0088cc;
 }
 
+/* Styles pour le bouton Mon compte mobile */
+.mobile-account {
+  display: none;
+}
+
+.login-button-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  background-color: #274991;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 0.5rem 0;
+  transition: background-color 0.3s ease;
+}
+
+.login-button-mobile:hover {
+  background-color: #1a3366;
+}
+
+/* Les styles du bouton hamburger sont maintenant gérés directement dans le JSX */
+
+/* Styles pour le menu principal - visible par défaut sur desktop */
+.main-nav {
+  display: flex;
+  align-items: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  
+  .mobile-account {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
   .site-header {
     padding: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .mobile-menu-toggle {
+    display: flex;
+    order: 3;
+    margin-left: auto;
+  }
+  
+  .header-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .main-nav {
-    display: none; /* Pour une version mobile, on utiliserait un menu hamburger */
+    display: none;
+    width: 100%;
+    order: 4;
+    margin-top: 1rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .main-nav.mobile-open {
+    display: block !important;
+  }
+  
+  .main-nav ul {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .main-nav ul li {
+    width: 100%;
+    text-align: center;
+    margin: 0.5rem 0;
+  }
+  
+  .dropdown-menu {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: none;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .user-actions {
+    margin-left: auto;
+    order: 2;
   }
   
   .footer-section {
