@@ -61,7 +61,7 @@ const SimpleDashboard = () => {
                       className="dropdown-item" 
                       onClick={() => setShowBoatSubmenu(!showBoatSubmenu)}
                     >
-                      Location de bateau <FontAwesomeIcon icon={faChevronRight} className="submenu-arrow" />
+                      Modèle location de bateau <FontAwesomeIcon icon={faChevronRight} className="submenu-arrow" />
                     </div>
                     {showBoatSubmenu && (
                       <div className="submenu-container">
@@ -115,9 +115,10 @@ const SimpleDashboard = () => {
                     </div>
                     {showAboutSubmenu && (
                       <div className="submenu-container">
-                        <Link to="/about/company" className="submenu-link">Notre entreprise</Link>
-                        <Link to="/about/team" className="submenu-link">L'équipe</Link>
-                        <Link to="/about/contact" className="submenu-link">Nous contacter</Link>
+                        <Link to="/about" className="submenu-link">À propos</Link>
+                        <Link to="/about/reviews" className="submenu-link">Avis</Link>
+                        <Link to="/help" className="submenu-link">Aide</Link>
+                        <Link to="/contact" className="submenu-link">Contact</Link>
                       </div>
                     )}
                   </div>

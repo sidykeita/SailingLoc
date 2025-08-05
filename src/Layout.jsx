@@ -92,15 +92,14 @@ const Layout = ({ children }) => {
                   <div className="submenu-section">
                     <h3 
                       className="submenu-title"
-                      onClick={() => setShowDestinationsSubmenu(!showDestinationsSubmenu)}
+                      onClick={() => setShowModelsSubmenu(!showModelsSubmenu)}
                     >
-                      Destinations <FontAwesomeIcon icon={faAngleDown} />
+                      Location de bateau <FontAwesomeIcon icon={faAngleDown} />
                     </h3>
-                    {showDestinationsSubmenu && (
+                    {showModelsSubmenu && (
                       <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/marseille">Marseille</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/porto-cristo">Porto Cristo</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/bastia">Bastia</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/boats/motor">Bateaux à moteur</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/boats/sailing">Voiliers</Link></li>
                       </ul>
                     )}
                   </div>
@@ -108,15 +107,15 @@ const Layout = ({ children }) => {
                   <div className="submenu-section">
                     <h3 
                       className="submenu-title"
-                      onClick={() => setShowModelsSubmenu(!showModelsSubmenu)}
+                      onClick={() => setShowDestinationsSubmenu(!showDestinationsSubmenu)}
                     >
-                      Modèles <FontAwesomeIcon icon={faAngleDown} />
+                      Meilleures destinations <FontAwesomeIcon icon={faAngleDown} />
                     </h3>
-                    {showModelsSubmenu && (
+                    {showDestinationsSubmenu && (
                       <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/bayliner">Bayliner</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/jeanneau">Jeanneau</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/beneteau">Beneteau</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/destinations/marseille">Marseille</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/destinations/porto-cristo">Porto Cristo</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/destinations/bastia">Bastia</Link></li>
                       </ul>
                     )}
                   </div>
@@ -130,9 +129,8 @@ const Layout = ({ children }) => {
                     </h3>
                     {showAboutSubmenu && (
                       <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/company">Notre entreprise</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/team">Notre équipe</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/values">Nos valeurs</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/about">À propos</Link></li>
+                        <li style={{display: 'block', margin: '5px 0'}}><Link to="/about/reviews">Avis</Link></li>
                       </ul>
                     )}
                   </div>

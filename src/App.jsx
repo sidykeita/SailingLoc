@@ -28,6 +28,7 @@ import PortoCristo from './pages/destinations/PortoCristo';
 import Bastia from './pages/destinations/Bastia';
 import Alicante from './pages/destinations/Alicante';
 import Corfou from './pages/destinations/Corfou';
+import Destinations from './pages/destinations/Destinations';
 import VilleneuveLoubet from './pages/destinations/VilleneuveLoubet';
 import DestinationDetail from './pages/destinations/DestinationDetail';
 
@@ -96,6 +97,7 @@ function App() {
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           
           {/* Routes des destinations - avec Layout */}
+          <Route path="/destinations" element={<Layout><Destinations /></Layout>} />
           <Route path="/destinations/marseille" element={<Layout><Marseille /></Layout>} />
           <Route path="/destinations/porto-cristo" element={<Layout><PortoCristo /></Layout>} />
           <Route path="/destinations/bastia" element={<Layout><Bastia /></Layout>} />
