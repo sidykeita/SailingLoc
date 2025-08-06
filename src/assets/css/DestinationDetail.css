@@ -1,0 +1,263 @@
+/* Styles pour les pages de détails des destinations */
+
+.destination-detail-page {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+/* Section héro avec image de fond */
+.hero-section {
+  height: 500px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.hero-overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.hero-section h1 {
+  color: white;
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-section p {
+  color: white;
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Contenu principal */
+.destination-content {
+  padding: 0 20px 60px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.destination-description {
+  margin-bottom: 50px;
+}
+
+.destination-description h2 {
+  font-size: 2.2rem;
+  color: #2962a3;
+  margin-bottom: 20px;
+  font-family: 'Pacifico', cursive;
+  font-weight: normal;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.destination-description h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background-color: #66c8c6;
+  border-radius: 2px;
+}
+
+.destination-description p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* Grille d'informations */
+.destination-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.info-card {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.info-card h3 {
+  color: #2962a3;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.info-card h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #66c8c6;
+  border-radius: 2px;
+}
+
+.info-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.info-card li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.info-card li:last-child {
+  border-bottom: none;
+}
+
+.info-card p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+/* Section des bateaux disponibles */
+.available-boats {
+  background-color: #f9f9f9;
+  padding: 40px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.available-boats h2 {
+  font-size: 2rem;
+  color: #2962a3;
+  margin-bottom: 30px;
+  font-family: 'Pacifico', cursive;
+  font-weight: normal;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.primary-button, .secondary-button {
+  display: inline-block;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.primary-button {
+  background-color: #ff6b35;
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+}
+
+.primary-button:hover {
+  background-color: #e64a26;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 107, 53, 0.4);
+}
+
+.secondary-button {
+  background-color: white;
+  color: #2962a3;
+  border: 2px solid #2962a3;
+}
+
+.secondary-button:hover {
+  background-color: #f0f8ff;
+  transform: translateY(-2px);
+}
+
+/* Page d'erreur */
+.destination-not-found {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.destination-not-found h2 {
+  font-size: 2.5rem;
+  color: #2962a3;
+  margin-bottom: 20px;
+}
+
+.destination-not-found p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.back-button {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: #2962a3;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #1e4b82;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(41, 98, 163, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 350px;
+  }
+  
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-section p {
+    font-size: 1.2rem;
+  }
+  
+  .destination-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .destination-description h2,
+  .available-boats h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+  }
+}

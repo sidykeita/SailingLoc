@@ -1,0 +1,610 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faAnchor, 
+  faWater, 
+  faShip, 
+  faUsers, 
+  faArrowLeft,
+  faBars,
+  faTimes,
+  faChevronUp,
+  faWind,
+  faCompass,
+  faCalendarAlt,
+  faUser,
+  faCheck,
+  faLifeRing,
+  faShieldAlt,
+  faMapMarkerAlt,
+  faClock
+} from '@fortawesome/free-solid-svg-icons';
+import './SailingBoatDetail.css'; // Import du fichier CSS
+
+// Importation des images
+import voilier1 from '../../assets/images/voilier1.jpeg';
+import voilier2 from '../../assets/images/voilier2.jpeg';
+import voilier3 from '../../assets/images/voilier3.jpeg';
+import voilier4 from '../../assets/images/voilier4.jpeg';
+import voilier5 from '../../assets/images/voilier5.jpeg';
+import voilier6 from '../../assets/images/voilier6.jpeg';
+import logoBlc from '../../assets/images/logo-blc.png';
+
+// Images pour le footer
+import facebookIcon from '../../assets/images/picto-facebook.png';
+import instaIcon from '../../assets/images/picto-insta.png';
+import tiktokIcon from '../../assets/images/picto-tiktok.png';
+import mastercardIcon from '../../assets/images/mastercard.png';
+import visaIcon from '../../assets/images/visa.png';
+import applepayIcon from '../../assets/images/applepay.png';
+
+// Images supplémentaires pour la galerie
+import voilier1Detail1 from '../../assets/images/voilier1-detail1.jpeg';
+import voilier1Detail2 from '../../assets/images/voilier1-detail2.jpeg';
+import voilier1Detail3 from '../../assets/images/voilier1-detail3.jpeg';
+
+const SailingBoatDetail = () => {
+  const { id } = useParams();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [numberOfDays, setNumberOfDays] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(0);
+  
+  // Données simulées des voiliers
+  const boatsData = [
+    {
+      id: "s1",
+      name: "Oceanis 40.1",
+      description: "Voilier moderne et confortable, idéal pour les croisières côtières et hauturières",
+      longDescription: "L'Oceanis 40.1 est un voilier de croisière moderne qui allie confort, performance et facilité de manœuvre. Avec son design élégant et ses espaces de vie généreux, il offre une expérience de navigation exceptionnelle pour les sorties en famille ou entre amis. Sa coque optimisée assure une excellente stabilité et des performances remarquables, même par mer formée.",
+      sailArea: "95 m²",
+      capacity: "8 personnes",
+      length: "12,9 mètres",
+      beam: "4,18 mètres",
+      draft: "2,25 mètres",
+      displacement: "8,9 tonnes",
+      engine: "45 CV Yanmar",
+      waterCapacity: "330 litres",
+      fuelCapacity: "195 litres",
+      cabins: "3",
+      bathrooms: "2",
+      year: "2022",
+      images: [voilier1, voilier1Detail1, voilier1Detail2, voilier1Detail3],
+      price: 450,
+      available: true,
+      features: [
+        "Pilote automatique",
+        "GPS traceur",
+        "Guindeau électrique",
+        "Propulseur d'étrave",
+        "Chauffage",
+        "Eau chaude",
+        "Douche de pont",
+        "Bimini",
+        "Annexe",
+        "Convertisseur 220V",
+        "Réfrigérateur",
+        "Cuisine équipée"
+      ]
+    },
+    {
+      id: "s2",
+      name: "Sun Odyssey 410",
+      description: "Voilier performant avec un design innovant et des espaces de vie optimisés",
+      longDescription: "Le Sun Odyssey 410 est un voilier qui se distingue par son design innovant et ses performances de navigation exceptionnelles. Avec ses passavants inclinés et son cockpit ouvert, il offre une circulation à bord facilitée et des espaces de détente généreux. Sa carène performante et son plan de voilure équilibré en font un voilier rapide et agréable à barrer, même en équipage réduit.",
+      sailArea: "85 m²",
+      capacity: "6 personnes",
+      length: "12,3 mètres",
+      beam: "3,99 mètres",
+      draft: "2,10 mètres",
+      displacement: "7,8 tonnes",
+      engine: "40 CV Yanmar",
+      waterCapacity: "330 litres",
+      fuelCapacity: "200 litres",
+      cabins: "2",
+      bathrooms: "1",
+      year: "2021",
+      images: [voilier2],
+      price: 420,
+      available: true,
+      features: [
+        "Pilote automatique",
+        "GPS traceur",
+        "Guindeau électrique",
+        "Bimini",
+        "Annexe",
+        "Réfrigérateur",
+        "Cuisine équipée",
+        "Douche intérieure",
+        "Radio/USB",
+        "Prise de quai 220V"
+      ]
+    },
+    {
+      id: "s3",
+      name: "Dufour 430",
+      description: "Alliance parfaite entre performance, confort et élégance pour des navigations de rêve",
+      longDescription: "Le Dufour 430 est un voilier de croisière haut de gamme qui combine élégance, confort et performance. Son design intérieur raffiné offre des volumes généreux et des finitions de qualité. À l'extérieur, son pont dégagé et son cockpit spacieux facilitent les manœuvres et offrent d'agréables espaces de détente. Ses qualités marines exceptionnelles en font un voilier sûr et performant pour des croisières inoubliables.",
+      sailArea: "93 m²",
+      capacity: "8 personnes",
+      length: "13,2 mètres",
+      beam: "4,30 mètres",
+      draft: "2,10 mètres",
+      displacement: "9,5 tonnes",
+      engine: "50 CV Volvo",
+      waterCapacity: "380 litres",
+      fuelCapacity: "210 litres",
+      cabins: "3",
+      bathrooms: "2",
+      year: "2023",
+      images: [voilier3],
+      price: 480,
+      available: false,
+      features: [
+        "Pilote automatique",
+        "GPS traceur",
+        "Guindeau électrique",
+        "Propulseur d'étrave",
+        "Chauffage",
+        "Eau chaude",
+        "Douche de pont",
+        "Bimini",
+        "Annexe",
+        "Convertisseur 220V",
+        "Réfrigérateur",
+        "Cuisine équipée",
+        "TV LED",
+        "Système audio Bluetooth"
+      ]
+    },
+    {
+      id: "s4",
+      name: "Bavaria C45",
+      description: "Grand voilier familial offrant des volumes généreux et une navigation facile",
+      longDescription: "Le Bavaria C45 est un voilier spacieux et confortable, idéal pour les croisières en famille ou entre amis. Avec ses trois cabines doubles et ses deux salles d'eau, il offre tout le confort nécessaire pour des séjours prolongés en mer. Son cockpit particulièrement généreux et sa plateforme de bain rabattable facilitent la vie à bord et les baignades. Facile à manœuvrer malgré sa taille, il convient aussi bien aux skippers expérimentés qu'aux navigateurs occasionnels.",
+      sailArea: "108 m²",
+      capacity: "10 personnes",
+      length: "14,5 mètres",
+      beam: "4,49 mètres",
+      draft: "2,20 mètres",
+      displacement: "11,5 tonnes",
+      engine: "60 CV Volvo",
+      waterCapacity: "450 litres",
+      fuelCapacity: "250 litres",
+      cabins: "3",
+      bathrooms: "2",
+      year: "2022",
+      images: [voilier4],
+      price: 550,
+      available: true,
+      features: [
+        "Pilote automatique",
+        "GPS traceur",
+        "Guindeau électrique",
+        "Propulseur d'étrave",
+        "Chauffage",
+        "Eau chaude",
+        "Douche de pont",
+        "Bimini",
+        "Annexe",
+        "Convertisseur 220V",
+        "Réfrigérateur",
+        "Congélateur",
+        "Cuisine équipée",
+        "TV LED",
+        "Système audio Bluetooth",
+        "Générateur"
+      ]
+    },
+    {
+      id: "s5",
+      name: "First 27",
+      description: "Voilier sportif et rapide pour les amateurs de sensations et de régates",
+      longDescription: "Le First 27 est un voilier de sport moderne, léger et rapide, conçu pour les navigateurs à la recherche de sensations fortes. Avec sa coque planante et son gréement performant, il offre des sensations de glisse exceptionnelles et des pointes de vitesse impressionnantes. Malgré son orientation sportive, il dispose d'un aménagement intérieur fonctionnel permettant des sorties à la journée ou des week-ends en mer. Un voilier idéal pour s'initier à la régate ou simplement profiter de navigations dynamiques.",
+      sailArea: "45 m²",
+      capacity: "4 personnes",
+      length: "8,4 mètres",
+      beam: "2,54 mètres",
+      draft: "2,0 mètres",
+      displacement: "1,4 tonnes",
+      engine: "15 CV Yanmar",
+      waterCapacity: "50 litres",
+      fuelCapacity: "25 litres",
+      cabins: "1",
+      bathrooms: "0",
+      year: "2023",
+      images: [voilier5],
+      price: 280,
+      available: true,
+      features: [
+        "GPS traceur",
+        "Pilote automatique",
+        "Annexe",
+        "Réchaud",
+        "Glacière",
+        "Radio/USB",
+        "Équipement de sécurité complet"
+      ]
+    },
+    {
+      id: "s6",
+      name: "Hanse 388",
+      description: "Voilier moderne au design épuré offrant d'excellentes performances de navigation",
+      longDescription: "Le Hanse 388 est un voilier de croisière moderne qui se distingue par son design épuré et ses lignes élégantes. Son plan de pont dégagé et son cockpit spacieux offrent un confort optimal en navigation comme au mouillage. À l'intérieur, ses aménagements lumineux et fonctionnels créent une atmosphère accueillante. Facile à manœuvrer en équipage réduit grâce à son foc auto-vireur, il combine parfaitement performance, confort et simplicité d'utilisation.",
+      sailArea: "72 m²",
+      capacity: "6 personnes",
+      length: "11,4 mètres",
+      beam: "3,90 mètres",
+      draft: "2,05 mètres",
+      displacement: "7,1 tonnes",
+      engine: "30 CV Yanmar",
+      waterCapacity: "295 litres",
+      fuelCapacity: "160 litres",
+      cabins: "2",
+      bathrooms: "1",
+      year: "2021",
+      images: [voilier6],
+      price: 380,
+      available: true,
+      features: [
+        "Pilote automatique",
+        "GPS traceur",
+        "Guindeau électrique",
+        "Foc auto-vireur",
+        "Eau chaude",
+        "Douche de pont",
+        "Bimini",
+        "Annexe",
+        "Réfrigérateur",
+        "Cuisine équipée",
+        "Radio/USB",
+        "Prise de quai 220V"
+      ]
+    }
+  ];
+
+  // Trouver le bateau correspondant à l'ID dans l'URL
+  const boat = boatsData.find(b => b.id === id) || boatsData[0];
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
+  // Calcul du prix total en fonction des dates
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      // Calcul du nombre de jours
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        setNumberOfDays(diffDays);
+        setTotalPrice(boat.price * diffDays);
+      } else {
+        setNumberOfDays(1);
+        setTotalPrice(boat.price);
+      }
+    } else {
+      setTotalPrice(boat.price);
+    }
+  }, [startDate, endDate, boat.price]);
+  
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Fonction pour afficher un en-tête personnalisé sans modifier les autres pages
+  const CustomHeader = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    
+    const toggleMenu = () => {
+      setMenuOpen(!menuOpen);
+    };
+    
+    return (
+      <header className="sailing-boat-detail-header">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="logo">
+            <Link to="/">
+              <img src={logoBlc} alt="SAILING.LOC" className="h-10" />
+            </Link>
+          </div>
+          
+          {/* Bouton hamburger pour mobile */}
+          <button 
+            className="hamburger-button" 
+            onClick={toggleMenu}
+            aria-label="Menu principal"
+          >
+            <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
+          </button>
+          
+          {/* Navigation */}
+          <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
+            <ul>
+              <li><Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
+              <li><Link to="/boats/motor" className="nav-link" onClick={() => setMenuOpen(false)}>Bateaux à moteur</Link></li>
+              <li><Link to="/boats/sailing" className="nav-link" onClick={() => setMenuOpen(false)}>Voiliers</Link></li>
+              <li><Link to="/about" className="nav-link" onClick={() => setMenuOpen(false)}>À propos</Link></li>
+              <li><Link to="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>Contact</Link></li>
+              <li><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}><FontAwesomeIcon icon={faUser} /></Link></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+    );
+  };
+
+  return (
+    <div className="sailing-boat-detail-container">
+      {/* Utilisation de l'en-tête personnalisé */}
+      <CustomHeader />
+      
+      <div className="container mx-auto px-4 py-8 content-container">
+        {/* Bouton de retour */}
+        <Link to="/boats/sailing" className="back-button mb-6 inline-flex items-center">
+          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+          Retour aux voiliers
+        </Link>
+        
+        {/* Titre et prix */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h1 className="boat-title">{boat.name}</h1>
+          <div className="price-tag mt-2 md:mt-0">{boat.price}€ / jour</div>
+        </div>
+        
+        {/* Galerie d'images */}
+        <div className="boat-gallery mb-8">
+          <img 
+            src={boat.images[0]} 
+            alt={boat.name} 
+            className="boat-main-image"
+          />
+        </div>
+        
+        {/* Caractéristiques principales */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="feature-card">
+            <FontAwesomeIcon icon={faWind} className="feature-icon" />
+            <div className="feature-label">Surface de voile</div>
+            <div className="feature-value">{boat.sailArea}</div>
+          </div>
+          <div className="feature-card">
+            <FontAwesomeIcon icon={faUsers} className="feature-icon" />
+            <div className="feature-label">Capacité</div>
+            <div className="feature-value">{boat.capacity}</div>
+          </div>
+          <div className="feature-card">
+            <FontAwesomeIcon icon={faShip} className="feature-icon" />
+            <div className="feature-label">Longueur</div>
+            <div className="feature-value">{boat.length}</div>
+          </div>
+          <div className="feature-card">
+            <FontAwesomeIcon icon={faAnchor} className="feature-icon" />
+            <div className="feature-label">Année</div>
+            <div className="feature-value">{boat.year}</div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {/* Description et caractéristiques */}
+          <div className="md:col-span-2">
+            <h2 className="section-title mb-4">Description</h2>
+            <p className="text-gray-700 mb-6">{boat.longDescription}</p>
+            
+            <h2 className="section-title mb-4">Équipements</h2>
+            <div className="features-list mb-6">
+              {boat.features.map((feature, index) => (
+                <div key={index} className="feature-item">
+                  <FontAwesomeIcon icon={faCheck} className="feature-check" />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+            
+            <h2 className="section-title mb-4">Caractéristiques techniques</h2>
+            <div className="tech-specs">
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Longueur</span>
+                <span className="tech-spec-value">{boat.length}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Largeur</span>
+                <span className="tech-spec-value">{boat.beam}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Tirant d'eau</span>
+                <span className="tech-spec-value">{boat.draft}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Déplacement</span>
+                <span className="tech-spec-value">{boat.displacement}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Motorisation</span>
+                <span className="tech-spec-value">{boat.engine}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Capacité eau</span>
+                <span className="tech-spec-value">{boat.waterCapacity}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Capacité carburant</span>
+                <span className="tech-spec-value">{boat.fuelCapacity}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Cabines</span>
+                <span className="tech-spec-value">{boat.cabins}</span>
+              </div>
+              <div className="tech-spec-item">
+                <span className="tech-spec-label">Salles d'eau</span>
+                <span className="tech-spec-value">{boat.bathrooms}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Formulaire de réservation */}
+          <div>
+            <div className="booking-form">
+              <h2 className="section-title mb-4">Réserver ce voilier</h2>
+              
+              <div className="mb-4">
+                <label htmlFor="start-date" className="form-label">Date de début</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faCalendarAlt} className="input-icon" />
+                  <input 
+                    type="date" 
+                    id="start-date" 
+                    className="form-input" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="end-date" className="form-label">Date de fin</label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faCalendarAlt} className="input-icon" />
+                  <input 
+                    type="date" 
+                    id="end-date" 
+                    className="form-input" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    min={startDate || new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <div className="flex justify-between items-center py-2 border-t border-b border-gray-200">
+                  <span>Prix par jour:</span>
+                  <span className="font-semibold">{boat.price}€</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  <span>Nombre de jours:</span>
+                  <span className="font-semibold">{numberOfDays}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-200 text-lg font-bold">
+                  <span>Total:</span>
+                  <span>{totalPrice}€</span>
+                </div>
+              </div>
+              
+              <button 
+                className={`booking-button ${boat.available ? 'booking-button-available' : 'booking-button-unavailable'}`}
+                disabled={!boat.available}
+              >
+                {boat.available ? 'Réserver maintenant' : 'Non disponible'}
+              </button>
+              
+              {!boat.available && (
+                <p className="text-sm text-gray-500 text-center mt-2">
+                  Ce voilier n'est pas disponible actuellement.
+                </p>
+              )}
+            </div>
+            
+            <div className="mt-6 bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center mb-2">
+                <FontAwesomeIcon icon={faShieldAlt} className="text-blue-600 mr-2" />
+                <span className="font-semibold">Réservation sécurisée</span>
+              </div>
+              <p className="text-sm text-gray-600">Paiement sécurisé et annulation gratuite jusqu'à 30 jours avant le départ.</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Section pourquoi nous choisir */}
+        <div className="why-choose mb-12">
+          <h2 className="why-choose-title">Pourquoi louer avec SAILING.LOC ?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="benefit-card">
+              <FontAwesomeIcon icon={faLifeRing} className="benefit-icon" />
+              <h3 className="benefit-title">Assistance 24/7</h3>
+              <p className="benefit-text">Notre équipe est disponible à tout moment pour vous assister pendant votre location.</p>
+            </div>
+            <div className="benefit-card">
+              <FontAwesomeIcon icon={faCompass} className="benefit-icon" />
+              <h3 className="benefit-title">Expertise locale</h3>
+              <p className="benefit-text">Nos conseils personnalisés pour découvrir les plus beaux mouillages et criques secrètes.</p>
+            </div>
+            <div className="benefit-card">
+              <FontAwesomeIcon icon={faShip} className="benefit-icon" />
+              <h3 className="benefit-title">Flotte entretenue</h3>
+              <p className="benefit-text">Tous nos voiliers sont régulièrement entretenus et répondent aux normes de sécurité.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <footer className="site-footer">
+        <div className="footer-container">
+          <div className="footer-section">
+            <h3>À propos de SAILING.LOC</h3>
+            <p>Spécialiste de la location de bateaux depuis 2010, nous proposons une large gamme de voiliers et bateaux à moteur pour tous les budgets.</p>
+          </div>
+          <div className="footer-section">
+            <h3>Liens utiles</h3>
+            <p><Link to="/about" className="text-white hover:text-[#66C7C7]">À propos</Link></p>
+            <p><Link to="/contact" className="text-white hover:text-[#66C7C7]">Contact</Link></p>
+            <p><Link to="/terms" className="text-white hover:text-[#66C7C7]">Conditions générales</Link></p>
+            <p><Link to="/privacy" className="text-white hover:text-[#66C7C7]">Politique de confidentialité</Link></p>
+          </div>
+          <div className="footer-section">
+            <h3>Suivez-nous</h3>
+            <div className="social-icons">
+              <a href="#" className="social-icon"><img src={facebookIcon} alt="Facebook" /></a>
+              <a href="#" className="social-icon"><img src={instaIcon} alt="Instagram" /></a>
+              <a href="#" className="social-icon"><img src={tiktokIcon} alt="TikTok" /></a>
+            </div>
+            <h3 className="mt-4">Paiements sécurisés</h3>
+            <div className="payment-icons">
+              <span className="payment-icon"><img src={visaIcon} alt="Visa" /></span>
+              <span className="payment-icon"><img src={mastercardIcon} alt="Mastercard" /></span>
+              <span className="payment-icon"><img src={applepayIcon} alt="Apple Pay" /></span>
+            </div>
+          </div>
+        </div>
+        <div className="copyright">
+          <p>&copy; 2025 SAILING.LOC - Tous droits réservés</p>
+        </div>
+      </footer>
+      
+      {/* Bouton de scroll vers le haut */}
+      {showScrollTop && (
+        <button 
+          className="scroll-top-btn"
+          onClick={scrollToTop}
+          aria-label="Retour en haut"
+        >
+          <FontAwesomeIcon icon={faChevronUp} />
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default SailingBoatDetail;
