@@ -355,7 +355,7 @@ const SailingBoatDetail = () => {
   };
 
   return (
-    <div className="sailing-boat-detail-container">
+    <>
       {/* Utilisation de l'en-tête personnalisé */}
       <CustomHeader />
       
@@ -559,40 +559,6 @@ const SailingBoatDetail = () => {
         </div>
       </div>
       
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="footer-container">
-          <div className="footer-section">
-            <h3>À propos de SAILING.LOC</h3>
-            <p>Spécialiste de la location de bateaux depuis 2010, nous proposons une large gamme de voiliers et bateaux à moteur pour tous les budgets.</p>
-          </div>
-          <div className="footer-section">
-            <h3>Liens utiles</h3>
-            <p><Link to="/about" className="text-white hover:text-[#66C7C7]">À propos</Link></p>
-            <p><Link to="/contact" className="text-white hover:text-[#66C7C7]">Contact</Link></p>
-            <p><Link to="/terms" className="text-white hover:text-[#66C7C7]">Conditions générales</Link></p>
-            <p><Link to="/privacy" className="text-white hover:text-[#66C7C7]">Politique de confidentialité</Link></p>
-          </div>
-          <div className="footer-section">
-            <h3>Suivez-nous</h3>
-            <div className="social-icons">
-              <a href="#" className="social-icon"><img src={facebookIcon} alt="Facebook" /></a>
-              <a href="#" className="social-icon"><img src={instaIcon} alt="Instagram" /></a>
-              <a href="#" className="social-icon"><img src={tiktokIcon} alt="TikTok" /></a>
-            </div>
-            <h3 className="mt-4">Paiements sécurisés</h3>
-            <div className="payment-icons">
-              <span className="payment-icon"><img src={visaIcon} alt="Visa" /></span>
-              <span className="payment-icon"><img src={mastercardIcon} alt="Mastercard" /></span>
-              <span className="payment-icon"><img src={applepayIcon} alt="Apple Pay" /></span>
-            </div>
-          </div>
-        </div>
-        <div className="copyright">
-          <p>&copy; 2025 SAILING.LOC - Tous droits réservés</p>
-        </div>
-      </footer>
-      
       {/* Bouton de scroll vers le haut */}
       {showScrollTop && (
         <button 
@@ -603,7 +569,7 @@ const SailingBoatDetail = () => {
           <FontAwesomeIcon icon={faChevronUp} />
         </button>
       )}
-    </div>
+    </>
   );
 };
 

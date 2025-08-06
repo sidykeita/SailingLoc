@@ -22,5 +22,5 @@
 /* Styles pour le contenu principal */
 .main-content {
   flex: 1;
-  padding: 1rem;
+  padding: 0; /* Suppression de tous les paddings */
 }

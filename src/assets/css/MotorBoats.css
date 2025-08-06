@@ -17,7 +17,12 @@
 
 /* Style pour app-container avec padding-top */
 .app-container {
-  padding-top: 100px;
+  /* padding-top supprimé pour éviter la marge grise en haut */
+}
+
+/* Style pour le conteneur principal de la page */
+.motor-boats-container {
+  /* Fond supprimé */
 }
 
 /* Style pour le conteneur de contenu avec marge pour le header fixe */

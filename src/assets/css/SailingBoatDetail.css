@@ -2,8 +2,9 @@
 
 /* Style général de la page */
 .sailing-boat-detail-container {
-  background-color: #f9fafb;
+  background-color: #f5f5f5 !important; /* Fond gris clair avec priorité */
   min-height: 100vh;
+  padding-top: 60px !important; /* Ajout d'un padding-top avec priorité */
 }
 
 /* Style pour le conteneur de contenu avec marge pour le header fixe */

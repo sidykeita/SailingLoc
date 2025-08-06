@@ -14,7 +14,7 @@ import {
   faCompass,
   faWind
 } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../Layout';
+// Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/SailingBoats.css'; // Import du fichier CSS depuis le nouveau chemin
 
 // Importation des nouvelles images des voiliers
@@ -153,9 +153,9 @@ const SailingBoats = () => {
   });
 
   return (
-    <Layout>
+    <>
       <div className="sailing-boats-page">
-        <div className="container mx-auto px-4 py-8 content-container">
+        <div className="page-content container mx-auto px-4 py-8 content-container">
           <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de voiliers</h1>
           <p className="text-[#333333] mb-8">Découvrez notre flotte de voiliers disponibles à la location pour des aventures inoubliables</p>
           <div className="filters-section">
@@ -322,7 +322,7 @@ const SailingBoats = () => {
           </button>
         )}
       </div>
-    </Layout>
+    </>
   );
 };
 

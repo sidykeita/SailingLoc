@@ -16,7 +16,7 @@ import {
   faUtensils,
   faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../Layout';
+// Layout est maintenant géré au niveau des routes dans App.jsx
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/BoatDetail.css';
 
@@ -300,8 +300,8 @@ const BoatDetail = () => {
   }
 
   return (
-    <Layout>
-      <div className="boat-detail-container">
+    <>
+      <div className="boat-detail-page">
         <div className="container mx-auto px-4 py-8 content-container">
       {/* Bouton retour */}
       <div className="mb-6">
@@ -525,7 +525,7 @@ const BoatDetail = () => {
       )}
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

@@ -39,6 +39,10 @@ import Home from './pages/home/Home';
 import LegalNotices from './pages/legal/LegalNotices';
 import CGUCGV from './pages/legal/CGUCGV';
 
+// Pages à propos
+import About from './pages/about/About';
+import Reviews from './pages/about/Reviews';
+
 // Pages d'aide
 import Help from './pages/help/Help';
 import BoatRental from './pages/help/BoatRental';
@@ -95,6 +99,10 @@ function App() {
           
           {/* Page de contact - avec Layout */}
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          
+          {/* Pages à propos - avec Layout */}
+          <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/about/reviews" element={<Layout><Reviews /></Layout>} />
           
           {/* Routes des destinations - avec Layout */}
           <Route path="/destinations" element={<Layout><Destinations /></Layout>} />
