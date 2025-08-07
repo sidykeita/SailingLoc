@@ -6,9 +6,6 @@ import {
   faWater, 
   faShip, 
   faUsers, 
-  faArrowLeft,
-  faBars,
-  faTimes,
   faChevronUp,
   faWind,
   faCompass,
@@ -29,15 +26,7 @@ import voilier3 from '../../assets/images/voilier3.jpeg';
 import voilier4 from '../../assets/images/voilier4.jpeg';
 import voilier5 from '../../assets/images/voilier5.jpeg';
 import voilier6 from '../../assets/images/voilier6.jpeg';
-import logoBlc from '../../assets/images/logo-blc.png';
-
-// Images pour le footer
-import facebookIcon from '../../assets/images/picto-facebook.png';
-import instaIcon from '../../assets/images/picto-insta.png';
-import tiktokIcon from '../../assets/images/picto-tiktok.png';
-import mastercardIcon from '../../assets/images/mastercard.png';
-import visaIcon from '../../assets/images/visa.png';
-import applepayIcon from '../../assets/images/applepay.png';
+// Images pour le footer - Supprimées car maintenant gérées par le composant Layout
 
 // Images supplémentaires pour la galerie (utilisation d'images existantes)
 import voilier1Detail1 from '../../assets/images/AdobeStock_177675231.jpeg';

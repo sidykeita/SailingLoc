@@ -16,15 +16,9 @@
   padding-top: 100px !important; /* Ajouté pour éviter le chevauchement du menu */
 }
 
-/* Style pour app-container avec padding-top */
-.app-container {
-  /* padding-top supprimé pour éviter la marge grise en haut */
-}
+/* Styles pour les boutons et interactions */
 
-/* Style pour le conteneur principal de la page */
-.motor-boats-container {
-  /* Fond supprimé */
-}
+/* Style pour les éléments de navigation */
 
 /* Style pour le conteneur de contenu avec marge pour le header fixe */
 .content-container {

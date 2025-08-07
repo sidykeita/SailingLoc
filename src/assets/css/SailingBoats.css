@@ -15,9 +15,9 @@
   min-height: 100vh;
 }
 
-/* Style pour app-container avec padding-top */
-.app-container {
-  /* padding-top supprimé pour éviter la marge grise en haut */
+/* Style pour le conteneur principal avec padding-top */
+.sailing-boats-container {
+  padding-top: 100px !important; /* Ajouté pour éviter le chevauchement du menu */
 }
 
 /* Style pour le conteneur principal de la page */

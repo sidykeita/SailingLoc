@@ -12,79 +12,11 @@
   margin-top: 6rem; /* Espace pour le header fixe */
 }
 
-/* Style pour le header */
-.sailing-boat-detail-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background-color: #274991; /* Bleu foncé de la charte */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+/* Styles pour les éléments de navigation - Supprimés car gérés par le composant Layout */
 
-/* Style pour le bouton hamburger */
-.hamburger-button {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
+/* Styles pour la navigation et le logo - Supprimés car gérés par le composant Layout */
 
-/* Style pour la navigation */
-.main-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.main-nav li {
-  margin-left: 1.5rem;
-}
-
-.nav-link {
-  color: white;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #66C7C7; /* Bleu-vert clair de la charte */
-}
-
-/* Media query pour afficher le bouton hamburger sur mobile */
-@media (max-width: 768px) {
-  .hamburger-button {
-    display: block;
-  }
-  
-  .main-nav {
-    display: none;
-  }
-  
-  .main-nav.open {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #274991;
-    padding: 1rem;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .main-nav.open ul {
-    flex-direction: column;
-  }
-  
-  .main-nav.open li {
-    margin: 0.5rem 0;
-  }
-}
+/* Styles pour le responsive - Supprimés car gérés par le composant Layout */
 
 /* Style pour le bouton de retour */
 .back-button {
