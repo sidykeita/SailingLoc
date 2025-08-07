@@ -11,8 +11,9 @@
 
 /* Style pour le conteneur principal */
 .motor-boats-container {
-  background-color: #f9fafb;
+  background-color: #f0f2f5; /* Gris légèrement plus foncé */
   min-height: 100vh;
+  padding-top: 100px !important; /* Ajouté pour éviter le chevauchement du menu */
 }
 
 /* Style pour app-container avec padding-top */

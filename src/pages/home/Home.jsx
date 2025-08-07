@@ -13,6 +13,9 @@ import moteurImg from '../../assets/images/moteur.jpg';
 import moteur1Img from '../../assets/images/moteur1.jpeg';
 import moteur2Img from '../../assets/images/moteur2.jpeg';
 import moteur3Img from '../../assets/images/moteur3.jpeg';
+import moteur4Img from '../../assets/images/moteur4.jpeg';
+import moteur5Img from '../../assets/images/moteur5.jpeg';
+import moteur6Img from '../../assets/images/moteur6.jpeg';
 import marseilleImage from '../../assets/images/destinations/marseille.jpeg';
 import portoCristoImage from '../../assets/images/destinations/porto-cristo.jpeg';
 import bastiaImage from '../../assets/images/destinations/bastia.jpeg';
@@ -201,62 +204,68 @@ const Home = () => {
           <div className="section-container">
             <h2 className="section-title">Les coup de coeur de la communauté</h2>
             <div className="boat-cards">
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur1Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>Marseille</h3>
-                    <div className="boat-rating">★★★★★ (4.82)</div>
+              <Link to="/boats/1" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur4Img} alt="Speedster 250" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">JEANNEAU 795 • 7,95m • 8 pers • 75CV</p>
-                  <p className="boat-owner">Proposé par <span>Yoann F.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">149 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>La Rochelle</h3>
+                      <div className="boat-rating">★★★★★ (4.82)</div>
+                    </div>
+                    <p className="boat-description">Speedster 250 • 7,5m • 6 pers • 250CV</p>
+                    <p className="boat-owner">Proposé par <span>Thomas M.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">350 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
               
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur2Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>La Rochelle</h3>
-                    <div className="boat-rating">★★★★★ (4.89)</div>
+              <Link to="/boats/2" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur5Img} alt="Cruiser 180" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">BAYLINER 742R • 7,42m • 8 pers • 300CV</p>
-                  <p className="boat-owner">Proposé par <span>Philippe B.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">249 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>Marseille</h3>
+                      <div className="boat-rating">★★★★★ (4.89)</div>
+                    </div>
+                    <p className="boat-description">Cruiser 180 • 8,2m • 8 pers • 180CV</p>
+                    <p className="boat-owner">Proposé par <span>Sophie D.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">450 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
               
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur1Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>Le Croisic</h3>
-                    <div className="boat-rating">★★★★★ (4.95)</div>
+              <Link to="/boats/3" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur6Img} alt="Fisherman Pro" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">QUICKSILVER 675 • 6,75m • 8 pers • 175CV</p>
-                  <p className="boat-owner">Proposé par <span>Marine L.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">199 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>Le Croisic</h3>
+                      <div className="boat-rating">★★★★★ (4.95)</div>
+                    </div>
+                    <p className="boat-description">Fisherman Pro • 6,5m • 4 pers • 150CV</p>
+                    <p className="boat-owner">Proposé par <span>Pierre L.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">280 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </section>

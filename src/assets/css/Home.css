@@ -469,9 +469,16 @@ p, div, span, a, button, input, select, textarea {
   width: 100%;
 }
 
+.boat-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer; /* Ajout de la propriété cursor pour rendre les cartes cliquables */
+}
+
 .boat-card {
   background-color: #fff;
-  border-radius: 0 !important;
+  border-radius: 10px !important;
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
@@ -480,7 +487,7 @@ p, div, span, a, button, input, select, textarea {
 
 /* Règle supplémentaire pour forcer le style */
 .boat-cards .boat-card {
-  border-radius: 0 !important;
+  border-radius: 10px !important;
 }
 
 .boat-card:hover {
@@ -599,6 +606,9 @@ p, div, span, a, button, input, select, textarea {
   display: flex;
   flex-direction: column;
   margin-top: 5px;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 10px;
 }
 
 .price-label {

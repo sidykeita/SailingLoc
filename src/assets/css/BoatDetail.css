@@ -2,8 +2,9 @@
 
 /* Style général de la page */
 .boat-detail-container {
-  background-color: #f9fafb;
+  background-color: #f0f2f5; /* Gris légèrement plus foncé */
   min-height: 100vh;
+  padding-top: 100px !important; /* Ajout d'un padding-top pour éviter le chevauchement avec le menu */
 }
 
 /* Style pour le conteneur de contenu avec marge pour le header fixe */

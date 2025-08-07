@@ -312,54 +312,12 @@ const SailingBoatDetail = () => {
     });
   };
 
-  // Fonction pour afficher un en-tête personnalisé sans modifier les autres pages
-  const CustomHeader = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    
-    const toggleMenu = () => {
-      setMenuOpen(!menuOpen);
-    };
-    
-    return (
-      <header className="sailing-boat-detail-header">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="logo">
-            <Link to="/">
-              <img src={logoBlc} alt="SAILING.LOC" className="h-10" />
-            </Link>
-          </div>
-          
-          {/* Bouton hamburger pour mobile */}
-          <button 
-            className="hamburger-button" 
-            onClick={toggleMenu}
-            aria-label="Menu principal"
-          >
-            <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
-          </button>
-          
-          {/* Navigation */}
-          <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
-            <ul>
-              <li><Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
-              <li><Link to="/boats/motor" className="nav-link" onClick={() => setMenuOpen(false)}>Bateaux à moteur</Link></li>
-              <li><Link to="/boats/sailing" className="nav-link" onClick={() => setMenuOpen(false)}>Voiliers</Link></li>
-              <li><Link to="/about" className="nav-link" onClick={() => setMenuOpen(false)}>À propos</Link></li>
-              <li><Link to="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>Contact</Link></li>
-              <li><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}><FontAwesomeIcon icon={faUser} /></Link></li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-    );
-  };
+  // Le header est maintenant géré par le composant Layout dans App.jsx
 
   return (
     <>
-      {/* Utilisation de l'en-tête personnalisé */}
-      <CustomHeader />
-      
-      <div className="container mx-auto px-4 py-8 content-container">
+      <div className="sailing-boat-detail-container">
+        <div className="container mx-auto px-4 py-8 content-container">
         {/* Bouton de retour */}
         <Link to="/boats/sailing" className="back-button mb-6 inline-flex items-center">
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
@@ -569,6 +527,7 @@ const SailingBoatDetail = () => {
           <FontAwesomeIcon icon={faChevronUp} />
         </button>
       )}
+    </div>
     </>
   );
 };

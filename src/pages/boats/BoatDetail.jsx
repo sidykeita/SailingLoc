@@ -301,7 +301,7 @@ const BoatDetail = () => {
 
   return (
     <>
-      <div className="boat-detail-page">
+      <div className="boat-detail-page boat-detail-container">
         <div className="container mx-auto px-4 py-8 content-container">
       {/* Bouton retour */}
       <div className="mb-6">

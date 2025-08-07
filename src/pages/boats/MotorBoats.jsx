@@ -154,7 +154,7 @@ const MotorBoats = () => {
 
   return (
     <>
-      <div className="motor-boats-page">
+      <div className="motor-boats-page motor-boats-container">
         <div className="page-content container mx-auto px-4 py-8 content-container">
           <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de bateaux à moteur</h1>
           <p className="text-[#333333] mb-8">Découvrez notre flotte de bateaux à moteur disponibles à la location</p>
