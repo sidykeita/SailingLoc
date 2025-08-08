@@ -3,7 +3,11 @@ const Boat = require('../models/boat');
 // Créer un bateau
 exports.createBoat = async (req, res) => {
   try {
-    const boat = await Boat.create(req.body);
+    // DEBUG : log req.user pour comprendre le contexte d'auth
+    console.log('DEBUG req.user:', req.user);
+    // Injection automatique de l'owner à partir du token utilisateur
+    const boatData = { ...req.body, owner: req.user && req.user._id };
+    const boat = await Boat.create(boatData);
     res.status(201).json(boat);
   } catch (err) {
     res.status(400).json({ message: err.message });

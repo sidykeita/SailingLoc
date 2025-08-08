@@ -3,6 +3,8 @@ import { useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BackgroundImage from './components/BackgroundImage';
 import Layout from './Layout';
+import TestUpload from "./TestUpload";
+
 
 // Pages d'authentification
 import Login from './pages/auth/Login';
@@ -21,6 +23,9 @@ import MotorBoats from './pages/boats/MotorBoats';
 import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
 import SailingBoatDetail from './pages/boats/SailingBoatDetail';
+import AddBoat from './pages/boats/AddBoat';
+import MesBateaux from './pages/boats/MesBateaux';
+import EditBoat from './pages/boats/EditBoat';
 
 // Pages des destinations
 import Marseille from './pages/destinations/Marseille';
@@ -70,11 +75,18 @@ function App() {
       <BackgroundImage />
       <main>
         <Routes>
+        <Route path="/test-upload" element={<TestUpload />} />
+
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />  {/* Home contient déjà Layout */}
           <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes des bateaux - avec Layout */}
+          <Route path="/boats" element={
+            <ProtectedRoute userRole="owner">
+              <Layout><MesBateaux /></Layout>
+            </ProtectedRoute>
+          } />
           <Route path="/boats/motor" element={<Layout><MotorBoats /></Layout>} />
           <Route path="/boats/sailing" element={<Layout><SailingBoats /></Layout>} />
           <Route path="/boats/sailing/:id" element={<Layout><SailingBoatDetail /></Layout>} />
@@ -115,7 +127,10 @@ function App() {
           {/* Routes protégées pour les locataires */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <SimpleDashboard />
+              {(userRole === 'owner' || userRole === 'propriétaire' || userRole === 'proprietaire')
+                ? <Navigate to="/owner/dashboard" />
+                : <SimpleDashboard />
+              }
             </ProtectedRoute>
           } />
           
@@ -123,6 +138,17 @@ function App() {
           <Route path="/owner/dashboard" element={
             <ProtectedRoute userRole="owner">
               <OwnerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/add-boat" element={
+            <ProtectedRoute userRole="owner">
+              <AddBoat />
+            </ProtectedRoute>
+          } />
+          {/* Route d'édition de bateau (propriétaire) */}
+          <Route path="/edit-boat/:id" element={
+            <ProtectedRoute userRole="owner">
+              <EditBoat />
             </ProtectedRoute>
           } />
           

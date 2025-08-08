@@ -16,7 +16,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
   
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
   
   // Vérifier la connexion réseau au chargement
@@ -81,12 +81,20 @@ const Register = () => {
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
-      
-      // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
-      if (user.role === 'propriétaire') {
-        navigate('/owner/dashboard');
-      } else {
-        navigate('/dashboard');
+
+      // Connexion automatique après inscription
+      try {
+        const loginResult = await login(email, password);
+        console.log('Résultat login auto après inscription:', loginResult);
+        // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
+        if (user.role === 'propriétaire') {
+          navigate('/owner/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (e) {
+        setError("Inscription réussie, mais connexion impossible. Merci de réessayer.");
+        console.error('Erreur lors du login auto après inscription:', e);
       }
     } catch (err) {
       console.error('Erreur d\'inscription:', err);

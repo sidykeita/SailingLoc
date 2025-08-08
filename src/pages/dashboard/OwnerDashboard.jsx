@@ -94,7 +94,11 @@ const OwnerDashboard = () => {
           </div>
           
           <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || 'Propriétaire'}</span>
+            <span className="text-dark mr-4">
+              Bonjour, {currentUser
+                ? currentUser.name || [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ')
+                : 'Propriétaire'}
+            </span>
             <button 
               onClick={handleLogout}
               className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
@@ -116,7 +120,11 @@ const OwnerDashboard = () => {
             <div className="flex flex-col space-y-4">
               <div>
                 <p className="text-gray-500 text-sm">Nom</p>
-                <p className="font-medium">{currentUser?.name || 'Non défini'}</p>
+                <p className="font-medium">
+                  {currentUser
+                    ? currentUser.name || [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ')
+                    : 'Non défini'}
+                </p>
               </div>
               <div>
                 <p className="text-gray-500 text-sm">Email</p>

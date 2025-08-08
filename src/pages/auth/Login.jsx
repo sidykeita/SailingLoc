@@ -57,10 +57,10 @@ const Login = () => {
       
       // Appel de la fonction login du contexte d'authentification
       const user = await login(email, password);
-      navigate('/dashboard');
-      
+console.log('Utilisateur connecté:', user);
+
       // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
-      if (user.role === 'owner') {
+      if (user.role === 'owner' || user.role === 'propriétaire' || user.role === 'proprietaire') {
         navigate('/owner/dashboard');
       } else {
         navigate('/dashboard');

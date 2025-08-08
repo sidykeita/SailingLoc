@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 // Import du vrai service d'authentification
 import authService from '../services/auth.service';
+// import mockAuthService from '../services/mockAuth.service'; // <-- S'assurer que ceci est bien commenté
 
 // Création du contexte d'authentification
 const AuthContext = createContext();

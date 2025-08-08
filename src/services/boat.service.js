@@ -24,7 +24,7 @@ class BoatService {
   // Obtenir les bateaux d'un propriétaire
   async getMyBoats() {
     try {
-      const response = await apiClient.get('/boats/user/my-boats');
+      const response = await apiClient.get('/boats/my-boats');
       return response.data;
     } catch (error) {
       throw this.handleError(error);

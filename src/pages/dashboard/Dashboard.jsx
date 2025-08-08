@@ -62,10 +62,10 @@ const Dashboard = () => {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex flex-col items-center">
               <div className="w-28 h-28 rounded-full bg-teal-800 flex items-center justify-center text-white text-5xl font-light mb-4">
-                {currentUser ? `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}`.toUpperCase() : ''}
+                Ce
               </div>
               <button className="text-teal-400 text-sm mb-2">+ Ajouter une photo</button>
-              <h2 className="text-2xl font-medium text-gray-800 mb-1">{currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : ''}</h2>
+              <h2 className="text-2xl font-medium text-gray-800 mb-1">celine</h2>
               <p className="text-gray-500 text-sm mb-4">Membre depuis 2025</p>
               
               <div className="w-full mb-2">
