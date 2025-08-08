@@ -54,10 +54,11 @@ p, div, span, a, button, input, select, textarea {
   background-color: var(--secondary-blue);
   padding: 30px;
   border-radius: 10px;
-  width: 400px; /* Réduction de la largeur */
+  width: 400px; /* Largeur par défaut */
   color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   margin-top: 80px;
+  max-width: 90%; /* Empêche le débordement sur petits écrans */
 }
 
 .home-page .hero-section .search-container h1 {
@@ -110,6 +111,7 @@ p, div, span, a, button, input, select, textarea {
   border-radius: 5px;
   font-size: 14px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  color: #666; /* Ajout de la couleur grise pour le texte */
 }
 
 .search-input:focus, .search-select:focus {
@@ -134,6 +136,44 @@ p, div, span, a, button, input, select, textarea {
 
 .search-button:hover {
   background-color: #e64a26;
+}
+
+/* Styles minimaux pour les résultats de recherche - préservant le design original */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  margin-top: 5px;
+}
+
+.search-result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  color: #666; /* Ajout de la couleur grise pour le texte */
+}
+
+.search-result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .boat-type-btn {
@@ -333,6 +373,8 @@ p, div, span, a, button, input, select, textarea {
   padding: 10px 15px;
   font-weight: 600;
   font-size: 18px;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .view-all-destinations {
@@ -383,6 +425,30 @@ p, div, span, a, button, input, select, textarea {
   color: white;
 }
 
+/* Styles pour les témoignages étendus */
+.extended-content {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.read-more {
+  display: inline-block;
+  color: #1e3a8a;
+  font-weight: 500;
+  margin-top: 10px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.read-more:hover {
+  color: #ff6b35;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .section-title {
   font-size: 28px;
   color: #1e3a8a;
@@ -403,9 +469,16 @@ p, div, span, a, button, input, select, textarea {
   width: 100%;
 }
 
+.boat-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer; /* Ajout de la propriété cursor pour rendre les cartes cliquables */
+}
+
 .boat-card {
   background-color: #fff;
-  border-radius: 0 !important;
+  border-radius: 10px !important;
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
@@ -414,7 +487,7 @@ p, div, span, a, button, input, select, textarea {
 
 /* Règle supplémentaire pour forcer le style */
 .boat-cards .boat-card {
-  border-radius: 0 !important;
+  border-radius: 10px !important;
 }
 
 .boat-card:hover {
@@ -533,6 +606,9 @@ p, div, span, a, button, input, select, textarea {
   display: flex;
   flex-direction: column;
   margin-top: 5px;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 10px;
 }
 
 .price-label {
@@ -744,6 +820,37 @@ p, div, span, a, button, input, select, textarea {
   color: #ffcc00;
 }
 
+/* Responsive adjustments pour search-container */
+@media (max-width: 768px) {
+  .home-page .hero-section .search-container {
+    width: 90%;
+    padding: 20px;
+    margin-top: 40px;
+  }
+  
+  .home-page .hero-section .search-container h1 {
+    font-size: 20px;
+  }
+  
+  .home-page .hero-section .search-container p {
+    font-size: 12px;
+  }
+  
+  .search-box {
+    flex-direction: column;
+  }
+  
+  .search-input-group {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .search-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   /* Tablette */
@@ -752,18 +859,24 @@ p, div, span, a, button, input, select, textarea {
     justify-content: center;
   }
   
+  .destination-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 30px;
+  }
+  
   .destination-card {
-    width: 45%;
+    width: 100%;
     margin-bottom: 20px;
   }
   
-  .testimonials-container {
-    flex-wrap: wrap;
-    justify-content: center;
+  .testimonial-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 30px;
   }
   
   .testimonial-card {
-    flex-basis: 45%;
     margin-bottom: 20px;
   }
   
@@ -800,6 +913,37 @@ p, div, span, a, button, input, select, textarea {
   
   .boat-cards {
     grid-template-columns: 1fr;
+  }
+  
+  /* Destinations responsive pour mobile */
+  .destination-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+  }
+  
+  .destination-card {
+    height: 200px;
+  }
+  
+  .destination-title {
+    font-size: 1.2rem;
+  }
+  
+  /* Testimonials responsive pour mobile */
+  .testimonial-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+  }
+  
+  .testimonial-card {
+    margin-bottom: 15px;
+  }
+  
+  .cursive-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
   }
   
   /* Mobile */

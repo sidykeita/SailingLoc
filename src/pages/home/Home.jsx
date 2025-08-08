@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMapMarkerAlt, faCalendarAlt, faChevronRight, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMapMarkerAlt, faCalendarAlt, faChevronRight, faHeart, faTimes } from '@fortawesome/free-solid-svg-icons';
+import portService from '../../services/port.service';
 import Layout from '../../Layout';
 import '../../assets/css/Home.css';
 
@@ -12,17 +13,28 @@ import moteurImg from '../../assets/images/moteur.jpg';
 import moteur1Img from '../../assets/images/moteur1.jpeg';
 import moteur2Img from '../../assets/images/moteur2.jpeg';
 import moteur3Img from '../../assets/images/moteur3.jpeg';
+import moteur4Img from '../../assets/images/moteur4.jpeg';
+import moteur5Img from '../../assets/images/moteur5.jpeg';
+import moteur6Img from '../../assets/images/moteur6.jpeg';
 import marseilleImage from '../../assets/images/destinations/marseille.jpeg';
 import portoCristoImage from '../../assets/images/destinations/porto-cristo.jpeg';
 import bastiaImage from '../../assets/images/destinations/bastia.jpeg';
 
 // Images de profil
-import profileImg1 from '../../assets/images/profil.jpg';
-import profileImg2 from '../../assets/images/profil.jpg';
-import profileImg3 from '../../assets/images/profil.jpg';
+import profileImg1 from '../../assets/images/jean.jpg';
+import profileImg2 from '../../assets/images/fanny.jpg';
+import profileImg3 from '../../assets/images/mathieu.jpg';
 
 const Home = () => {
   const [selectedBoatType, setSelectedBoatType] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [selectedPort, setSelectedPort] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [expandedTestimonials, setExpandedTestimonials] = useState([false, false, false]);
+  const searchRef = useRef(null);
+  const navigate = useNavigate();
   
   const scrollToContent = () => {
     const contentSection = document.querySelector('.community-favorites');
@@ -31,6 +43,67 @@ const Home = () => {
     }
   };
   
+  // Recherche de ports en fonction de la requête
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      const results = portService.searchPorts(searchQuery);
+      setSearchResults(results);
+      setShowResults(results.length > 0);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  }, [searchQuery]);
+
+  // Gestion du clic en dehors des résultats de recherche
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Gestion de la sélection d'un port
+  const handleSelectPort = (port) => {
+    setSelectedPort(port);
+    setSearchQuery(port.name);
+    setShowResults(false);
+  };
+
+  // Effacer la recherche
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedPort(null);
+    setSearchResults([]);
+    setShowResults(false);
+  };
+
+  // Gestion de la soumission du formulaire de recherche
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (selectedPort) {
+      // Redirection vers la page des bateaux avec les paramètres de recherche
+      navigate(`/boats?location=${selectedPort.id}&date=${selectedDate}`);
+    } else if (searchQuery.trim()) {
+      // Si aucun port n'est sélectionné mais qu'il y a une requête, utiliser la requête
+      navigate(`/boats?query=${encodeURIComponent(searchQuery)}&date=${selectedDate}`);
+    }
+  };
+  
+  // Gestion du clic sur "Lire la suite" des témoignages
+  const toggleTestimonial = (index, e) => {
+    e.preventDefault();
+    const newExpandedState = [...expandedTestimonials];
+    newExpandedState[index] = !newExpandedState[index];
+    setExpandedTestimonials(newExpandedState);
+  };
+
   // Ajout d'un log pour vérifier si le composant est rendu
   console.log('Composant Home rendu');
 
@@ -44,15 +117,63 @@ const Home = () => {
               <p>Comparez les offres pour votre bateau en un clic et réservez en ligne des voiliers et bateaux à moteur</p>
               
               <div className="search-box">
-                <div className="search-input-group location-group">
+                <div className="search-input-group location-group" ref={searchRef}>
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="search-icon" />
-                  <input type="text" placeholder="Où souhaitez-vous louer un bateau ?" className="search-input" />
+                  <input 
+                    type="text" 
+                    placeholder="Où souhaitez-vous louer un bateau ?" 
+                    className="search-input" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => {
+                      if (searchResults.length > 0) {
+                        setShowResults(true);
+                      }
+                    }}
+                  />
+                  {searchQuery && (
+                    <button 
+                      type="button" 
+                      className="clear-search-btn" 
+                      onClick={clearSearch}
+                    >
+                      <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                  )}
+                  
+                  {showResults && searchResults.length > 0 && (
+                    <div className="search-results">
+                      {searchResults.map((port) => (
+                        <div 
+                          key={port.id} 
+                          className="search-result-item"
+                          onClick={() => handleSelectPort(port)}
+                        >
+                          {port.name} - {port.country}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="search-input-group date-group">
                   <FontAwesomeIcon icon={faCalendarAlt} className="search-icon" />
-                  <input type="text" placeholder="Choisissez vos dates" className="search-input" />
+                  <input 
+                    type="date" 
+                    placeholder="Choisissez vos dates" 
+                    className="search-input" 
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  />
                 </div>
+                
+                <button 
+                  className="search-button" 
+                  onClick={handleSearch}
+                >
+                  <FontAwesomeIcon icon={faSearch} className="search-button-icon" />
+                  Rechercher
+                </button>
               </div>
               
               <div className="boat-type-selector">
@@ -83,62 +204,68 @@ const Home = () => {
           <div className="section-container">
             <h2 className="section-title">Les coup de coeur de la communauté</h2>
             <div className="boat-cards">
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur1Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>Marseille</h3>
-                    <div className="boat-rating">★★★★★ (4.82)</div>
+              <Link to="/boats/1" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur4Img} alt="Speedster 250" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">JEANNEAU 795 • 7,95m • 8 pers • 75CV</p>
-                  <p className="boat-owner">Proposé par <span>Yoann F.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">149 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>La Rochelle</h3>
+                      <div className="boat-rating">★★★★★ (4.82)</div>
+                    </div>
+                    <p className="boat-description">Speedster 250 • 7,5m • 6 pers • 250CV</p>
+                    <p className="boat-owner">Proposé par <span>Thomas M.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">350 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
               
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur2Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>La Rochelle</h3>
-                    <div className="boat-rating">★★★★★ (4.89)</div>
+              <Link to="/boats/2" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur5Img} alt="Cruiser 180" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">BAYLINER 742R • 7,42m • 8 pers • 300CV</p>
-                  <p className="boat-owner">Proposé par <span>Philippe B.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">249 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>Marseille</h3>
+                      <div className="boat-rating">★★★★★ (4.89)</div>
+                    </div>
+                    <p className="boat-description">Cruiser 180 • 8,2m • 8 pers • 180CV</p>
+                    <p className="boat-owner">Proposé par <span>Sophie D.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">450 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
               
-              <div className="boat-card">
-                <div className="boat-card-header">
-                  <img src={moteur1Img} alt="Bateau à moteur" className="boat-image" />
-                  <button className="favorite-btn"><FontAwesomeIcon icon={faHeart} /></button>
-                </div>
-                <div className="boat-info">
-                  <div className="boat-header">
-                    <h3>Le Croisic</h3>
-                    <div className="boat-rating">★★★★★ (4.95)</div>
+              <Link to="/boats/3" className="boat-card-link">
+                <div className="boat-card">
+                  <div className="boat-card-header">
+                    <img src={moteur6Img} alt="Fisherman Pro" className="boat-image" />
+                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                   </div>
-                  <p className="boat-description">QUICKSILVER 675 • 6,75m • 8 pers • 175CV</p>
-                  <p className="boat-owner">Proposé par <span>Marine L.</span></p>
-                  <div className="boat-price">
-                    <span className="price-label">à partir de</span>
-                    <div className="price-value">199 € / jour</div>
+                  <div className="boat-info">
+                    <div className="boat-header">
+                      <h3>Le Croisic</h3>
+                      <div className="boat-rating">★★★★★ (4.95)</div>
+                    </div>
+                    <p className="boat-description">Fisherman Pro • 6,5m • 4 pers • 150CV</p>
+                    <p className="boat-owner">Proposé par <span>Pierre L.</span></p>
+                    <div className="boat-price">
+                      <span className="price-label">à partir de</span>
+                      <div className="price-value">280 € / jour</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </section>
@@ -203,8 +330,18 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="testimonial-content">
-                  <p>Excellente expérience avec ce voilier ! Le propriétaire était très accueillant et nous a donné de bons conseils pour notre itinéraire. Le bateau était impeccable et très confortable. Je recommande vivement !</p>
-                  <a href="#" className="read-more">Lire la suite</a>
+                  <p>
+                    Excellente expérience avec ce voilier ! Le propriétaire était très accueillant et nous a donné de bons conseils pour notre itinéraire. Le bateau était impeccable et très confortable. Je recommande vivement !
+                    {expandedTestimonials[0] && (
+                      <span className="extended-content">
+                        <br /><br />
+                        Nous avons navigué pendant une semaine le long de la côte méditerranéenne et c'était magique. Le voilier est parfaitement équipé avec tout le nécessaire pour cuisiner et se détendre. La navigation était fluide et le bateau très stable même avec un peu de vent. Le propriétaire nous a même suggéré quelques criques secrètes où nous avons pu jeter l'ancre loin de la foule. Une expérience à refaire sans hésiter !
+                      </span>
+                    )}
+                  </p>
+                  <a href="#" className="read-more" onClick={(e) => toggleTestimonial(0, e)}>
+                    {expandedTestimonials[0] ? 'Voir moins' : 'Lire la suite'}
+                  </a>
                 </div>
               </div>
 
@@ -217,8 +354,18 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="testimonial-content">
-                  <p>Nous avons loués le bateau tout une journée avec 5 de mes amis et c'était super ! Très bon accueil, pas eu besoin de nous occuper du moteur, tout était top ! Merci encore nous reviendrons !</p>
-                  <a href="#" className="read-more">Lire la suite</a>
+                  <p>
+                    Nous avons loués le bateau tout une journée avec 5 de mes amis et c'était super ! Très bon accueil, pas eu besoin de nous occuper du moteur, tout était top ! Merci encore nous reviendrons !
+                    {expandedTestimonials[1] && (
+                      <span className="extended-content">
+                        <br /><br />
+                        Le propriétaire nous a fait une présentation complète du bateau avant de partir et nous a même montré les meilleurs spots pour se baigner. Le bateau était très spacieux et confortable, parfait pour notre groupe. Nous avons pu profiter du soleil sur le pont et même faire du snorkeling dans des eaux cristallines. La journée s'est terminée par un magnifique coucher de soleil en mer. Une expérience à vivre absolument !
+                      </span>
+                    )}
+                  </p>
+                  <a href="#" className="read-more" onClick={(e) => toggleTestimonial(1, e)}>
+                    {expandedTestimonials[1] ? 'Voir moins' : 'Lire la suite'}
+                  </a>
                 </div>
               </div>
 
@@ -231,8 +378,18 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="testimonial-content">
-                  <p>Je ne peut que recommander ! Il a pris soin du bateau et est très à l'écoute des informations données par le propriétaire. Le point de vue d'un propriétaire, très rassurant. Je lui laisser mon voilier quand il veut !</p>
-                  <a href="#" className="read-more">Lire la suite</a>
+                  <p>
+                    Je ne peut que recommander ! Il a pris soin du bateau et est très à l'écoute des informations données par le propriétaire. Le point de vue d'un propriétaire, très rassurant. Je lui laisser mon voilier quand il veut !
+                    {expandedTestimonials[2] && (
+                      <span className="extended-content">
+                        <br /><br />
+                        En tant que propriétaire, je suis toujours inquiet quand je loue mon voilier, mais cette expérience m'a complètement rassuré. Le locataire a respecté toutes les consignes et a ramené le bateau dans un état impeccable. La communication était excellente avant, pendant et après la location. C'est un vrai plaisir de rencontrer des passionnés de voile qui respectent le matériel. Je recommande vivement cette plateforme pour la qualité des échanges et la sécurité qu'elle offre.
+                      </span>
+                    )}
+                  </p>
+                  <a href="#" className="read-more" onClick={(e) => toggleTestimonial(2, e)}>
+                    {expandedTestimonials[2] ? 'Voir moins' : 'Lire la suite'}
+                  </a>
                 </div>
               </div>
             </div>

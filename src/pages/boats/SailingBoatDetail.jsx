@@ -6,9 +6,6 @@ import {
   faWater, 
   faShip, 
   faUsers, 
-  faArrowLeft,
-  faBars,
-  faTimes,
   faChevronUp,
   faWind,
   faCompass,
@@ -22,27 +19,19 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/SailingBoatDetail.css'; // Import du fichier CSS
 
-// Importation des images (utilisation d'images existantes)
-import voilier1 from '../../assets/images/AdobeStock_198032487.jpeg';
-import voilier2 from '../../assets/images/AdobeStock_315021887.jpeg';
-import voilier3 from '../../assets/images/AdobeStock_1028777944.jpeg';
-import voilier4 from '../../assets/images/AdobeStock_1165484620.jpeg';
-import voilier5 from '../../assets/images/AdobeStock_1218649634.jpeg';
-import voilier6 from '../../assets/images/AdobeStock_622498772.jpeg';
-import logoBlc from '../../assets/images/logo-blc.png';
-
-// Images pour le footer
-import facebookIcon from '../../assets/images/picto-facebook.png';
-import instaIcon from '../../assets/images/picto-insta.png';
-import tiktokIcon from '../../assets/images/picto-tiktok.png';
-import mastercardIcon from '../../assets/images/mastercard.png';
-import visaIcon from '../../assets/images/visa.png';
-import applepayIcon from '../../assets/images/applepay.png';
+// Importation des nouvelles images des voiliers
+import voilier1 from '../../assets/images/voilier1.jpeg';
+import voilier2 from '../../assets/images/voilier2.jpeg';
+import voilier3 from '../../assets/images/voilier3.jpeg';
+import voilier4 from '../../assets/images/voilier4.jpeg';
+import voilier5 from '../../assets/images/voilier5.jpeg';
+import voilier6 from '../../assets/images/voilier6.jpeg';
+// Images pour le footer - Supprimées car maintenant gérées par le composant Layout
 
 // Images supplémentaires pour la galerie (utilisation d'images existantes)
 import voilier1Detail1 from '../../assets/images/AdobeStock_177675231.jpeg';
 import voilier1Detail2 from '../../assets/images/AdobeStock_177675261.jpeg';
-import voilier1Detail3 from '../../assets/images/AdobeStock_124406431.jpeg';
+import voilier1Detail3 from '../../assets/images/voilier3.jpeg'; // Remplacé par une image existante
 
 const SailingBoatDetail = () => {
   const { id } = useParams();
@@ -312,54 +301,12 @@ const SailingBoatDetail = () => {
     });
   };
 
-  // Fonction pour afficher un en-tête personnalisé sans modifier les autres pages
-  const CustomHeader = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    
-    const toggleMenu = () => {
-      setMenuOpen(!menuOpen);
-    };
-    
-    return (
-      <header className="sailing-boat-detail-header">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="logo">
-            <Link to="/">
-              <img src={logoBlc} alt="SAILING.LOC" className="h-10" />
-            </Link>
-          </div>
-          
-          {/* Bouton hamburger pour mobile */}
-          <button 
-            className="hamburger-button" 
-            onClick={toggleMenu}
-            aria-label="Menu principal"
-          >
-            <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
-          </button>
-          
-          {/* Navigation */}
-          <nav className={`main-nav ${menuOpen ? 'open' : ''}`}>
-            <ul>
-              <li><Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>Accueil</Link></li>
-              <li><Link to="/boats/motor" className="nav-link" onClick={() => setMenuOpen(false)}>Bateaux à moteur</Link></li>
-              <li><Link to="/boats/sailing" className="nav-link" onClick={() => setMenuOpen(false)}>Voiliers</Link></li>
-              <li><Link to="/about" className="nav-link" onClick={() => setMenuOpen(false)}>À propos</Link></li>
-              <li><Link to="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>Contact</Link></li>
-              <li><Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}><FontAwesomeIcon icon={faUser} /></Link></li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-    );
-  };
+  // Le header est maintenant géré par le composant Layout dans App.jsx
 
   return (
-    <div className="sailing-boat-detail-container">
-      {/* Utilisation de l'en-tête personnalisé */}
-      <CustomHeader />
-      
-      <div className="container mx-auto px-4 py-8 content-container">
+    <>
+      <div className="sailing-boat-detail-container">
+        <div className="container mx-auto px-4 py-8 content-container">
         {/* Bouton de retour */}
         <Link to="/boats/sailing" className="back-button mb-6 inline-flex items-center">
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
@@ -559,40 +506,6 @@ const SailingBoatDetail = () => {
         </div>
       </div>
       
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="footer-container">
-          <div className="footer-section">
-            <h3>À propos de SAILING.LOC</h3>
-            <p>Spécialiste de la location de bateaux depuis 2010, nous proposons une large gamme de voiliers et bateaux à moteur pour tous les budgets.</p>
-          </div>
-          <div className="footer-section">
-            <h3>Liens utiles</h3>
-            <p><Link to="/about" className="text-white hover:text-[#66C7C7]">À propos</Link></p>
-            <p><Link to="/contact" className="text-white hover:text-[#66C7C7]">Contact</Link></p>
-            <p><Link to="/terms" className="text-white hover:text-[#66C7C7]">Conditions générales</Link></p>
-            <p><Link to="/privacy" className="text-white hover:text-[#66C7C7]">Politique de confidentialité</Link></p>
-          </div>
-          <div className="footer-section">
-            <h3>Suivez-nous</h3>
-            <div className="social-icons">
-              <a href="#" className="social-icon"><img src={facebookIcon} alt="Facebook" /></a>
-              <a href="#" className="social-icon"><img src={instaIcon} alt="Instagram" /></a>
-              <a href="#" className="social-icon"><img src={tiktokIcon} alt="TikTok" /></a>
-            </div>
-            <h3 className="mt-4">Paiements sécurisés</h3>
-            <div className="payment-icons">
-              <span className="payment-icon"><img src={visaIcon} alt="Visa" /></span>
-              <span className="payment-icon"><img src={mastercardIcon} alt="Mastercard" /></span>
-              <span className="payment-icon"><img src={applepayIcon} alt="Apple Pay" /></span>
-            </div>
-          </div>
-        </div>
-        <div className="copyright">
-          <p>&copy; 2025 SAILING.LOC - Tous droits réservés</p>
-        </div>
-      </footer>
-      
       {/* Bouton de scroll vers le haut */}
       {showScrollTop && (
         <button 
@@ -604,6 +517,7 @@ const SailingBoatDetail = () => {
         </button>
       )}
     </div>
+    </>
   );
 };
 

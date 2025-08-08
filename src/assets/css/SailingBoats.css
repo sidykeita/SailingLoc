@@ -11,8 +11,19 @@
 
 /* Style pour le conteneur principal */
 .sailing-boats-container {
-  background-color: #f9fafb;
+  background-color: #f0f2f5; /* Gris légèrement plus foncé */
   min-height: 100vh;
+}
+
+/* Style pour le conteneur principal avec padding-top */
+.sailing-boats-container {
+  padding-top: 100px !important; /* Ajouté pour éviter le chevauchement du menu */
+}
+
+/* Style pour le conteneur principal de la page */
+.sailing-boats-container {
+  background-color: #f5f5f5 !important; /* Fond gris clair avec priorité */
+  padding-top: 100px !important; /* Augmentation du padding-top pour éviter le chevauchement avec le menu */
 }
 
 /* Style pour le conteneur de contenu avec marge pour le header fixe */
@@ -314,11 +325,12 @@ h2::after {
 
 /* Style pour les filtres */
 .filters-section {
-  background-color: #D9D9D9; /* Gris clair de la charte */
+  background-color: #66C7C7; /* Turquoise de la charte */
   padding: 1.5rem;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
   border-left: 4px solid #3C83C4; /* Bordure gauche bleu moyen */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-grid {

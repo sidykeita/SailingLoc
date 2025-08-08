@@ -14,16 +14,16 @@ import {
   faCompass,
   faWind
 } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../Layout';
+// Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/SailingBoats.css'; // Import du fichier CSS depuis le nouveau chemin
 
-// Importation des images (utilisation d'images existantes)
-import voilier1 from '../../assets/images/AdobeStock_198032487.jpeg';
-import voilier2 from '../../assets/images/AdobeStock_315021887.jpeg';
-import voilier3 from '../../assets/images/AdobeStock_1028777944.jpeg';
-import voilier4 from '../../assets/images/AdobeStock_1165484620.jpeg';
-import voilier5 from '../../assets/images/AdobeStock_1218649634.jpeg';
-import voilier6 from '../../assets/images/AdobeStock_622498772.jpeg';
+// Importation des nouvelles images des voiliers
+import voilier1 from '../../assets/images/voilier1.jpeg';
+import voilier2 from '../../assets/images/voilier2.jpeg';
+import voilier3 from '../../assets/images/voilier3.jpeg';
+import voilier4 from '../../assets/images/voilier4.jpeg';
+import voilier5 from '../../assets/images/voilier5.jpeg';
+import voilier6 from '../../assets/images/voilier6.jpeg';
 
 const SailingBoats = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -153,9 +153,9 @@ const SailingBoats = () => {
   });
 
   return (
-    <Layout>
-      <div className="sailing-boats-page">
-        <div className="container mx-auto px-4 py-8 content-container">
+    <>
+      <div className="sailing-boats-page sailing-boats-container">
+        <div className="page-content container mx-auto px-4 py-8 content-container">
           <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de voiliers</h1>
           <p className="text-[#333333] mb-8">Découvrez notre flotte de voiliers disponibles à la location pour des aventures inoubliables</p>
           <div className="filters-section">
@@ -322,7 +322,7 @@ const SailingBoats = () => {
           </button>
         )}
       </div>
-    </Layout>
+    </>
   );
 };
 
