@@ -121,7 +121,7 @@ const AddBoat = () => {
         setSubmitting(false);
         return;
       }
-      navigate('/owner/dashboard');
+      navigate('/owner/dashboard', { state: { added: true } });
     } catch (err) {
       setError(err?.message || 'Erreur lors de la création du bateau');
       console.error('Erreur submit:', err);
@@ -331,12 +331,29 @@ const AddBoat = () => {
                 </label>
               </div>
             </div>
-            <div className="flex justify-center gap-2 pt-6">
-              <button type="button" className="btn-secondary" onClick={() => navigate('/owner/dashboard')}>Annuler</button>
-              <button type="submit" className="btn-primary" disabled={submitting}>
-                {submitting ? 'Enregistrement...' : 'Créer le bateau'}
-              </button>
-            </div>
+            <div className="flex justify-center gap-4 pt-6">
+  <button
+    type="button"
+    className="btn-secondary px-6 py-3"
+    onClick={() => navigate('/owner/dashboard')}
+    disabled={submitting}
+  >
+    Annuler
+  </button>
+  <button
+    type="submit"
+    className="btn-primary px-6 py-3 flex items-center justify-center"
+    disabled={submitting}
+  >
+    {submitting && (
+      <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+      </svg>
+    )}
+    {submitting ? 'Ajout en cours...' : 'Ajouter le bateau'}
+  </button>
+</div>
           </form>
         </div>
       </main>

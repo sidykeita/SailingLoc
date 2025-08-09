@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 import boatService from '../../services/boat.service';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const OwnerDashboard = () => {
+  const location = useLocation();
   const { currentUser, logout } = useAuth();
   const [boats, setBoats] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Chargement réel des bateaux et réservations du propriétaire depuis la BDD
@@ -34,6 +38,18 @@ const OwnerDashboard = () => {
 
     fetchOwnerData();
   }, [currentUser]);
+
+
+
+  useEffect(() => {
+    // Affiche le message de succès si on vient d’ajouter un bateau
+    if (location.state && location.state.added) {
+      setSuccessMessage("Bateau ajouté avec succès !");
+      setTimeout(() => setSuccessMessage(""), 4000);
+      // Nettoie le state pour éviter de réafficher après navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleLogout = () => {
     logout();
@@ -145,6 +161,12 @@ const OwnerDashboard = () => {
               <h2 className="font-montserrat text-xl font-semibold text-dark">Mes bateaux</h2>
             </div>
             
+            {successMessage && (
+              <div className="mb-4 text-green-700 bg-green-100 border border-green-300 rounded p-2 text-center animate-fade-in">
+                {successMessage}
+              </div>
+            )}
+            
             {loading ? (
               <p className="text-center py-4">Chargement des bateaux...</p>
             ) : boats.length === 0 ? (
@@ -174,7 +196,7 @@ const OwnerDashboard = () => {
                         </span>
                       </div>
                       <p className="text-gray-600">{boat.location}</p>
-                      <div className="flex flex-wrap gap-4 mt-2">
+                      <div className="flex flex-wrap gap-4 mt-2 items-center">
                         <div>
                           <p className="text-gray-500 text-sm">Type</p>
                           <p>{boat.type}</p>
@@ -189,14 +211,17 @@ const OwnerDashboard = () => {
                         </div>
                         <div>
                           <p className="text-gray-500 text-sm">Prix/jour</p>
-                          <p className="font-semibold">{boat.dailyPrice} €</p>
+                          <div className="mt-4 flex gap-2 flex-wrap">
+                            <button className="btn-secondary py-2 px-4">Modifier</button>
+                            <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors">Supprimer</button>
+                            <button
+                              className="btn-primary py-2 px-4 text-sm font-semibold rounded shadow hover:bg-primary-dark transition"
+                              onClick={() => navigate(`/boats/${boat._id || boat.id}`)}
+                            >
+                              Voir l'annonce
+                            </button>
                           </div>
-                      </div>
-                      <div className="mt-4 flex space-x-2">
-                        <button className="btn-secondary py-2 px-4">Modifier</button>
-                        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors">
-                          Supprimer
-                        </button>
+                        </div>
                       </div>
                     </div>
                   </div>
