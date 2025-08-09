@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoning - SailingLoc</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #274991;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #274991;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #274991;
+            border-bottom: 2px solid #66C7C7;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+        
+        .section h3 {
+            color: #66C7C7;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .page-layout {
+            border: 2px solid #274991;
+            margin: 20px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .zone {
+            border: 1px dashed #66C7C7;
+            margin: 10px;
+            padding: 15px;
+            background-color: white;
+            position: relative;
+        }
+        
+        .zone-header {
+            background-color: #274991;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            font-size: 0.9em;
+        }
+        
+        .zone-content {
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .sub-zone {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .sub-zone-title {
+            font-weight: bold;
+            color: #274991;
+            margin-bottom: 5px;
+        }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .wireframe {
+            border: 2px solid #ddd;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .wireframe-title {
+            text-align: center;
+            font-weight: bold;
+            color: #274991;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .component-list {
+            background-color: #f0f8ff;
+            border-left: 4px solid #274991;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .component-list h4 {
+            color: #274991;
+            margin-bottom: 10px;
+        }
+        
+        .component-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .component-list li {
+            margin: 5px 0;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ZONING - SAILINGLOC</h1>
+            <p>Architecture et structure des pages</p>
+            <p><strong>Plateforme de location de bateaux en ligne</strong></p>
+        </div>
+        
+        <div class="section">
+            <h2>1. ARCHITECTURE GÉNÉRALE DU SITE</h2>
+            
+            <h3>1.1 Structure de navigation</h3>
+            <div class="component-list">
+                <h4>Navigation principale</h4>
+                <ul>
+                    <li>Accueil</li>
+                    <li>Voiliers</li>
+                    <li>Bateaux à moteur</li>
+                    <li>Destinations</li>
+                    <li>Mon compte</li>
+                    <li>Contact</li>
+                </ul>
+            </div>
+            
+            <h3>1.2 Pages principales</h3>
+            <div class="component-list">
+                <h4>Pages publiques</h4>
+                <ul>
+                    <li>Page d'accueil (Home)</li>
+                    <li>Liste des voiliers (SailingBoats)</li>
+                    <li>Liste des bateaux à moteur (MotorBoats)</li>
+                    <li>Détail d'un bateau (BoatDetail)</li>
+                    <li>Destinations</li>
+                    <li>Mentions légales</li>
+                    <li>Conditions générales</li>
+                </ul>
+            </div>
+            
+            <div class="component-list">
+                <h4>Pages utilisateur</h4>
+                <ul>
+                    <li>Connexion / Inscription</li>
+                    <li>Profil utilisateur</li>
+                    <li>Mes réservations</li>
+                    <li>Mes favoris</li>
+                    <li>Historique</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. ZONING PAGE D'ACCUEIL</h2>
+            
+            <div class="page-layout">
+                <div class="wireframe-title">PAGE D'ACCUEIL - STRUCTURE</div>
+                
+                <div class="zone">
+                    <div class="zone-header">HEADER</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Logo SailingLoc</div>
+                            Position : Gauche | Taille : 150x50px
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Navigation principale</div>
+                            Accueil | Voiliers | Bateaux à moteur | Destinations | Mon compte
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Actions utilisateur</div>
+                            Connexion | Inscription | Panier
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">HERO SECTION</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Image de fond</div>
+                            Image panoramique de bateaux | Taille : 1920x600px
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre principal</div>
+                            "Louez votre bateau en un clic !" | Police : Roboto Bold 48px
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Sous-titre</div>
+                            Description du service | Police : Roboto Regular 18px
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Barre de recherche</div>
+                            Champ localisation | Sélecteur de dates | Bouton rechercher
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Sélecteur type de bateau</div>
+                            Bouton Voilier | Bouton Bateau à moteur
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">SECTION COUPS DE CŒUR</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre de section</div>
+                            "Les coups de cœur de la communauté"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Grille de bateaux</div>
+                            3 cartes bateau en ligne | Format : 350x400px chacune
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Contenu des cartes</div>
+                            Image | Localisation | Note | Description | Prix | Propriétaire
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">SECTION DESTINATIONS</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre de section</div>
+                            "Choisissez votre destination en France et en Europe"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Grille destinations</div>
+                            3 cartes destination | Format : 300x250px chacune
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Contenu des cartes</div>
+                            Image de destination | Nom | Nombre de bateaux | Lien "Explorer"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Bouton voir plus</div>
+                            "Découvrez nos autres destinations"
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">SECTION TÉMOIGNAGES</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre de section</div>
+                            "Nos utilisateurs vous partagent leur expérience inoubliable"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Grille témoignages</div>
+                            3 cartes témoignage | Format : 350x300px chacune
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Contenu des cartes</div>
+                            Photo profil | Nom | Localisation | Type de location | Témoignage | Lien "Lire la suite"
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">FOOTER</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Informations légales</div>
+                            Mentions légales | CGV | Politique de confidentialité
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Contact</div>
+                            Adresse | Téléphone | Email | Réseaux sociaux
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Navigation</div>
+                            Liens rapides vers les sections principales
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>3. ZONING PAGE LISTE BATEAUX</h2>
+            
+            <div class="page-layout">
+                <div class="wireframe-title">PAGE LISTE BATEAUX (VOILIERS/MOTEUR)</div>
+                
+                <div class="zone">
+                    <div class="zone-header">HEADER</div>
+                    <div class="zone-content">Identique à la page d'accueil</div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">BREADCRUMB</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Fil d'Ariane</div>
+                            Accueil > Voiliers (ou Bateaux à moteur)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">TITRE ET DESCRIPTION</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre principal</div>
+                            "Location de voiliers" ou "Location de bateaux à moteur"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Description</div>
+                            Texte descriptif de la catégorie
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">FILTRES DE RECHERCHE</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Barre de recherche</div>
+                            Champ de recherche par nom ou description
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Filtre prix</div>
+                            Sélecteur : Tous | Économique | Intermédiaire | Premium
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Filtre capacité</div>
+                            Sélecteur : Toutes | Petit groupe | Groupe moyen | Grand groupe
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">RÉSULTATS</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Compteur résultats</div>
+                            "Voiliers disponibles (X)"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Grille de bateaux</div>
+                            Grille responsive : 3 colonnes desktop | 2 colonnes tablet | 1 colonne mobile
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Cartes bateau</div>
+                            Image | Nom | Description | Caractéristiques | Prix | Statut | Lien détails
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">SECTION INFORMATIVE</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Titre</div>
+                            "Pourquoi louer un voilier avec nous ?"
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Avantages</div>
+                            3 blocs : Flotte moderne | Conseils personnalisés | Assistance 24/7
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">FOOTER</div>
+                    <div class="zone-content">Identique à la page d'accueil</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>4. ZONING PAGE DÉTAIL BATEAU</h2>
+            
+            <div class="page-layout">
+                <div class="wireframe-title">PAGE DÉTAIL BATEAU</div>
+                
+                <div class="zone">
+                    <div class="zone-header">HEADER</div>
+                    <div class="zone-content">Identique aux autres pages</div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">BREADCRUMB</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Fil d'Ariane</div>
+                            Accueil > Voiliers > [Nom du bateau]
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Bouton retour</div>
+                            "Retour aux voiliers"
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">TITRE ET PRIX</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Nom du bateau</div>
+                            Titre principal H1
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Prix</div>
+                            Prix par jour mis en évidence
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">GALERIE IMAGES</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Image principale</div>
+                            Grande image 800x500px
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Miniatures</div>
+                            Galerie de miniatures cliquables
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">CARACTÉRISTIQUES RAPIDES</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Grille 4 colonnes</div>
+                            Surface de voile | Capacité | Longueur | Année
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">CONTENU PRINCIPAL</div>
+                    <div class="zone-content">
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Colonne gauche (2/3)</div>
+                            Description détaillée | Équipements | Caractéristiques techniques
+                        </div>
+                        <div class="sub-zone">
+                            <div class="sub-zone-title">Colonne droite (1/3)</div>
+                            Formulaire de réservation | Calendrier | Calcul prix | Bouton réserver
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zone">
+                    <div class="zone-header">FOOTER</div>
+                    <div class="zone-content">Identique aux autres pages</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>5. COMPOSANTS TRANSVERSAUX</h2>
+            
+            <h3>5.1 Header</h3>
+            <div class="component-list">
+                <h4>Éléments du header</h4>
+                <ul>
+                    <li><strong>Logo :</strong> SailingLoc (150x50px, position gauche)</li>
+                    <li><strong>Navigation :</strong> Menu horizontal centré</li>
+                    <li><strong>Actions :</strong> Connexion, Inscription, Panier (position droite)</li>
+                    <li><strong>Responsive :</strong> Menu burger sur mobile</li>
+                </ul>
+            </div>
+            
+            <h3>5.2 Footer</h3>
+            <div class="component-list">
+                <h4>Éléments du footer</h4>
+                <ul>
+                    <li><strong>Informations légales :</strong> Mentions légales, CGV, Confidentialité</li>
+                    <li><strong>Contact :</strong> Adresse, téléphone, email</li>
+                    <li><strong>Réseaux sociaux :</strong> Facebook, Instagram, Twitter</li>
+                    <li><strong>Newsletter :</strong> Formulaire d'inscription</li>
+                </ul>
+            </div>
+            
+            <h3>5.3 Cartes bateau</h3>
+            <div class="component-list">
+                <h4>Éléments des cartes</h4>
+                <ul>
+                    <li><strong>Image :</strong> Photo principale (350x200px)</li>
+                    <li><strong>Titre :</strong> Nom du bateau</li>
+                    <li><strong>Localisation :</strong> Port d'attache</li>
+                    <li><strong>Caractéristiques :</strong> Longueur, capacité, puissance</li>
+                    <li><strong>Prix :</strong> Prix par jour</li>
+                    <li><strong>Actions :</strong> Bouton favoris, lien détails</li>
+                </ul>
+            </div>
+            
+            <h3>5.4 Formulaires</h3>
+            <div class="component-list">
+                <h4>Éléments des formulaires</h4>
+                <ul>
+                    <li><strong>Champs de saisie :</strong> Style uniforme avec bordures arrondies</li>
+                    <li><strong>Boutons :</strong> Couleur principale #274991, hover #66C7C7</li>
+                    <li><strong>Validation :</strong> Messages d'erreur en rouge, succès en vert</li>
+                    <li><strong>Responsive :</strong> Adaptation mobile avec champs pleine largeur</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>6. SPÉCIFICATIONS TECHNIQUES</h2>
+            
+            <h3>6.1 Breakpoints responsive</h3>
+            <div class="component-list">
+                <h4>Points de rupture</h4>
+                <ul>
+                    <li><strong>Mobile :</strong> < 768px (1 colonne)</li>
+                    <li><strong>Tablet :</strong> 768px - 1024px (2 colonnes)</li>
+                    <li><strong>Desktop :</strong> > 1024px (3 colonnes)</li>
+                    <li><strong>Large Desktop :</strong> > 1200px (4 colonnes max)</li>
+                </ul>
+            </div>
+            
+            <h3>6.2 Charte graphique</h3>
+            <div class="component-list">
+                <h4>Couleurs principales</h4>
+                <ul>
+                    <li><strong>Bleu principal :</strong> #274991</li>
+                    <li><strong>Turquoise :</strong> #66C7C7</li>
+                    <li><strong>Gris foncé :</strong> #333333</li>
+                    <li><strong>Gris clair :</strong> #f8f9fa</li>
+                    <li><strong>Blanc :</strong> #ffffff</li>
+                </ul>
+            </div>
+            
+            <div class="component-list">
+                <h4>Typographie</h4>
+                <ul>
+                    <li><strong>Police principale :</strong> Roboto (Google Fonts)</li>
+                    <li><strong>Titres H1 :</strong> 48px Bold</li>
+                    <li><strong>Titres H2 :</strong> 36px Bold</li>
+                    <li><strong>Titres H3 :</strong> 24px Medium</li>
+                    <li><strong>Texte courant :</strong> 16px Regular</li>
+                </ul>
+            </div>
+            
+            <h3>6.3 Animations et interactions</h3>
+            <div class="component-list">
+                <h4>Effets visuels</h4>
+                <ul>
+                    <li><strong>Hover cartes :</strong> Élévation avec ombre portée</li>
+                    <li><strong>Boutons :</strong> Transition couleur 0.3s</li>
+                    <li><strong>Images :</strong> Effet zoom léger au survol</li>
+                    <li><strong>Scroll :</strong> Bouton retour en haut après 300px</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>7. FLUX UTILISATEUR</h2>
+            
+            <h3>7.1 Parcours de réservation</h3>
+            <div class="component-list">
+                <h4>Étapes principales</h4>
+                <ul>
+                    <li><strong>1. Recherche :</strong> Saisie localisation et dates</li>
+                    <li><strong>2. Résultats :</strong> Liste des bateaux disponibles</li>
+                    <li><strong>3. Sélection :</strong> Choix d'un bateau et consultation détails</li>
+                    <li><strong>4. Réservation :</strong> Sélection dates précises et options</li>
+                    <li><strong>5. Identification :</strong> Connexion ou création compte</li>
+                    <li><strong>6. Paiement :</strong> Saisie informations et validation</li>
+                    <li><strong>7. Confirmation :</strong> Email et récapitulatif réservation</li>
+                </ul>
+            </div>
+            
+            <h3>7.2 Gestion compte utilisateur</h3>
+            <div class="component-list">
+                <h4>Fonctionnalités compte</h4>
+                <ul>
+                    <li><strong>Profil :</strong> Informations personnelles et préférences</li>
+                    <li><strong>Réservations :</strong> Historique et réservations en cours</li>
+                    <li><strong>Favoris :</strong> Bateaux sauvegardés</li>
+                    <li><strong>Messages :</strong> Communication avec propriétaires</li>
+                    <li><strong>Évaluations :</strong> Avis laissés et reçus</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer" style="margin-top: 50px; border-top: 2px solid #ddd; padding-top: 20px; text-align: center; color: #666; font-size: 0.9em;">
+            <p><strong>Document créé le :</strong> 09/08/2025</p>
+            <p><strong>Version :</strong> 1.0</p>
+            <p><em>Ce zoning constitue la base de l'architecture de l'application SailingLoc</em></p>
+        </div>
+    </div>
+</body>
+</html>

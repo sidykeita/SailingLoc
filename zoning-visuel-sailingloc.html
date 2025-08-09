@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoning Visuel - SailingLoc</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #274991 0%, #66C7C7 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 3em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .wireframe {
+            margin: 40px 0;
+            border: 3px solid #274991;
+            border-radius: 10px;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+        
+        .wireframe-title {
+            background: #274991;
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .wireframe-content {
+            padding: 0;
+        }
+        
+        .zone {
+            border-bottom: 2px dashed #66C7C7;
+            background: white;
+            margin: 0;
+            position: relative;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .zone:last-child {
+            border-bottom: none;
+        }
+        
+        .zone-label {
+            background: #66C7C7;
+            color: white;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 0.9em;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .zone-content {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        
+        .zone-height-small { min-height: 60px; }
+        .zone-height-medium { min-height: 120px; }
+        .zone-height-large { min-height: 200px; }
+        .zone-height-xlarge { min-height: 300px; }
+        
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #274991;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .site-map {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .page-box {
+            background: linear-gradient(135deg, #274991 0%, #66C7C7 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 120px;
+            position: relative;
+        }
+        
+        .page-box.main {
+            background: linear-gradient(135deg, #66C7C7 0%, #274991 100%);
+            font-size: 1.1em;
+            padding: 20px 30px;
+        }
+        
+        .page-box.secondary {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #274991;
+        }
+        
+        .connector {
+            width: 2px;
+            height: 20px;
+            background: #274991;
+            margin: 0 auto;
+        }
+        
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .device-mockup {
+            border: 3px solid #274991;
+            border-radius: 15px;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .device-header {
+            background: #274991;
+            color: white;
+            padding: 10px 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .device-screen {
+            padding: 20px;
+            min-height: 300px;
+            background: #f8f9fa;
+        }
+        
+        .component-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .component-box.header { background: #274991; color: white; }
+        .component-box.hero { background: #66C7C7; color: white; }
+        .component-box.content { background: #e3f2fd; color: #274991; }
+        .component-box.footer { background: #333; color: white; }
+        
+        .color-palette {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .color-swatch {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            font-size: 0.8em;
+        }
+        
+        .color-primary { background: #274991; }
+        .color-secondary { background: #66C7C7; }
+        .color-dark { background: #333333; }
+        .color-light { background: #f8f9fa; color: #333; }
+        .color-white { background: #ffffff; color: #333; border: 2px solid #ddd; }
+        
+        .flow-diagram {
+            background: white;
+            border: 2px solid #274991;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .flow-step {
+            background: linear-gradient(135deg, #274991 0%, #66C7C7 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: 500;
+            margin: 10px;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: #274991;
+        }
+        
+        .flow-step:last-child::after {
+            display: none;
+        }
+        
+        .section-title {
+            color: #274991;
+            font-size: 2em;
+            font-weight: 600;
+            margin: 40px 0 20px 0;
+            text-align: center;
+            border-bottom: 3px solid #66C7C7;
+            padding-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .level {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .color-palette {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .flow-step {
+                display: block;
+                margin: 10px 0;
+            }
+            
+            .flow-step::after {
+                content: '↓';
+                right: 50%;
+                top: 100%;
+                transform: translateX(50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ZONING VISUEL</h1>
+            <p>SailingLoc - Architecture et Design</p>
+        </div>
+        
+        <div class="content">
+            <h2 class="section-title">🏗️ Architecture du Site</h2>
+            
+            <div class="architecture-diagram">
+                <div class="site-map">
+                    <div class="level">
+                        <div class="page-box main">ACCUEIL</div>
+                    </div>
+                    
+                    <div class="connector"></div>
+                    
+                    <div class="level">
+                        <div class="page-box">VOILIERS</div>
+                        <div class="page-box">BATEAUX MOTEUR</div>
+                        <div class="page-box">DESTINATIONS</div>
+                        <div class="page-box">MON COMPTE</div>
+                    </div>
+                    
+                    <div class="connector"></div>
+                    
+                    <div class="level">
+                        <div class="page-box secondary">Détail Voilier</div>
+                        <div class="page-box secondary">Détail Moteur</div>
+                        <div class="page-box secondary">Réservation</div>
+                        <div class="page-box secondary">Profil</div>
+                        <div class="page-box secondary">Mes Réservations</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">📱 Wireframes des Pages Principales</h2>
+            
+            <!-- Page d'accueil -->
+            <div class="wireframe">
+                <h3 class="wireframe-title">🏠 PAGE D'ACCUEIL</h3>
+                <div class="wireframe-content">
+                    <div class="zone zone-height-small">
+                        <div class="zone-label">HEADER</div>
+                        <div class="zone-content">
+                            <strong>Logo SailingLoc</strong> | Navigation: Accueil • Voiliers • Bateaux moteur • Destinations | <strong>Connexion • Inscription</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-xlarge">
+                        <div class="zone-label">HERO SECTION</div>
+                        <div class="zone-content">
+                            <strong>🖼️ Image de fond panoramique</strong><br>
+                            <strong style="font-size: 1.2em;">"Louez votre bateau en un clic !"</strong><br>
+                            📍 <em>Barre de recherche localisation</em> | 📅 <em>Sélecteur dates</em> | 🔍 <em>Bouton rechercher</em><br>
+                            ⛵ <strong>Voilier</strong> | 🚤 <strong>Bateau à moteur</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-large">
+                        <div class="zone-label">COUPS DE CŒUR</div>
+                        <div class="zone-content">
+                            <strong>"Les coups de cœur de la communauté"</strong><br>
+                            🏆 <em>3 cartes bateaux en ligne</em><br>
+                            📍 La Rochelle • Marseille • Le Croisic | ⭐ Notes | 💰 Prix/jour
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-large">
+                        <div class="zone-label">DESTINATIONS</div>
+                        <div class="zone-content">
+                            <strong>"Choisissez votre destination en France et en Europe"</strong><br>
+                            🌊 <em>3 cartes destinations</em><br>
+                            📍 Marseille • Porto Cristo • Bastia | 🚤 Nombre de bateaux disponibles
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-large">
+                        <div class="zone-label">TÉMOIGNAGES</div>
+                        <div class="zone-content">
+                            <strong>"Nos utilisateurs partagent leur expérience"</strong><br>
+                            👤 <em>3 témoignages avec photos profil</em><br>
+                            💬 Avis détaillés | 📖 "Lire la suite"
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-medium">
+                        <div class="zone-label">FOOTER</div>
+                        <div class="zone-content">
+                            📄 <em>Mentions légales • CGV • Contact</em> | 📱 <em>Réseaux sociaux</em> | 📧 <em>Newsletter</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page liste bateaux -->
+            <div class="wireframe">
+                <h3 class="wireframe-title">⛵ PAGE LISTE BATEAUX</h3>
+                <div class="wireframe-content">
+                    <div class="zone zone-height-small">
+                        <div class="zone-label">HEADER</div>
+                        <div class="zone-content">Identique à la page d'accueil</div>
+                    </div>
+                    
+                    <div class="zone zone-height-small">
+                        <div class="zone-label">BREADCRUMB</div>
+                        <div class="zone-content">🏠 <em>Accueil</em> > ⛵ <em>Voiliers</em></div>
+                    </div>
+                    
+                    <div class="zone zone-height-medium">
+                        <div class="zone-label">FILTRES</div>
+                        <div class="zone-content">
+                            🔍 <em>Recherche par nom</em> | 💰 <em>Filtre prix</em> | 👥 <em>Filtre capacité</em><br>
+                            <strong>Résultats: "Voiliers disponibles (6)"</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-xlarge">
+                        <div class="zone-label">GRILLE RÉSULTATS</div>
+                        <div class="zone-content">
+                            <strong>📱 Responsive: 3 colonnes desktop | 2 tablet | 1 mobile</strong><br>
+                            🖼️ <em>Image bateau</em> | <strong>Nom</strong> | 📏 <em>Caractéristiques</em><br>
+                            💰 <em>Prix/jour</em> | ✅ <em>Disponibilité</em> | 🔗 <em>"Voir détails"</em>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-medium">
+                        <div class="zone-label">AVANTAGES</div>
+                        <div class="zone-content">
+                            <strong>"Pourquoi louer avec nous ?"</strong><br>
+                            🚢 <em>Flotte moderne</em> | 🧭 <em>Conseils personnalisés</em> | 🆘 <em>Assistance 24/7</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page détail bateau -->
+            <div class="wireframe">
+                <h3 class="wireframe-title">🔍 PAGE DÉTAIL BATEAU</h3>
+                <div class="wireframe-content">
+                    <div class="zone zone-height-small">
+                        <div class="zone-label">HEADER</div>
+                        <div class="zone-content">Identique aux autres pages</div>
+                    </div>
+                    
+                    <div class="zone zone-height-small">
+                        <div class="zone-label">NAVIGATION</div>
+                        <div class="zone-content">
+                            ← <em>"Retour aux voiliers"</em> | 🏠 <em>Accueil</em> > ⛵ <em>Voiliers</em> > <strong>Oceanis 40.1</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-medium">
+                        <div class="zone-label">TITRE & PRIX</div>
+                        <div class="zone-content">
+                            <strong style="font-size: 1.3em;">Oceanis 40.1</strong> | 💰 <strong style="color: #274991;">450€/jour</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-large">
+                        <div class="zone-label">GALERIE</div>
+                        <div class="zone-content">
+                            🖼️ <strong>Image principale 800x500px</strong><br>
+                            📸 <em>Miniatures galerie cliquables</em>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-medium">
+                        <div class="zone-label">CARACTÉRISTIQUES</div>
+                        <div class="zone-content">
+                            🌊 <em>Surface voile: 95m²</em> | 👥 <em>Capacité: 8 pers</em> | 📏 <em>Longueur: 12,9m</em> | 📅 <em>Année: 2022</em>
+                        </div>
+                    </div>
+                    
+                    <div class="zone zone-height-xlarge">
+                        <div class="zone-label">CONTENU PRINCIPAL</div>
+                        <div class="zone-content">
+                            <strong>📝 Colonne gauche (2/3):</strong> Description détaillée | ⚙️ Équipements | 🔧 Spécifications techniques<br>
+                            <strong>📋 Colonne droite (1/3):</strong> 📅 Formulaire réservation | 💰 Calcul prix | 🛒 Bouton réserver
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">📱 Responsive Design</h2>
+            
+            <div class="responsive-grid">
+                <div class="device-mockup">
+                    <div class="device-header">📱 MOBILE (< 768px)</div>
+                    <div class="device-screen">
+                        <div class="component-box header">Header compact + Menu burger</div>
+                        <div class="component-box hero">Hero vertical</div>
+                        <div class="component-box content">1 colonne</div>
+                        <div class="component-box content">Cards empilées</div>
+                        <div class="component-box footer">Footer simplifié</div>
+                    </div>
+                </div>
+                
+                <div class="device-mockup">
+                    <div class="device-header">💻 TABLET (768-1024px)</div>
+                    <div class="device-screen">
+                        <div class="component-box header">Header complet</div>
+                        <div class="component-box hero">Hero adapté</div>
+                        <div class="component-box content">2 colonnes</div>
+                        <div class="component-box content">Grille 2x2</div>
+                        <div class="component-box footer">Footer complet</div>
+                    </div>
+                </div>
+                
+                <div class="device-mockup">
+                    <div class="device-header">🖥️ DESKTOP (> 1024px)</div>
+                    <div class="device-screen">
+                        <div class="component-box header">Header complet + Navigation</div>
+                        <div class="component-box hero">Hero pleine largeur</div>
+                        <div class="component-box content">3-4 colonnes</div>
+                        <div class="component-box content">Grille optimisée</div>
+                        <div class="component-box footer">Footer détaillé</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">🎨 Charte Graphique</h2>
+            
+            <div class="color-palette">
+                <div class="color-swatch color-primary">#274991<br>Bleu Principal</div>
+                <div class="color-swatch color-secondary">#66C7C7<br>Turquoise</div>
+                <div class="color-swatch color-dark">#333333<br>Gris Foncé</div>
+                <div class="color-swatch color-light">#F8F9FA<br>Gris Clair</div>
+                <div class="color-swatch color-white">#FFFFFF<br>Blanc</div>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <h3 style="color: #274991;">📝 Typographie</h3>
+                <p><strong>Police principale:</strong> Roboto (Google Fonts)</p>
+                <p style="font-size: 48px; font-weight: 700; color: #274991; margin: 10px 0;">Titre H1 - 48px Bold</p>
+                <p style="font-size: 36px; font-weight: 700; color: #66C7C7; margin: 10px 0;">Titre H2 - 36px Bold</p>
+                <p style="font-size: 24px; font-weight: 500; color: #274991; margin: 10px 0;">Titre H3 - 24px Medium</p>
+                <p style="font-size: 16px; color: #333;">Texte courant - 16px Regular</p>
+            </div>
+            
+            <h2 class="section-title">🔄 Flux Utilisateur</h2>
+            
+            <div class="flow-diagram">
+                <h3 style="text-align: center; color: #274991; margin-bottom: 30px;">Parcours de Réservation</h3>
+                <div style="text-align: center;">
+                    <div class="flow-step">1. 🔍 Recherche</div>
+                    <div class="flow-step">2. 📋 Résultats</div>
+                    <div class="flow-step">3. ⛵ Sélection</div>
+                    <div class="flow-step">4. 📅 Réservation</div>
+                    <div class="flow-step">5. 👤 Identification</div>
+                    <div class="flow-step">6. 💳 Paiement</div>
+                    <div class="flow-step">7. ✅ Confirmation</div>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #274991 0%, #66C7C7 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin: 40px 0;">
+                <h3 style="margin: 0 0 15px 0;">📊 Métriques Clés</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div>
+                        <strong style="font-size: 2em; display: block;">7</strong>
+                        <span>Pages principales</span>
+                    </div>
+                    <div>
+                        <strong style="font-size: 2em; display: block;">15+</strong>
+                        <span>Composants UI</span>
+                    </div>
+                    <div>
+                        <strong style="font-size: 2em; display: block;">3</strong>
+                        <span>Breakpoints responsive</span>
+                    </div>
+                    <div>
+                        <strong style="font-size: 2em; display: block;">5</strong>
+                        <span>Couleurs principales</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 30px; border-top: 2px solid #ddd; margin-top: 50px; color: #666;">
+                <p><strong>Document créé le:</strong> 09/08/2025</p>
+                <p><strong>Version:</strong> 1.0 - Zoning Visuel</p>
+                <p><em>Ce document présente l'architecture visuelle de l'application SailingLoc</em></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

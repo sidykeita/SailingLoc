@@ -1,0 +1,184 @@
+MENTIONS LÉGALES
+Plateforme SailingLoc - Location de bateaux en ligne
+Document de référence pour le cahier des charges
+
+===============================================================================
+
+1. IDENTIFICATION DE L'ÉDITEUR
+
+Raison sociale : SailingLoc SAS
+Forme juridique : Société par Actions Simplifiée
+Capital social : [À définir] €
+Numéro SIRET : [À obtenir]
+Code APE : 7712Z (Location et location-bail d'autres biens personnels et domestiques)
+Numéro TVA intracommunautaire : [À obtenir]
+Adresse du siège social : [Adresse à définir]
+Téléphone : [Numéro à définir]
+Email : contact@sailingloc.fr
+Directeur de la publication : [Nom du dirigeant]
+
+===============================================================================
+
+2. HÉBERGEMENT DU SITE
+
+Hébergeur : [À définir selon le choix d'hébergement]
+Adresse : [Adresse de l'hébergeur]
+Téléphone : [Numéro de l'hébergeur]
+
+===============================================================================
+
+3. OBJET DU SITE
+
+Le site SailingLoc est une plateforme numérique de mise en relation entre 
+propriétaires de bateaux (voiliers et bateaux à moteur) et locataires 
+particuliers ou professionnels.
+
+3.1 Services proposés
+• Mise en ligne d'annonces de location de bateaux
+• Système de recherche et de filtrage des embarcations
+• Gestion des réservations en ligne
+• Système de paiement sécurisé
+• Service client et assistance technique
+• Système d'évaluation et de commentaires
+
+===============================================================================
+
+4. CONDITIONS D'UTILISATION
+
+4.1 Accès au service
+L'accès au site SailingLoc est gratuit pour la consultation. L'inscription 
+est nécessaire pour effectuer une réservation ou proposer un bateau à la location.
+
+4.2 Responsabilités
+SailingLoc agit en qualité d'intermédiaire entre les propriétaires et les 
+locataires. La société ne peut être tenue responsable :
+• De l'état des embarcations proposées à la location
+• Des incidents survenus pendant la location
+• De la véracité des informations fournies par les utilisateurs
+• Des conditions météorologiques
+
+IMPORTANT : Chaque utilisateur doit s'assurer de disposer des assurances 
+nécessaires et des qualifications requises pour la navigation.
+
+===============================================================================
+
+5. PROTECTION DES DONNÉES PERSONNELLES (RGPD)
+
+5.1 Responsable de traitement
+SailingLoc SAS est responsable du traitement des données personnelles 
+collectées sur la plateforme.
+
+5.2 Données collectées
+• Données d'identification (nom, prénom, email, téléphone)
+• Données de navigation et d'utilisation du site
+• Données de paiement (via prestataires sécurisés)
+• Données de géolocalisation (avec consentement)
+• Photos et documents justificatifs
+
+5.3 Finalités du traitement
+• Gestion des comptes utilisateurs
+• Traitement des réservations
+• Service client et support technique
+• Amélioration des services
+• Respect des obligations légales
+
+5.4 Droits des utilisateurs
+Conformément au RGPD, les utilisateurs disposent des droits suivants :
+• Droit d'accès aux données
+• Droit de rectification
+• Droit à l'effacement
+• Droit à la portabilité
+• Droit d'opposition
+• Droit de limitation du traitement
+
+Pour exercer ces droits : dpo@sailingloc.fr
+
+===============================================================================
+
+6. PROPRIÉTÉ INTELLECTUELLE
+
+6.1 Droits de SailingLoc
+Tous les éléments du site (textes, images, logos, design, code source) sont 
+protégés par le droit d'auteur et appartiennent à SailingLoc ou à ses partenaires.
+
+6.2 Contenus utilisateurs
+Les utilisateurs conservent leurs droits sur les contenus qu'ils publient 
+(photos, descriptions) mais accordent à SailingLoc une licence d'utilisation 
+dans le cadre du service.
+
+===============================================================================
+
+7. COOKIES ET TECHNOLOGIES SIMILAIRES
+
+7.1 Types de cookies utilisés
+• Cookies techniques : Nécessaires au fonctionnement du site
+• Cookies analytiques : Mesure d'audience (Google Analytics)
+• Cookies de personnalisation : Préférences utilisateur
+• Cookies publicitaires : Publicités ciblées (avec consentement)
+
+7.2 Gestion des cookies
+L'utilisateur peut configurer ses préférences cookies via le bandeau de 
+consentement ou les paramètres de son navigateur.
+
+===============================================================================
+
+8. DISPOSITIONS FINANCIÈRES
+
+8.1 Commission
+SailingLoc prélève une commission sur chaque transaction réalisée via la plateforme.
+
+8.2 Paiements
+Les paiements sont sécurisés et traités par des prestataires certifiés PCI-DSS.
+
+8.3 Remboursements
+Les conditions de remboursement sont définies dans les conditions générales de vente.
+
+===============================================================================
+
+9. ASSURANCES ET RESPONSABILITÉS
+
+OBLIGATION D'ASSURANCE : Tous les bateaux proposés à la location doivent être 
+couverts par une assurance responsabilité civile et coque valide.
+
+9.1 Assurance plateforme
+SailingLoc dispose d'une assurance responsabilité civile professionnelle 
+couvrant son activité d'intermédiaire.
+
+9.2 Vérifications
+SailingLoc s'engage à vérifier la validité des documents d'assurance fournis 
+par les propriétaires.
+
+===============================================================================
+
+10. DROIT APPLICABLE ET JURIDICTIONS
+
+10.1 Droit applicable
+Les présentes mentions légales sont soumises au droit français.
+
+10.2 Règlement des litiges
+En cas de litige, une solution amiable sera recherchée avant toute action 
+judiciaire. À défaut, les tribunaux français seront compétents.
+
+10.3 Médiation
+Conformément à la réglementation, SailingLoc adhère à un service de médiation 
+de la consommation : [Nom du médiateur à définir]
+
+===============================================================================
+
+11. CONTACT ET RÉCLAMATIONS
+
+Service client : support@sailingloc.fr
+Réclamations : reclamations@sailingloc.fr
+Protection des données : dpo@sailingloc.fr
+Téléphone : [Numéro à définir]
+Horaires : Du lundi au vendredi, 9h-18h
+
+===============================================================================
+
+Document créé le : 07/08/2025
+Dernière mise à jour : 07/08/2025
+
+Ces mentions légales sont susceptibles d'être modifiées. La version en vigueur 
+est celle publiée sur le site.
+
+===============================================================================

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devis - Projet SailingLoc</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #274991;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #274991;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            color: #274991;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .section h3 {
+            color: #66C7C7;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .section p {
+            margin: 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            color: #274991;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-box {
+            width: 45%;
+            border-top: 1px dotted #999;
+            padding-top: 10px;
+            margin-top: 50px;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DEVIS - PROJET SAILINGLOC</h1>
+            <p><strong>Date :</strong> 07/08/2025</p>
+            <p><strong>Référence :</strong> DEV-SL-2025-001</p>
+            <p><strong>Client :</strong> SailingLoc</p>
+        </div>
+        
+        <div class="section">
+            <h2>1. PRÉSENTATION DU PROJET</h2>
+            <p>Développement d'une application web de location de bateaux (voiliers et bateaux à moteur) permettant aux utilisateurs de rechercher, consulter et réserver des bateaux en ligne.</p>
+        </div>
+        
+        <div class="section">
+            <h2>2. FONCTIONNALITÉS DÉVELOPPÉES</h2>
+            
+            <h3>2.1 Interface utilisateur</h3>
+            <ul>
+                <li>Page d'accueil avec recherche par localisation et date</li>
+                <li>Navigation entre les différentes catégories de bateaux (voiliers/bateaux à moteur)</li>
+                <li>Affichage des destinations populaires</li>
+                <li>Témoignages d'utilisateurs</li>
+                <li>Design responsive et moderne</li>
+            </ul>
+            
+            <h3>2.2 Catalogue de bateaux</h3>
+            <ul>
+                <li>Liste des voiliers disponibles avec filtres (prix, capacité)</li>
+                <li>Liste des bateaux à moteur disponibles avec filtres</li>
+                <li>Fiches détaillées des bateaux avec caractéristiques techniques</li>
+                <li>Galerie d'images pour chaque bateau</li>
+                <li>Système de favoris</li>
+            </ul>
+            
+            <h3>2.3 Système de réservation</h3>
+            <ul>
+                <li>Sélection des dates de location</li>
+                <li>Calcul automatique du prix en fonction de la durée</li>
+                <li>Formulaire de réservation</li>
+                <li>Système de paiement en ligne</li>
+            </ul>
+            
+            <h3>2.4 Fonctionnalités utilisateur</h3>
+            <ul>
+                <li>Création et gestion de compte</li>
+                <li>Historique des réservations</li>
+                <li>Système d'avis et de notation</li>
+            </ul>
+            
+            <h3>2.5 Administration</h3>
+            <ul>
+                <li>Gestion du catalogue de bateaux</li>
+                <li>Gestion des réservations</li>
+                <li>Tableau de bord statistique</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>3. TECHNOLOGIES UTILISÉES</h2>
+            <ul>
+                <li><strong>Frontend :</strong> React 19, React Router 7, Bootstrap 5, Tailwind CSS</li>
+                <li><strong>Bibliothèques UI :</strong> FontAwesome, Headless UI</li>
+                <li><strong>Cartographie :</strong> React Google Maps API</li>
+                <li><strong>Authentification :</strong> JWT</li>
+                <li><strong>Build et déploiement :</strong> Vite 6</li>
+                <li><strong>Tests :</strong> Vitest, React Testing Library</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>4. DÉTAIL DES PRESTATIONS</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prestation</th>
+                        <th>Description</th>
+                        <th>Jours</th>
+                        <th>Montant HT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Analyse et conception</strong></td>
+                        <td>Analyse des besoins, wireframes, maquettes</td>
+                        <td>5</td>
+                        <td>2 500 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Développement Frontend</strong></td>
+                        <td>Intégration des maquettes, composants React</td>
+                        <td>15</td>
+                        <td>7 500 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Développement Backend</strong></td>
+                        <td>API, base de données, authentification</td>
+                        <td>10</td>
+                        <td>5 000 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Intégration cartographique</strong></td>
+                        <td>Implémentation Google Maps, géolocalisation</td>
+                        <td>3</td>
+                        <td>1 500 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Système de réservation</strong></td>
+                        <td>Calendrier, disponibilités, paiement</td>
+                        <td>7</td>
+                        <td>3 500 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tests et débogage</strong></td>
+                        <td>Tests unitaires et fonctionnels</td>
+                        <td>4</td>
+                        <td>2 000 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Déploiement</strong></td>
+                        <td>Mise en production, configuration serveur</td>
+                        <td>2</td>
+                        <td>1 000 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Formation</strong></td>
+                        <td>Formation à l'administration du site</td>
+                        <td>1</td>
+                        <td>500 €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>5. RÉCAPITULATIF FINANCIER</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Désignation</th>
+                        <th>Montant HT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Total prestations</strong></td>
+                        <td>23 500 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TVA (20%)</strong></td>
+                        <td>4 700 €</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL TTC</strong></td>
+                        <td><strong>28 200 €</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>6. CONDITIONS DE PAIEMENT</h2>
+            <ul>
+                <li>30% à la commande</li>
+                <li>30% à la livraison de la version beta</li>
+                <li>40% à la livraison finale</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>7. DÉLAIS DE RÉALISATION</h2>
+            <ul>
+                <li><strong>Durée totale du projet :</strong> 12 semaines</li>
+                <li><strong>Date de début estimée :</strong> À définir</li>
+                <li><strong>Date de livraison estimée :</strong> À définir + 12 semaines</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>8. CONDITIONS GÉNÉRALES</h2>
+            <ul>
+                <li>Ce devis est valable 30 jours à compter de sa date d'émission.</li>
+                <li>Les modifications demandées après validation du cahier des charges feront l'objet d'un devis complémentaire.</li>
+                <li>La propriété intellectuelle sera transférée au client après paiement intégral.</li>
+                <li>Garantie technique de 3 mois après livraison.</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <div class="signature-box">
+                <p><strong>Pour le prestataire :</strong><br>Nom et signature</p>
+            </div>
+            <div class="signature-box">
+                <p><strong>Pour le client :</strong><br>Nom et signature</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
