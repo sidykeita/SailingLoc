@@ -22,6 +22,7 @@ import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
 import SailingBoatDetail from './pages/boats/SailingBoatDetail';
 import AddBoat from './pages/boats/AddBoat';
+import EditBoat from './pages/boats/EditBoat';
 
 // Pages des destinations
 import Marseille from './pages/destinations/Marseille';
@@ -139,6 +140,11 @@ function App() {
           <Route path="/add-boat" element={
             <ProtectedRoute userRole="propriétaire">
               <AddBoat />
+            </ProtectedRoute>
+          } />
+          <Route path="/boats/:id/edit" element={
+            <ProtectedRoute userRole="propriétaire">
+              <EditBoat />
             </ProtectedRoute>
           } />
           

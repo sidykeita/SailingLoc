@@ -6,6 +6,19 @@ import boatService from '../../services/boat.service';
 import { Link, useNavigate } from 'react-router-dom';
 
 const OwnerDashboard = () => {
+  // ...
+  const handleDeleteBoat = async (boatId) => {
+  try {
+    await boatService.deleteBoat(boatId);
+    setBoats(boats.filter((boat) => (boat._id || boat.id) !== boatId));
+    setDeleteDone(true);
+    setDeleteConfirmId(null);
+    setTimeout(() => setDeleteDone(false), 3000);
+  } catch (error) {
+    setError(error?.message || "Erreur lors de la suppression du bateau.");
+    setDeleteConfirmId(null);
+  }
+}
   const location = useLocation();
   const { currentUser, logout } = useAuth();
   const [boats, setBoats] = useState([]);
@@ -13,6 +26,8 @@ const OwnerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+const [deleteDone, setDeleteDone] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,9 +101,11 @@ const OwnerDashboard = () => {
       <header className="bg-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <div className="h-12">
-              <img src={logoColor} alt="SailingLOC" className="h-full" />
-            </div>
+            <Link to="/">
+              <div className="h-12">
+                <img src={logoColor} alt="SailingLOC" className="h-full" />
+              </div>
+            </Link>
           </div>
           
           <div className="flex items-center">
@@ -161,11 +178,16 @@ const OwnerDashboard = () => {
               <h2 className="font-montserrat text-xl font-semibold text-dark">Mes bateaux</h2>
             </div>
             
-            {successMessage && (
-              <div className="mb-4 text-green-700 bg-green-100 border border-green-300 rounded p-2 text-center animate-fade-in">
-                {successMessage}
-              </div>
-            )}
+            {deleteDone && (
+  <div className="mb-4 text-red-700 bg-red-100 border border-red-400 rounded p-2 text-center animate-fade-in">
+    Le bateau a bien été supprimé.
+  </div>
+)}
+{successMessage && (
+  <div className="mb-4 text-green-700 bg-green-100 border border-green-300 rounded p-2 text-center animate-fade-in">
+    {successMessage}
+  </div>
+)}
             
             {loading ? (
               <p className="text-center py-4">Chargement des bateaux...</p>
@@ -211,9 +233,40 @@ const OwnerDashboard = () => {
                         </div>
                         <div>
                           <p className="text-gray-500 text-sm">Prix/jour</p>
+                          <p>{boat.dailyPrice} €</p>
                           <div className="mt-4 flex gap-2 flex-wrap">
-                            <button className="btn-secondary py-2 px-4">Modifier</button>
-                            <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors">Supprimer</button>
+                            <button
+  className="btn-secondary py-2 px-4"
+  onClick={() => navigate(`/boats/${boat._id || boat.id}/edit`)}
+>
+  Modifier
+</button>
+                            {deleteConfirmId === (boat._id || boat.id) ? (
+  <div className="bg-white border border-red-400 rounded p-3 flex flex-col md:flex-row items-center gap-2 shadow-md">
+    <span className="text-red-600 font-semibold mr-2">Confirmer la suppression de ce bateau ?</span>
+    <div className="flex gap-2 mt-2 md:mt-0">
+      <button
+        className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
+        onClick={() => handleDeleteBoat(boat._id || boat.id)}
+      >
+        Oui, supprimer
+      </button>
+      <button
+        className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
+        onClick={() => setDeleteConfirmId(null)}
+      >
+        Annuler
+      </button>
+    </div>
+  </div>
+) : (
+  <button
+    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
+    onClick={() => setDeleteConfirmId(boat._id || boat.id)}
+  >
+    Supprimer
+  </button>
+) }
                             <button
                               className="btn-primary py-2 px-4 text-sm font-semibold rounded shadow hover:bg-primary-dark transition"
                               onClick={() => navigate(`/boats/${boat._id || boat.id}`)}
@@ -324,12 +377,12 @@ const OwnerDashboard = () => {
         <div className="mt-8">
           <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Actions rapides</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+            <Link to="/add-boat" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
               <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               <span className="font-medium">Ajouter un bateau</span>
-            </button>
+            </Link>
             
             <button className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
               <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
