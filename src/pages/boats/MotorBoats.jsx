@@ -15,7 +15,7 @@ import {
   faTimes,
   faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../Layout';
+// Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/MotorBoats.css'; // Import du fichier CSS
 
 // Importation des images
@@ -31,11 +31,13 @@ import moteur9 from '../../assets/images/moteur9.jpeg';
 // Suppression des imports pour les icônes du footer
 
 const MotorBoats = () => {
+  // États pour les filtres
   const [searchTerm, setSearchTerm] = useState('');
   const [priceFilter, setPriceFilter] = useState('all');
   const [capacityFilter, setCapacityFilter] = useState('all');
   const [showScrollTop, setShowScrollTop] = useState(false);
   
+  // Effet pour gérer l'affichage du bouton de retour en haut
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -51,13 +53,14 @@ const MotorBoats = () => {
     };
   }, []);
   
+  // Fonction pour remonter en haut de la page
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  
+
   // Données simulées des bateaux à moteur avec les images importées
   const boats = [
     {
@@ -150,8 +153,8 @@ const MotorBoats = () => {
   });
 
   return (
-    <Layout>
-      <div className="motor-boats-page">
+    <>
+      <div className="motor-boats-page motor-boats-container">
         <div className="page-content container mx-auto px-4 py-8 content-container">
           <h1 className="text-3xl font-bold text-[#274991] mb-2">Location de bateaux à moteur</h1>
           <p className="text-[#333333] mb-8">Découvrez notre flotte de bateaux à moteur disponibles à la location</p>
@@ -159,10 +162,10 @@ const MotorBoats = () => {
           {/* Filtres et recherche */}
           <div className="filters-section">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Barre de recherche */}
-          <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
-            <div className="filter-input">
+              {/* Barre de recherche */}
+              <div>
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">Rechercher</label>
+                <div className="filter-input">
               <FontAwesomeIcon icon={faSearch} className="filter-icon" />
               <input
                 type="text"
@@ -172,51 +175,51 @@ const MotorBoats = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+                </div>
+              </div>
+              
+              {/* Filtre de prix */}
+              <div>
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">Prix par jour</label>
+                <div className="filter-input">
+                  <FontAwesomeIcon icon={faFilter} className="filter-icon" />
+                  <select
+                    id="price"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    value={priceFilter}
+                    onChange={(e) => setPriceFilter(e.target.value)}
+                  >
+                    <option value="all">Tous les prix</option>
+                    <option value="low">Économique (moins de 300€)</option>
+                    <option value="medium">Intermédiaire (300€ - 500€)</option>
+                    <option value="high">Premium (plus de 500€)</option>
+                  </select>
+                </div>
+              </div>
+              
+              {/* Filtre de capacité */}
+              <div>
+                <label htmlFor="capacity" className="block text-sm font-medium text-gray-700 mb-2">Capacité</label>
+                <div className="filter-input">
+                  <FontAwesomeIcon icon={faUsers} className="filter-icon" />
+                  <select
+                    id="capacity"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    value={capacityFilter}
+                    onChange={(e) => setCapacityFilter(e.target.value)}
+                  >
+                    <option value="all">Toutes capacités</option>
+                    <option value="small">Petit groupe (jusqu'à 4 pers.)</option>
+                    <option value="medium">Groupe moyen (5-8 pers.)</option>
+                    <option value="large">Grand groupe (plus de 8 pers.)</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
           
-          {/* Filtre de prix */}
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">Prix par jour</label>
-            <div className="filter-input">
-              <FontAwesomeIcon icon={faFilter} className="filter-icon" />
-              <select
-                id="price"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={priceFilter}
-                onChange={(e) => setPriceFilter(e.target.value)}
-              >
-                <option value="all">Tous les prix</option>
-                <option value="low">Économique (moins de 300€)</option>
-                <option value="medium">Intermédiaire (300€ - 500€)</option>
-                <option value="high">Premium (plus de 500€)</option>
-              </select>
-            </div>
-          </div>
-          
-          {/* Filtre de capacité */}
-          <div>
-            <label htmlFor="capacity" className="block text-sm font-medium text-gray-700 mb-2">Capacité</label>
-            <div className="filter-input">
-              <FontAwesomeIcon icon={faUsers} className="filter-icon" />
-              <select
-                id="capacity"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={capacityFilter}
-                onChange={(e) => setCapacityFilter(e.target.value)}
-              >
-                <option value="all">Toutes capacités</option>
-                <option value="small">Petit groupe (jusqu'à 4 pers.)</option>
-                <option value="medium">Groupe moyen (5-8 pers.)</option>
-                <option value="large">Grand groupe (plus de 8 pers.)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Liste des bateaux */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {/* Liste des bateaux */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         {filteredBoats.length > 0 ? (
           filteredBoats.map((boat) => (
             <div key={boat.id} className={`boat-card ${boat.available ? 'available' : ''}`}>
@@ -278,40 +281,39 @@ const MotorBoats = () => {
             <p className="text-gray-600">Aucun bateau ne correspond à vos critères de recherche.</p>
           </div>
         )}
-      </div>
-      
-      {/* Section d'information */}
-      <div className="info-section">
-        <h2 className="text-2xl font-bold text-[#274991] mb-4 cursive-title">Pourquoi choisir notre flotte de bateaux à moteur ?</h2>
-        <div className="info-grid">
-          <div className="info-card">
-            <FontAwesomeIcon icon={faAnchor} className="info-icon" />
-            <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Bateaux récents et entretenus</h3>
-            <p className="text-[#333333]">Notre flotte est régulièrement renouvelée et entretenue par des professionnels pour vous garantir sécurité et fiabilité.</p>
           </div>
-          <div className="info-card">
-            <FontAwesomeIcon icon={faShip} className="info-icon" />
-            <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Large choix de modèles</h3>
-            <p className="text-[#333333]">Du petit bateau familial au puissant yacht, nous avons le bateau idéal pour chaque occasion et chaque budget.</p>
+          
+          {/* Section d'information */}
+          <div className="info-section">
+            <h2 className="text-2xl font-bold text-[#274991] mb-4 cursive-title">Pourquoi choisir notre flotte de bateaux à moteur ?</h2>
+            <div className="info-grid">
+              <div className="info-card">
+                <FontAwesomeIcon icon={faAnchor} className="info-icon" />
+                <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Bateaux récents et entretenus</h3>
+                <p className="text-[#333333]">Notre flotte est régulièrement renouvelée et entretenue par des professionnels pour vous garantir sécurité et fiabilité.</p>
+              </div>
+              <div className="info-card">
+                <FontAwesomeIcon icon={faShip} className="info-icon" />
+                <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Large choix de modèles</h3>
+                <p className="text-[#333333]">Du petit bateau familial au puissant yacht, nous avons le bateau idéal pour chaque occasion et chaque budget.</p>
+              </div>
+              <div className="info-card">
+                <FontAwesomeIcon icon={faWater} className="info-icon" />
+                <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Assistance en mer</h3>
+                <p className="text-[#333333]">Notre équipe est disponible 7j/7 pour vous assister en cas de besoin pendant votre location.</p>
+              </div>
+            </div>
           </div>
-          <div className="info-card">
-            <FontAwesomeIcon icon={faWater} className="info-icon" />
-            <h3 className="text-lg font-bold text-[#3C83C4] mb-2">Assistance en mer</h3>
-            <p className="text-[#333333]">Notre équipe est disponible 7j/7 pour vous assister en cas de besoin pendant votre location.</p>
-          </div>
+          
+          {/* Bouton pour remonter en haut de la page */}
+          {showScrollTop && (
+            <button className="scroll-top-btn" onClick={scrollToTop}>
+              <FontAwesomeIcon icon={faChevronUp} />
+            </button>
+          )}
         </div>
       </div>
-      </div>
-      
-      {/* Bouton pour remonter en haut de la page */}
-      {showScrollTop && (
-        <button className="scroll-top-btn" onClick={scrollToTop}>
-          <FontAwesomeIcon icon={faChevronUp} />
-        </button>
-      )}
-      
-      </div>
-    </Layout>
+    </>
   );
 };
 

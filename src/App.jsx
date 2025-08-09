@@ -3,8 +3,6 @@ import { useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BackgroundImage from './components/BackgroundImage';
 import Layout from './Layout';
-import TestUpload from "./TestUpload";
-
 
 // Pages d'authentification
 import Login from './pages/auth/Login';
@@ -24,8 +22,6 @@ import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
 import SailingBoatDetail from './pages/boats/SailingBoatDetail';
 import AddBoat from './pages/boats/AddBoat';
-import MesBateaux from './pages/boats/MesBateaux';
-import EditBoat from './pages/boats/EditBoat';
 
 // Pages des destinations
 import Marseille from './pages/destinations/Marseille';
@@ -33,6 +29,7 @@ import PortoCristo from './pages/destinations/PortoCristo';
 import Bastia from './pages/destinations/Bastia';
 import Alicante from './pages/destinations/Alicante';
 import Corfou from './pages/destinations/Corfou';
+import Destinations from './pages/destinations/Destinations';
 import VilleneuveLoubet from './pages/destinations/VilleneuveLoubet';
 import DestinationDetail from './pages/destinations/DestinationDetail';
 
@@ -42,6 +39,10 @@ import Home from './pages/home/Home';
 // Pages légales
 import LegalNotices from './pages/legal/LegalNotices';
 import CGUCGV from './pages/legal/CGUCGV';
+
+// Pages à propos
+import About from './pages/about/About';
+import Reviews from './pages/about/Reviews';
 
 // Pages d'aide
 import Help from './pages/help/Help';
@@ -75,18 +76,11 @@ function App() {
       <BackgroundImage />
       <main>
         <Routes>
-        <Route path="/test-upload" element={<TestUpload />} />
-
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />  {/* Home contient déjà Layout */}
-          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />
+          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes des bateaux - avec Layout */}
-          <Route path="/boats" element={
-            <ProtectedRoute userRole="owner">
-              <Layout><MesBateaux /></Layout>
-            </ProtectedRoute>
-          } />
           <Route path="/boats/motor" element={<Layout><MotorBoats /></Layout>} />
           <Route path="/boats/sailing" element={<Layout><SailingBoats /></Layout>} />
           <Route path="/boats/sailing/:id" element={<Layout><SailingBoatDetail /></Layout>} />
@@ -107,7 +101,12 @@ function App() {
           {/* Page de contact - avec Layout */}
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           
+          {/* Pages à propos - avec Layout */}
+          <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/about/reviews" element={<Layout><Reviews /></Layout>} />
+          
           {/* Routes des destinations - avec Layout */}
+          <Route path="/destinations" element={<Layout><Destinations /></Layout>} />
           <Route path="/destinations/marseille" element={<Layout><Marseille /></Layout>} />
           <Route path="/destinations/porto-cristo" element={<Layout><PortoCristo /></Layout>} />
           <Route path="/destinations/bastia" element={<Layout><Bastia /></Layout>} />
@@ -117,38 +116,29 @@ function App() {
           <Route path="/destinations/:destinationId" element={<Layout><DestinationDetail /></Layout>} />
           
           {/* Routes d'inscription */}
-          <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />
+          <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           <Route path="/register/tenant" element={!currentUser ? <RegisterTenant /> : <Navigate to='/dashboard' />} />
           <Route path="/register/owner" element={!currentUser ? <RegisterOwner /> : <Navigate to='/owner/dashboard' />} />
           
           {/* Conserver l'ancienne route pour la compatibilité */}
-          <Route path="/register/old" element={!currentUser ? <Register /> : <Navigate to={userRole === 'owner' ? '/owner/dashboard' : '/dashboard'} />} />
+          <Route path="/register/old" element={!currentUser ? <Register /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes protégées pour les locataires */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              {(userRole === 'owner' || userRole === 'propriétaire' || userRole === 'proprietaire')
-                ? <Navigate to="/owner/dashboard" />
-                : <SimpleDashboard />
-              }
+              <SimpleDashboard />
             </ProtectedRoute>
           } />
           
           {/* Routes protégées pour les propriétaires */}
           <Route path="/owner/dashboard" element={
-            <ProtectedRoute userRole="owner">
+            <ProtectedRoute userRole="propriétaire">
               <OwnerDashboard />
             </ProtectedRoute>
           } />
           <Route path="/add-boat" element={
-            <ProtectedRoute userRole="owner">
+            <ProtectedRoute userRole="propriétaire">
               <AddBoat />
-            </ProtectedRoute>
-          } />
-          {/* Route d'édition de bateau (propriétaire) */}
-          <Route path="/edit-boat/:id" element={
-            <ProtectedRoute userRole="owner">
-              <EditBoat />
             </ProtectedRoute>
           } />
           

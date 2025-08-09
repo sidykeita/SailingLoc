@@ -21,9 +21,10 @@ class BoatService {
     }
   }
 
-  // Obtenir les bateaux d'un propriétaire
+  // Obtenir les bateaux d'un propriétaire connecté
   async getMyBoats() {
     try {
+      // Bonne route backend (voir boatRoutes.js)
       const response = await apiClient.get('/boats/my-boats');
       return response.data;
     } catch (error) {

@@ -8,9 +8,10 @@ import '../../assets/css/Register.css';
 const RegisterOwner = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [homePort, setHomePort] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -49,7 +50,7 @@ const RegisterOwner = () => {
     }
     
     // Validation des champs
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    if (!name || !email || !password || !confirmPassword || !phoneNumber || !homePort) {
       setError('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -79,13 +80,16 @@ const RegisterOwner = () => {
         firstName: name.split(' ')[0],
         lastName: name.split(' ').slice(1).join(' '),
         email,
-        phone,
         password,
-        role: 'propriétaire'
+        phoneNumber,
+        homePort,
+        role: 'propriétaire' // Rôle fixé à propriétaire (français)
       };
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
+      
+      // Redirection vers le dashboard propriétaire
       navigate('/owner/dashboard');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
@@ -148,18 +152,28 @@ const RegisterOwner = () => {
             </div>
             
             <div className="form-group">
-              <label htmlFor="phone" className="form-label">Numéro de téléphone</label>
+              <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
               <input
                 type="tel"
-                id="phone"
+                id="phoneNumber"
                 className="form-input"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
             </div>
             
-
+            <div className="form-group">
+              <label htmlFor="homePort" className="form-label">Port d'attache principal</label>
+              <input
+                type="text"
+                id="homePort"
+                className="form-input"
+                value={homePort}
+                onChange={(e) => setHomePort(e.target.value)}
+                required
+              />
+            </div>
             
             <div className="form-group">
               <label htmlFor="password" className="form-label">Mot de passe</label>

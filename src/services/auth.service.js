@@ -1,40 +1,57 @@
-import apiClient from './api.service';
+import axios from 'axios';
 
-// Service d'authentification réel qui utilise l'API backend
-class AuthService {
-  // Inscription d'un nouvel utilisateur
-  async register(userData) {
-    const response = await apiClient.post('/auth/register', userData);
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'; // adapte selon ton backend
+
+const login = async (email, password) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+    console.log('[DEBUG][auth.service.js] Réponse login backend:', response.data);
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    if (response.data.user) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
     return response.data;
+  } catch (error) {
+    console.error('[DEBUG][auth.service.js] Erreur login backend:', error.response?.data || error);
+    throw error.response?.data || { message: 'Erreur de connexion' };
   }
+};
 
-  // Connexion d'un utilisateur existant
-  async login(email, password) {
-    const response = await apiClient.post('/auth/login', { email, password });
-    // Stocker le token dans localStorage
-    const { token, user } = response.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    return { user };
-  }
-
-  // Déconnexion
-  async logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    await apiClient.post('/auth/logout');
-  }
-
-  // Vérifier si l'utilisateur est authentifié
-  isAuthenticated() {
-    return !!localStorage.getItem('token');
-  }
-
-  // Obtenir les informations de l'utilisateur connecté
-  async getCurrentUser() {
-    const response = await apiClient.get('/auth/user');
+const register = async (userData) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
     return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Erreur d'inscription" };
   }
-}
+};
 
-export default new AuthService();
+const getCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) throw { message: 'Non authentifié' };
+  try {
+    const response = await axios.get(`${API_URL}/auth/user`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Erreur de récupération de l\'utilisateur' };
+  }
+  const response = await axios.get(`${API_URL}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.user;
+};
+
+const logout = () => {
+  localStorage.removeItem('token');
+};
+
+export default {
+  login,
+  register,
+  getCurrentUser,
+  logout,
+};

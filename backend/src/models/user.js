@@ -18,8 +18,22 @@ const userSchema = new mongoose.Schema({
 });
 
 // Ajout de la méthode pour comparer les mots de passe
-userSchema.methods.comparePassword = function(candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  // 1. Essai normal avec bcrypt
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  if (isMatch) return true;
+
+  // 2. Si le hash ne matche pas, on tente la comparaison en clair (pour les vieux comptes mock)
+  if (candidatePassword === this.password) {
+    // On migre le mot de passe en hashé pour les prochaines connexions
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(candidatePassword, salt);
+    await this.save();
+    return true;
+  }
+
+  // 3. Sinon, échec
+  return false;
 };
 
 // Ajout du hashage automatique du mot de passe avant sauvegarde

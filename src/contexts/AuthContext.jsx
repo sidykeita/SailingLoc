@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-// Import du vrai service d'authentification
+// Import du service d'authentification pour le backend réel
 import authService from '../services/auth.service';
-// import mockAuthService from '../services/mockAuth.service'; // <-- S'assurer que ceci est bien commenté
 
 // Création du contexte d'authentification
 const AuthContext = createContext();
@@ -22,11 +21,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        if (authService.isAuthenticated()) {
+        if (localStorage.getItem('token')) {
           // Récupérer les informations de l'utilisateur depuis l'API
-          const userData = await authService.getCurrentUser();
-          setCurrentUser(userData);
-          setUserRole(userData.role || 'tenant'); // Par défaut 'tenant' si aucun rôle n'est spécifié
+          try {
+            const userData = await authService.getCurrentUser();
+            console.log('[DEBUG][AuthContext] userData:', userData);
+            setCurrentUser(userData);
+            setUserRole(userData.role || 'tenant'); // Par défaut 'tenant' si aucun rôle n'est spécifié
+          } catch (err) {
+            console.error('[DEBUG][AuthContext] getCurrentUser error:', err);
+            throw err;
+          }
         }
       } catch (err) {
         console.error('Erreur lors de la vérification de l\'authentification:', err);
@@ -129,17 +134,14 @@ export const AuthProvider = ({ children }) => {
     // Fonction pour basculer entre les rôles (uniquement pour le développement)
   const switchRole = () => {
     if (!currentUser) return;
-    
-    const newRole = userRole === 'owner' ? 'tenant' : 'owner';
+    // Utilise les vrais rôles de la base
+    const newRole = userRole === 'propriétaire' ? 'locataire' : 'propriétaire';
     setUserRole(newRole);
-    
-    // Mettre à jour l'utilisateur dans le localStorage
+    // Met à jour l'utilisateur dans le state uniquement (plus de mockUser)
     const updatedUser = { ...currentUser, role: newRole };
     setCurrentUser(updatedUser);
-    localStorage.setItem('mockUser', JSON.stringify(updatedUser));
-    
-    // Rediriger vers le tableau de bord approprié
-    window.location.href = newRole === 'owner' ? '/owner/dashboard' : '/dashboard';
+    // Redirige vers le bon dashboard
+    window.location.href = newRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard';
   };
 
   // Valeurs à fournir dans le contexte
@@ -159,7 +161,11 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#fff' }}>
+          <p>Chargement de l'authentification...</p>
+        </div>
+      ) : children}
     </AuthContext.Provider>
   );
 };

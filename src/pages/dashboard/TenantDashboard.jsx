@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import reservationService from '../../services/reservation.service';
 
 const TenantDashboard = () => {
   const { currentUser, logout } = useAuth();
@@ -7,37 +8,11 @@ const TenantDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simuler le chargement des réservations depuis l'API
+    // Chargement dynamique des réservations depuis la BDD
     const fetchReservations = async () => {
       try {
-        // Dans une application réelle, vous feriez un appel API ici
-        // const response = await axios.get('https://api.sailingloc.com/reservations');
-        
-        // Pour le développement, nous simulons des données
-        const mockReservations = [
-          {
-            id: '1',
-            boatName: 'Jeanneau Prestige 36',
-            location: 'Marseille',
-            startDate: '2025-07-15',
-            endDate: '2025-07-18',
-            status: 'confirmed',
-            price: 1350,
-            imageUrl: 'https://example.com/boat1.jpg'
-          },
-          {
-            id: '2',
-            boatName: 'Bayliner R42',
-            location: 'Cannes',
-            startDate: '2025-08-05',
-            endDate: '2025-08-10',
-            status: 'pending',
-            price: 2800,
-            imageUrl: 'https://example.com/boat2.jpg'
-          }
-        ];
-        
-        setReservations(mockReservations);
+        const reservationsData = await reservationService.getMyReservations();
+        setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       } catch (error) {
         console.error('Erreur lors du chargement des réservations:', error);
       } finally {

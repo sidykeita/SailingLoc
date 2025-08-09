@@ -1,73 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
+import boatService from '../../services/boat.service';
+import { Link } from 'react-router-dom';
 
 const OwnerDashboard = () => {
   const { currentUser, logout } = useAuth();
   const [boats, setBoats] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simuler le chargement des bateaux et réservations depuis l'API
+    // Chargement réel des bateaux et réservations du propriétaire depuis la BDD
     const fetchOwnerData = async () => {
       try {
-        // Dans une application réelle, vous feriez des appels API ici
-        // const boatsResponse = await axios.get('https://api.sailingloc.com/owner/boats');
-        // const reservationsResponse = await axios.get('https://api.sailingloc.com/owner/reservations');
-        
-        // Pour le développement, nous simulons des données
-        const mockBoats = [
-          {
-            id: '1',
-            name: 'Jeanneau Prestige 36',
-            type: 'Voilier',
-            location: 'Marseille',
-            length: 36,
-            capacity: 8,
-            pricePerDay: 450,
-            status: 'available',
-            imageUrl: 'https://example.com/boat1.jpg'
-          },
-          {
-            id: '2',
-            name: 'Bayliner R42',
-            type: 'Moteur',
-            location: 'Cannes',
-            length: 42,
-            capacity: 12,
-            pricePerDay: 700,
-            status: 'rented',
-            imageUrl: 'https://example.com/boat2.jpg'
-          }
-        ];
-        
-        const mockReservations = [
-          {
-            id: '1',
-            boatId: '1',
-            boatName: 'Jeanneau Prestige 36',
-            tenantName: 'Sophie Martin',
-            startDate: '2025-07-15',
-            endDate: '2025-07-18',
-            status: 'confirmed',
-            totalPrice: 1350
-          },
-          {
-            id: '2',
-            boatId: '2',
-            boatName: 'Bayliner R42',
-            tenantName: 'Thomas Dubois',
-            startDate: '2025-08-05',
-            endDate: '2025-08-10',
-            status: 'pending',
-            totalPrice: 2800
-          }
-        ];
-        
-        setBoats(mockBoats);
-        setReservations(mockReservations);
+        setLoading(true);
+        setError(null);
+        // Appel au service pour récupérer les bateaux du propriétaire connecté
+        const boatsData = await boatService.getMyBoats();
+        setBoats(Array.isArray(boatsData) ? boatsData : []);
+        // TODO: Ajouter ici l'appel réel pour les réservations si tu as une route dédiée
+        // const reservationsData = await reservationService.getMyReservations();
+        // setReservations(reservationsData);
       } catch (error) {
+        setError('Erreur lors du chargement des données bateaux.');
+        setBoats([]);
         console.error('Erreur lors du chargement des données:', error);
       } finally {
         setLoading(false);
@@ -75,12 +33,36 @@ const OwnerDashboard = () => {
     };
 
     fetchOwnerData();
-  }, []);
+  }, [currentUser]);
 
   const handleLogout = () => {
     logout();
     // La redirection sera gérée par le ProtectedRoute
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p>Chargement du tableau de bord propriétaire...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-red-600">Erreur : utilisateur non connecté ou session expirée.<br/>Veuillez vous reconnecter.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,11 +76,7 @@ const OwnerDashboard = () => {
           </div>
           
           <div className="flex items-center">
-            <span className="text-dark mr-4">
-              Bonjour, {currentUser
-                ? currentUser.name || [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ')
-                : 'Propriétaire'}
-            </span>
+            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
             <button 
               onClick={handleLogout}
               className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
@@ -120,11 +98,7 @@ const OwnerDashboard = () => {
             <div className="flex flex-col space-y-4">
               <div>
                 <p className="text-gray-500 text-sm">Nom</p>
-                <p className="font-medium">
-                  {currentUser
-                    ? currentUser.name || [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ')
-                    : 'Non défini'}
-                </p>
+                <p className="font-medium">{currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Non défini'}</p>
               </div>
               <div>
                 <p className="text-gray-500 text-sm">Email</p>
@@ -169,7 +143,6 @@ const OwnerDashboard = () => {
           <div className="card p-6 md:col-span-2">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-montserrat text-xl font-semibold text-dark">Mes bateaux</h2>
-              <button className="btn-primary">Ajouter un bateau</button>
             </div>
             
             {loading ? (
@@ -177,14 +150,17 @@ const OwnerDashboard = () => {
             ) : boats.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-500 mb-4">Vous n'avez pas encore de bateau enregistré</p>
-                <button className="btn-primary">Ajouter mon premier bateau</button>
               </div>
             ) : (
               <div className="space-y-4">
                 {boats.map((boat) => (
-                  <div key={boat.id} className="border rounded-lg p-4 flex flex-col md:flex-row">
+                  <div key={boat._id || boat.id} className="border rounded-lg p-4 flex flex-col md:flex-row">
                     <div className="w-full md:w-1/4 bg-neutral rounded-lg h-32 flex items-center justify-center mb-4 md:mb-0 md:mr-4">
-                      <span className="text-gray-500">Image du bateau</span>
+                      {boat.photos && boat.photos.length > 0 ? (
+                        <img src={boat.photos[0]} alt={boat.name} className="h-full object-cover rounded-lg" />
+                      ) : (
+                        <span className="text-gray-500">Image du bateau</span>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
@@ -194,7 +170,7 @@ const OwnerDashboard = () => {
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-blue-100 text-blue-800'
                         }`}>
-                          {boat.status === 'available' ? 'Disponible' : 'En location'}
+                          {boat.status}
                         </span>
                       </div>
                       <p className="text-gray-600">{boat.location}</p>
@@ -213,8 +189,8 @@ const OwnerDashboard = () => {
                         </div>
                         <div>
                           <p className="text-gray-500 text-sm">Prix/jour</p>
-                          <p className="font-semibold">{boat.pricePerDay} €</p>
-                        </div>
+                          <p className="font-semibold">{boat.dailyPrice} €</p>
+                          </div>
                       </div>
                       <div className="mt-4 flex space-x-2">
                         <button className="btn-secondary py-2 px-4">Modifier</button>
@@ -227,6 +203,11 @@ const OwnerDashboard = () => {
                 ))}
               </div>
             )}
+            
+            {/* Bouton Ajouter un bateau en bas */}
+            <div className="flex justify-center mt-6">
+              <Link to="/add-boat" className="btn-primary">Ajouter un bateau</Link>
+            </div>
           </div>
         </div>
         
@@ -265,7 +246,7 @@ const OwnerDashboard = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {reservations.map((reservation) => (
-                    <tr key={reservation.id}>
+                    <tr key={reservation._id || reservation.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{reservation.boatName}</div>
                       </td>

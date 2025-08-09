@@ -10,7 +10,9 @@ import {
   faStar, 
   faChevronUp, 
   faAngleDown, 
-  faChevronRight 
+  faChevronRight,
+  faBars,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
 // Import des images
@@ -34,6 +36,31 @@ const Layout = ({ children }) => {
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+    console.log("Menu mobile toggled: ", !mobileMenuOpen);
+  };
+  
+  // Style inline pour le bouton hamburger
+  const hamburgerStyle = {
+    display: 'none',
+    backgroundColor: '#274991',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '8px 12px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    marginLeft: 'auto',
+    '@media (max-width: 768px)': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
+    }
+  };
   
   useEffect(() => {
     const handleScroll = () => {
@@ -56,6 +83,18 @@ const Layout = ({ children }) => {
     };
   }, []);
   
+  // Gestion du redimensionnement de la fenêtre
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -72,81 +111,109 @@ const Layout = ({ children }) => {
             <img src={scrolled ? logoColor : logo} alt="SAILING.LOC" />
           </Link>
         </div>
-        <nav className="main-nav">
-          <ul>
-            <li className="dropdown">
-              <a 
-                href="#" 
-                className="dropdown-toggle" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowDropdown(!showDropdown);
-                }}
-              >
-                Découvrir <FontAwesomeIcon icon={faAngleDown} className="dropdown-arrow" />
-              </a>
-              {showDropdown && (
-                <div className="dropdown-menu">
-
-                  
-                  <div className="submenu-section">
-                    <h3 
-                      className="submenu-title"
-                      onClick={() => setShowDestinationsSubmenu(!showDestinationsSubmenu)}
-                    >
-                      Destinations <FontAwesomeIcon icon={faAngleDown} />
-                    </h3>
-                    {showDestinationsSubmenu && (
-                      <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/marseille">Marseille</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/porto-cristo">Porto Cristo</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/destinations/bastia">Bastia</Link></li>
-                      </ul>
-                    )}
+        <button 
+          onClick={toggleMobileMenu}
+          style={{
+            display: windowWidth <= 768 ? 'flex' : 'none',
+            backgroundColor: '#274991',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '8px 12px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            marginLeft: 'auto',
+            alignItems: 'center',
+            gap: '8px',
+            position: 'fixed',
+            right: '20px',
+            top: '20px',
+            zIndex: 9999
+          }}
+        >
+          <FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} /> 
+          {mobileMenuOpen ? 'Fermer' : 'Menu'}
+        </button>
+        
+        {/* Déplacé la navigation à droite et le bouton Mon compte à côté */}
+        <div className="header-right">
+          <nav className={`main-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+            <ul>
+              <li className="mobile-account">
+                <Link to="/login" className="login-button-mobile">
+                  <FontAwesomeIcon icon={faUser} /> Mon compte
+                </Link>
+              </li>
+              <li className="dropdown">
+                <a 
+                  href="#" 
+                  className="dropdown-toggle" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowDropdown(!showDropdown);
+                  }}
+                >
+                  Découvrir <FontAwesomeIcon icon={faAngleDown} className="dropdown-arrow" />
+                </a>
+                {showDropdown && (
+                  <div className="dropdown-menu">
+                    <div className="submenu-section">
+                      <h3 
+                        className="submenu-title"
+                        onClick={() => setShowModelsSubmenu(!showModelsSubmenu)}
+                      >
+                        Location de bateau <FontAwesomeIcon icon={faAngleDown} />
+                      </h3>
+                      {showModelsSubmenu && (
+                        <ul className="submenu-list">
+                          <li className="submenu-item"><Link to="/boats/motor">Bateaux à moteur</Link></li>
+                          <li className="submenu-item"><Link to="/boats/sailing">Voiliers</Link></li>
+                        </ul>
+                      )}
+                    </div>
+                    
+                    <div className="submenu-section">
+                      <h3 
+                        className="submenu-title"
+                        onClick={() => setShowDestinationsSubmenu(!showDestinationsSubmenu)}
+                      >
+                        Meilleures destinations <FontAwesomeIcon icon={faAngleDown} />
+                      </h3>
+                      {showDestinationsSubmenu && (
+                        <ul className="submenu-list">
+                          <li className="submenu-item"><Link to="/destinations/marseille">Marseille</Link></li>
+                          <li className="submenu-item"><Link to="/destinations/porto-cristo">Porto Cristo</Link></li>
+                          <li className="submenu-item"><Link to="/destinations/bastia">Bastia</Link></li>
+                        </ul>
+                      )}
+                    </div>
+                    
+                    <div className="submenu-section">
+                      <h3 
+                        className="submenu-title"
+                        onClick={() => setShowAboutSubmenu(!showAboutSubmenu)}
+                      >
+                        À propos <FontAwesomeIcon icon={faAngleDown} />
+                      </h3>
+                      {showAboutSubmenu && (
+                        <ul className="submenu-list">
+                          <li className="submenu-item"><Link to="/about">À propos</Link></li>
+                          <li className="submenu-item"><Link to="/about/reviews">Avis</Link></li>
+                          <li className="submenu-item"><Link to="/contact">Contact</Link></li>
+                          <li className="submenu-item"><Link to="/help">Aide</Link></li>
+                        </ul>
+                      )}
+                    </div>
                   </div>
-                  
-                  <div className="submenu-section">
-                    <h3 
-                      className="submenu-title"
-                      onClick={() => setShowModelsSubmenu(!showModelsSubmenu)}
-                    >
-                      Modèles <FontAwesomeIcon icon={faAngleDown} />
-                    </h3>
-                    {showModelsSubmenu && (
-                      <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/bayliner">Bayliner</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/jeanneau">Jeanneau</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/models/beneteau">Beneteau</Link></li>
-                      </ul>
-                    )}
-                  </div>
-                  
-                  <div className="submenu-section">
-                    <h3 
-                      className="submenu-title"
-                      onClick={() => setShowAboutSubmenu(!showAboutSubmenu)}
-                    >
-                      À propos <FontAwesomeIcon icon={faAngleDown} />
-                    </h3>
-                    {showAboutSubmenu && (
-                      <ul className="submenu-list">
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/company">Notre entreprise</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/team">Notre équipe</Link></li>
-                        <li style={{display: 'block', margin: '10px 0'}}><Link to="/about/values">Nos valeurs</Link></li>
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              )}
-            </li>
-            <li><Link to="/contact">Contact</Link></li>
-            <li><Link to="/help">Aide</Link></li>
-          </ul>
-        </nav>
-        <div className="user-actions">
-          <Link to="/login" className="login-button">
-            <FontAwesomeIcon icon={faUser} /> Mon compte
-          </Link>
+                )}
+              </li>
+            </ul>
+          </nav>
+          <div className="user-actions desktop-only">
+            <Link to="/login" className="login-button">
+              <FontAwesomeIcon icon={faUser} /> Mon compte
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -183,13 +250,13 @@ const Layout = ({ children }) => {
           <div className="footer-section">
             <h3>Réseaux sociaux</h3>
             <div className="social-icons">
-              <a href="#" className="social-icon">
+              <a href="https://www.facebook.com/profile.php?id=61579044514425" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={facebookIcon} alt="Facebook" />
               </a>
-              <a href="#" className="social-icon">
+              <a href="https://www.instagram.com/sailingloc2025/" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={instaIcon} alt="Instagram" />
               </a>
-              <a href="#" className="social-icon">
+              <a href="#" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={tiktokIcon} alt="TikTok" />
               </a>
             </div>
@@ -204,14 +271,13 @@ const Layout = ({ children }) => {
             </div>
           </div>
         </div>
-
         <div className="footer-bottom">
           <div className="footer-bottom-container">
             <p>© SailingLoc 2025</p>
             <div className="footer-links">
               <Link to="/legal-notices">Mentions légales</Link>
               <Link to="/cgu-cgv">CGU / CGV</Link>
-              <Link to="#">Partenaires</Link>
+
               <Link to="/contact">Contact</Link>
             </div>
           </div>

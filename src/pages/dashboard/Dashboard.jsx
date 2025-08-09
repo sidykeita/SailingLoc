@@ -65,7 +65,7 @@ const Dashboard = () => {
                 Ce
               </div>
               <button className="text-teal-400 text-sm mb-2">+ Ajouter une photo</button>
-              <h2 className="text-2xl font-medium text-gray-800 mb-1">celine</h2>
+              <h2 className="text-2xl font-medium text-gray-800 mb-1">{currentUser ? (currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim()) : 'Utilisateur'}</h2>
               <p className="text-gray-500 text-sm mb-4">Membre depuis 2025</p>
               
               <div className="w-full mb-2">

@@ -14,17 +14,10 @@ const ProtectedRoute = ({ children, userRole }) => {
     return <Navigate to="/login" />;
   }
 
-  // Vérification robuste du rôle propriétaire
-  const ownerRoles = ['owner', 'propriétaire', 'proprietaire'];
-  const isOwnerRole = ownerRoles.includes(currentUserRole);
-  const isRequiredOwner = ownerRoles.includes(userRole);
-
-  if (userRole && (
-      (isRequiredOwner && !isOwnerRole) ||
-      (!isRequiredOwner && currentUserRole !== userRole)
-    )) {
-    // Rediriger vers le dashboard approprié selon le rôle de l'utilisateur
-    return <Navigate to={isOwnerRole ? '/owner/dashboard' : '/dashboard'} />;
+  // Si un rôle spécifique est requis et que l'utilisateur n'a pas ce rôle, rediriger
+  if (userRole && currentUserRole !== userRole) {
+    // Rediriger vers le dashboard approprié selon le rôle de l'utilisateur (en français)
+    return <Navigate to={currentUserRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />;
   }
 
   // Si l'utilisateur est authentifié et a le bon rôle, afficher le contenu protégé
