@@ -28,7 +28,20 @@ const EditBoat = () => {
     status: 'available',
     description: '',
     cabins: '',
-    licenceRequise: false,
+    skipper: false,
+  });
+  // Liste d'équipements courants (à personnaliser si besoin)
+  const ALL_FEATURES = [
+    "GPS", "Radio", "Glacière", "Douche", "Plateforme de baignade", "Bain de soleil", "Cuisine équipée", "Toilettes marines", "Table pique-nique"
+  ];
+  const [features, setFeatures] = useState([]);
+  // Caractéristiques techniques dynamiques
+  const [technicalSpecs, setTechnicalSpecs] = useState({
+    year: '',
+    engine: '',
+    fuelCapacity: '',
+    maxSpeed: '',
+    weight: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -53,8 +66,10 @@ const EditBoat = () => {
           status: data.status === 'disponible' ? 'available' : (data.status === 'en location' ? 'rented' : data.status),
           description: data.description || '',
           cabins: data.cabins || '',
-          licenceRequise: !!data.licenceRequise || !!data.licenseRequired,
+          skipper: !!data.skipper,
         });
+        setFeatures(Array.isArray(data.features) ? data.features : []);
+        setTechnicalSpecs(data.technicalSpecs || { year: '', engine: '', fuelCapacity: '', maxSpeed: '', weight: '' });
         if (data.photos && data.photos.length > 0) {
           setImagePreview(data.photos[0]);
         }
@@ -111,7 +126,9 @@ const EditBoat = () => {
         status: form.status,
         description: form.description.trim(),
         cabins: Number(form.cabins) || 0,
-        licenceRequise: !!form.licenceRequise,
+        skipper: !!form.skipper,
+        features: features.filter(f => f.trim() !== ''),
+        technicalSpecs,
       };
       if (!payload.name || !payload.type || !payload.dailyPrice) {
         setError('Merci de renseigner au minimum le nom, le type et le prix/jour');
@@ -130,7 +147,9 @@ const EditBoat = () => {
         ...payload,
         photos: photoUrls,
         status: form.status === 'available' ? 'disponible' : (form.status === 'rented' ? 'en location' : form.status),
-        licenseRequired: !!form.licenceRequise,
+        skipper: !!form.skipper,
+        features: features.filter(f => f.trim() !== ''),
+        technicalSpecs,
       };
       await boatService.updateBoat(id, finalPayload);
       navigate('/owner/dashboard', { state: { updated: true } });
@@ -256,6 +275,66 @@ const EditBoat = () => {
                 <option value="semi-rigide">Semi-rigide</option>
               </select>
             </div>
+            {/* Caractéristiques techniques dynamiques */}
+            <div>
+              <label className="block text-sm text-gray-700 mb-1 font-semibold">Caractéristiques techniques</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input
+                  type="text"
+                  placeholder="Année"
+                  value={technicalSpecs.year}
+                  onChange={e => setTechnicalSpecs({ ...technicalSpecs, year: e.target.value })}
+                  className="input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Moteur"
+                  value={technicalSpecs.engine}
+                  onChange={e => setTechnicalSpecs({ ...technicalSpecs, engine: e.target.value })}
+                  className="input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Capacité carburant"
+                  value={technicalSpecs.fuelCapacity}
+                  onChange={e => setTechnicalSpecs({ ...technicalSpecs, fuelCapacity: e.target.value })}
+                  className="input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Vitesse max"
+                  value={technicalSpecs.maxSpeed}
+                  onChange={e => setTechnicalSpecs({ ...technicalSpecs, maxSpeed: e.target.value })}
+                  className="input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Poids"
+                  value={technicalSpecs.weight}
+                  onChange={e => setTechnicalSpecs({ ...technicalSpecs, weight: e.target.value })}
+                  className="input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+              </div>
+            </div>
+            {/* Équipements (cases à cocher) */}
+            <div>
+              <label className="block text-sm text-gray-700 mb-1 font-semibold">Équipements</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {ALL_FEATURES.map((feat) => (
+                  <label key={feat} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={features.includes(feat)}
+                      onChange={e => {
+                        if (e.target.checked) setFeatures([...features, feat]);
+                        else setFeatures(features.filter(f => f !== feat));
+                      }}
+                    />
+                    {feat}
+                  </label>
+                ))}
+              </div>
+            </div>
             {/* Longueur / Capacité / Cabines / Prix */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -319,28 +398,29 @@ const EditBoat = () => {
                   En location
                 </button>
               </div>
-              {/* Licence requise */}
-              <div className="flex items-center gap-4 mt-6">
+              {/* Skipper */}
+              <div className="flex items-center gap-8 mt-6">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="licenceRequise"
-                    checked={!!form.licenceRequise}
-                    onChange={handleChange}
+                    name="skipper"
+                    checked={!!form.skipper}
+                    onChange={() => setForm(prev => ({ ...prev, skipper: !prev.skipper }))}
                     className="accent-primary w-4 h-4 rounded border-gray-300 focus:ring-primary/40"
                   />
-                  <span className="text-sm text-gray-700">Licence requise <span className="text-orange-500">*</span></span>
+                  <span className="text-sm text-gray-700">Skipper obligatoire</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="licenceRequise"
-                    checked={!form.licenceRequise}
-                    onChange={() => setForm((prev) => ({ ...prev, licenceRequise: false }))}
+                    name="noSkipper"
+                    checked={!form.skipper}
+                    onChange={() => setForm(prev => ({ ...prev, skipper: false }))}
                     className="accent-primary w-4 h-4 rounded border-gray-300 focus:ring-primary/40"
                   />
-                  <span className="text-sm text-gray-700">Pas de licence requise <span className="text-orange-500">*</span></span>
+                  <span className="text-sm text-gray-700">Sans skipper</span>
                 </label>
+                <span className="text-xs text-gray-500">(Cochez une seule case selon le mode de location)</span>
               </div>
             </div>
             <div className="flex justify-center gap-4 pt-6">
