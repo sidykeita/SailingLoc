@@ -15,6 +15,7 @@ import {
   faTimes,
   faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
+import boatService from '../../services/boat.service';
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/MotorBoats.css'; // Import du fichier CSS
 
@@ -36,6 +37,9 @@ const MotorBoats = () => {
   const [priceFilter, setPriceFilter] = useState('all');
   const [capacityFilter, setCapacityFilter] = useState('all');
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [boats, setBoats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   
   // Effet pour gérer l'affichage du bouton de retour en haut
   useEffect(() => {
@@ -61,76 +65,14 @@ const MotorBoats = () => {
     });
   };
 
-  // Données simulées des bateaux à moteur avec les images importées
-  const boats = [
-    {
-      id: "1",
-      name: "Speedster 250",
-      description: "Bateau rapide et élégant, parfait pour les sorties en mer",
-      power: "250 CV",
-      capacity: "6 personnes",
-      length: "7,5 mètres",
-      image: moteur4,
-      price: 350,
-      available: true
-    },
-    {
-      id: "2",
-      name: "Cruiser 180",
-      description: "Idéal pour les croisières côtières avec tout le confort nécessaire",
-      power: "180 CV",
-      capacity: "8 personnes",
-      length: "8,2 mètres",
-      image: moteur5,
-      price: 450,
-      available: true
-    },
-    {
-      id: "3",
-      name: "Fisherman Pro",
-      description: "Spécialement conçu pour la pêche avec de nombreux équipements dédiés",
-      power: "150 CV",
-      capacity: "4 personnes",
-      length: "6,5 mètres",
-      image: moteur6,
-      price: 280,
-      available: false
-    },
-    {
-      id: "4",
-      name: "Family Boat 220",
-      description: "Spacieux et confortable, idéal pour les sorties en famille",
-      power: "220 CV",
-      capacity: "10 personnes",
-      length: "9 mètres",
-      image: moteur9,
-      price: 520,
-      available: true
-    },
-    {
-      id: "5",
-      name: "Sport 300",
-      description: "Performances exceptionnelles pour les amateurs de sensations fortes",
-      power: "300 CV",
-      capacity: "4 personnes",
-      length: "7 mètres",
-      image: moteur8,
-      price: 600,
-      available: true
-    },
-    {
-      id: "6",
-      name: "Coastal Explorer",
-      description: "Parfait pour explorer les côtes et les criques isolées",
-      power: "200 CV",
-      capacity: "6 personnes",
-      length: "7,8 mètres",
-      image: moteur7,
-      price: 400,
-      available: true
-    }
-  ];
-  
+  useEffect(() => {
+    setLoading(true);
+    boatService.getAllBoats({ type: 'bateau-moteur' })
+      .then(data => setBoats(data))
+      .catch(() => setError('Erreur lors du chargement des bateaux'))
+      .finally(() => setLoading(false));
+  }, []);
+
   // Filtrer les bateaux en fonction des critères
   const filteredBoats = boats.filter(boat => {
     // Filtre de recherche
@@ -225,14 +167,14 @@ const MotorBoats = () => {
             <div key={boat.id} className={`boat-card ${boat.available ? 'available' : ''}`}>
               {/* Image du bateau */}
               <div className="boat-image">
-                <img src={boat.image} alt={boat.name} className="w-full h-full object-cover" />
+                <img src={boat.photos} alt={boat.name} className="w-full h-full object-cover" />
               </div>
               
               <div className="boat-details">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="text-xl font-bold text-[#274991]">{boat.name}</h2>
                   <span className="boat-price">
-                    {boat.price}€/jour
+                    {boat.dailyPrice}€/jour
                   </span>
                 </div>
                 
@@ -257,15 +199,11 @@ const MotorBoats = () => {
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  {boat.available ? (
-                    <span className="text-sm text-[#66C7C7] font-medium">Disponible</span>
-                  ) : (
-                    <span className="text-sm px-2 py-1 bg-[#FF7F50] text-white rounded-md font-medium">
-                      Non disponible
-                    </span>
-                  )}
+                  <span className={`badge ${boat.status === "disponible" ? 'badge-available' : 'badge-unavailable'}`}>
+                    {boat.status === "disponible" ? 'Disponible' : 'Indisponible'}
+                  </span>
                   <Link 
-                    to={`/boats/${boat.id}`}
+                    to={`/boats/motor/${boat._id}`}
                     className="inline-flex items-center text-[#274991] hover:text-[#3C83C4]"
                   >
                     Voir détails

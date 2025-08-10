@@ -24,6 +24,7 @@ import bastiaImage from '../../assets/images/destinations/bastia.jpeg';
 import profileImg1 from '../../assets/images/jean.jpg';
 import profileImg2 from '../../assets/images/fanny.jpg';
 import profileImg3 from '../../assets/images/mathieu.jpg';
+import boatService from '../../services/boat.service';
 
 const Home = () => {
   const [selectedBoatType, setSelectedBoatType] = useState(null);
@@ -33,8 +34,19 @@ const Home = () => {
   const [selectedPort, setSelectedPort] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [expandedTestimonials, setExpandedTestimonials] = useState([false, false, false]);
+  const [boatsDynamiques, setBoatsDynamiques] = useState([]);
+  const [boatsLoading, setBoatsLoading] = useState(true);
+  const [boatsError, setBoatsError] = useState('');
   const searchRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setBoatsLoading(true);
+    boatService.getAllBoats()
+      .then(data => setBoatsDynamiques(data))
+      .catch(() => setBoatsError('Erreur lors du chargement des bateaux'))
+      .finally(() => setBoatsLoading(false));
+  }, []);
   
   const scrollToContent = () => {
     const contentSection = document.querySelector('.community-favorites');
@@ -201,74 +213,44 @@ const Home = () => {
         </div>
         
         <section className="community-favorites">
-          <div className="section-container">
-            <h2 className="section-title">Les coup de coeur de la communauté</h2>
-            <div className="boat-cards">
-              <Link to="/boats/1" className="boat-card-link">
-                <div className="boat-card">
-                  <div className="boat-card-header">
-                    <img src={moteur4Img} alt="Speedster 250" className="boat-image" />
-                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
-                  </div>
-                  <div className="boat-info">
-                    <div className="boat-header">
-                      <h3>La Rochelle</h3>
-                      <div className="boat-rating">★★★★★ (4.82)</div>
-                    </div>
-                    <p className="boat-description">Speedster 250 • 7,5m • 6 pers • 250CV</p>
-                    <p className="boat-owner">Proposé par <span>Thomas M.</span></p>
-                    <div className="boat-price">
-                      <span className="price-label">à partir de</span>
-                      <div className="price-value">350 € / jour</div>
-                    </div>
-                  </div>
+  <div className="section-container">
+    <h2 className="section-title">Les coup de coeur de la communauté</h2>
+    <div className="boat-cards">
+      {boatsLoading ? (
+        <div className="boat-card loading">Chargement des bateaux...</div>
+      ) : boatsError ? (
+        <div className="boat-card error">{boatsError}</div>
+      ) : boatsDynamiques.length === 0 ? (
+        <div className="boat-card empty">Aucun bateau à afficher</div>
+      ) : (
+        boatsDynamiques.slice(0, 3).map((boat) => (
+          <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
+            <div className="boat-card">
+              <div className="boat-card-header">
+                <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} className="boat-image" />
+                <button className="favorite-btn" onClick={e => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
+              </div>
+              <div className="boat-info">
+                <div className="boat-header">
+                  <h3>{boat.location || boat.port || 'Port inconnu'}</h3>
+                  {/* Note : rating mocké, à remplacer si besoin plus tard */}
+                  <div className="boat-rating">★★★★★</div>
                 </div>
-              </Link>
-              
-              <Link to="/boats/2" className="boat-card-link">
-                <div className="boat-card">
-                  <div className="boat-card-header">
-                    <img src={moteur5Img} alt="Cruiser 180" className="boat-image" />
-                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
-                  </div>
-                  <div className="boat-info">
-                    <div className="boat-header">
-                      <h3>Marseille</h3>
-                      <div className="boat-rating">★★★★★ (4.89)</div>
-                    </div>
-                    <p className="boat-description">Cruiser 180 • 8,2m • 8 pers • 180CV</p>
-                    <p className="boat-owner">Proposé par <span>Sophie D.</span></p>
-                    <div className="boat-price">
-                      <span className="price-label">à partir de</span>
-                      <div className="price-value">450 € / jour</div>
-                    </div>
-                  </div>
+                <p className="boat-description">{boat.name} • {boat.length || '?'}m • {boat.capacity || '?'} pers{boat.power ? ` • ${boat.power}` : ''}</p>
+                <p className="boat-owner">Proposé par <span>{boat.owner && (boat.owner.firstName || boat.owner.lastName) ? `${boat.owner.firstName || ''} ${boat.owner.lastName || ''}`.trim() : 'Propriétaire'}</span></p>
+                <div className="boat-price">
+                  <span className="price-label">à partir de</span>
+                  <div className="price-value">{boat.dailyPrice || boat.price || '?'} € / jour</div>
                 </div>
-              </Link>
-              
-              <Link to="/boats/3" className="boat-card-link">
-                <div className="boat-card">
-                  <div className="boat-card-header">
-                    <img src={moteur6Img} alt="Fisherman Pro" className="boat-image" />
-                    <button className="favorite-btn" onClick={(e) => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
-                  </div>
-                  <div className="boat-info">
-                    <div className="boat-header">
-                      <h3>Le Croisic</h3>
-                      <div className="boat-rating">★★★★★ (4.95)</div>
-                    </div>
-                    <p className="boat-description">Fisherman Pro • 6,5m • 4 pers • 150CV</p>
-                    <p className="boat-owner">Proposé par <span>Pierre L.</span></p>
-                    <div className="boat-price">
-                      <span className="price-label">à partir de</span>
-                      <div className="price-value">280 € / jour</div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+              </div>
             </div>
-          </div>
-        </section>
+          </Link>
+        ))
+      )}
+    </div>
+  </div>
+</section>
+
         
         <section className="destinations">
           <div className="section-container">

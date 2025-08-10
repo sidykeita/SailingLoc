@@ -53,7 +53,7 @@ exports.getBoats = async (req, res) => {
     // Optionnel : pour debug
     console.log("Filters used:", filters);
 
-    const boats = await Boat.find(filters);
+    const boats = await Boat.find(filters).populate('owner', 'firstName lastName');
     res.json(boats);
 
   } catch (err) {

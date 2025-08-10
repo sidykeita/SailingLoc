@@ -14,22 +14,18 @@ import {
   faCompass,
   faWind
 } from '@fortawesome/free-solid-svg-icons';
+import boatService from '../../services/boat.service';
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/SailingBoats.css'; // Import du fichier CSS depuis le nouveau chemin
-
-// Importation des nouvelles images des voiliers
-import voilier1 from '../../assets/images/voilier1.jpeg';
-import voilier2 from '../../assets/images/voilier2.jpeg';
-import voilier3 from '../../assets/images/voilier3.jpeg';
-import voilier4 from '../../assets/images/voilier4.jpeg';
-import voilier5 from '../../assets/images/voilier5.jpeg';
-import voilier6 from '../../assets/images/voilier6.jpeg';
 
 const SailingBoats = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [priceFilter, setPriceFilter] = useState('all');
   const [capacityFilter, setCapacityFilter] = useState('all');
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [boats, setBoats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   
   useEffect(() => {
     const handleScroll = () => {
@@ -46,82 +42,20 @@ const SailingBoats = () => {
     };
   }, []);
   
+  useEffect(() => {
+    setLoading(true);
+    boatService.getAllBoats({ type: 'voilier' })
+      .then(data => setBoats(data))
+      .catch(() => setError('Erreur lors du chargement des bateaux'))
+      .finally(() => setLoading(false));
+  }, []);
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  
-  // Données simulées des voiliers avec les images importées
-  const boats = [
-    {
-      id: "s1",
-      name: "Oceanis 40.1",
-      description: "Voilier moderne et confortable, idéal pour les croisières côtières et hauturières",
-      sailArea: "95 m²",
-      capacity: "8 personnes",
-      length: "12,9 mètres",
-      image: voilier1,
-      price: 450,
-      available: true
-    },
-    {
-      id: "s2",
-      name: "Sun Odyssey 410",
-      description: "Voilier performant avec un design innovant et des espaces de vie optimisés",
-      sailArea: "85 m²",
-      capacity: "6 personnes",
-      length: "12,3 mètres",
-      image: voilier2,
-      price: 420,
-      available: true
-    },
-    {
-      id: "s3",
-      name: "Dufour 430",
-      description: "Alliance parfaite entre performance, confort et élégance pour des navigations de rêve",
-      sailArea: "93 m²",
-      capacity: "8 personnes",
-      length: "13,2 mètres",
-      image: voilier3,
-      price: 480,
-      available: false
-    },
-    {
-      id: "s4",
-      name: "Bavaria C45",
-      description: "Grand voilier familial offrant des volumes généreux et une navigation facile",
-      sailArea: "108 m²",
-      capacity: "10 personnes",
-      length: "14,5 mètres",
-      image: voilier4,
-      price: 550,
-      available: true
-    },
-    {
-      id: "s5",
-      name: "First 27",
-      description: "Voilier sportif et rapide pour les amateurs de sensations et de régates",
-      sailArea: "45 m²",
-      capacity: "4 personnes",
-      length: "8,4 mètres",
-      image: voilier5,
-      price: 280,
-      available: true
-    },
-    {
-      id: "s6",
-      name: "Hanse 388",
-      description: "Voilier moderne au design épuré offrant d'excellentes performances de navigation",
-      sailArea: "72 m²",
-      capacity: "6 personnes",
-      length: "11,4 mètres",
-      image: voilier6,
-      price: 380,
-      available: true
-    }
-  ];
   
   // Filtrage des voiliers en fonction des critères de recherche et des filtres
   const filteredBoats = boats.filter(boat => {
@@ -220,7 +154,15 @@ const SailingBoats = () => {
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-[#274991] mb-4">Voiliers disponibles ({filteredBoats.length})</h2>
             
-            {filteredBoats.length === 0 ? (
+            {loading ? (
+              <div className="bg-gray-100 p-8 rounded-lg text-center">
+                <p className="text-lg text-gray-600">Chargement des voiliers...</p>
+              </div>
+            ) : error ? (
+              <div className="bg-gray-100 p-8 rounded-lg text-center">
+                <p className="text-lg text-gray-600">{error}</p>
+              </div>
+            ) : filteredBoats.length === 0 ? (
               <div className="bg-gray-100 p-8 rounded-lg text-center">
                 <p className="text-lg text-gray-600">Aucun voilier ne correspond à vos critères de recherche.</p>
                 <button 
@@ -238,16 +180,16 @@ const SailingBoats = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredBoats.map((boat, index) => (
                   <div 
-                    key={boat.id} 
+                    key={boat._id || boat.id || index}
                     className={`boat-card ${boat.available ? 'available' : ''} animated-card delay-${index % 6 + 1}`}
                   >
                     <div className="boat-image">
-                      <img src={boat.image} alt={boat.name} />
+                      <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} />
                     </div>
                     <div className="boat-details">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-xl font-bold text-[#274991]">{boat.name}</h3>
-                        <span className="boat-price">{boat.price}€/jour</span>
+                        <span className="boat-price">{boat.dailyPrice}€/jour</span>
                       </div>
                       <p className="text-gray-600 text-sm mb-4">{boat.description}</p>
                       
@@ -270,11 +212,11 @@ const SailingBoats = () => {
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <span className={`badge ${boat.available ? 'badge-available' : 'badge-unavailable'}`}>
-                          {boat.available ? 'Disponible' : 'Indisponible'}
+                        <span className={`badge ${boat.status === "disponible" ? 'badge-available' : 'badge-unavailable'}`}>
+                          {boat.status === "disponible" ? 'Disponible' : 'Indisponible'}
                         </span>
                         <Link 
-                          to={`/boats/sailing/${boat.id}`} 
+                          to={`/boats/sailing/${boat._id}`} 
                           className="text-[#274991] hover:text-[#66C7C7] font-medium flex items-center transition-colors"
                         >
                           Voir détails

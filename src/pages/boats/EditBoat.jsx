@@ -270,7 +270,7 @@ const EditBoat = () => {
                 <option value="" disabled>Sélectionnez le type de bateau</option>
                 <option value="voilier">Voilier</option>
                 <option value="catamaran">Catamaran</option>
-                <option value="bateau-moteur">Bateau à moteur</option>
+                <option value="bateau-moteur">bateau-moteur</option>
                 <option value="yacht">Yacht</option>
                 <option value="semi-rigide">Semi-rigide</option>
               </select>
