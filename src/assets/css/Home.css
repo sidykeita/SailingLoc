@@ -234,6 +234,22 @@ p, div, span, a, button, input, select, textarea {
   opacity: 1;
 }
 
+/* Yacht button (no image) */
+.boat-type-btn.yacht {
+  background: linear-gradient(135deg, #274991 0%, #3C83C4 50%, #66C7C7 100%);
+  border-color: rgba(255,255,255,0.4);
+  position: relative;
+}
+.boat-type-btn.yacht .boat-type-emoji {
+  position: absolute;
+  z-index: 1;
+  font-size: 28px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+
 /* Community Favorites Section */
 .community-favorites {
   padding: 30px 30px;

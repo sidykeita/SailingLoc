@@ -79,11 +79,14 @@ const MotorBoats = () => {
     const matchesSearch = boat.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           boat.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Filtre de prix
+    // Filtre de prix (normalisé sur dailyPrice || pricePerDay || price)
+    const normalizedPrice = Number(
+      boat?.dailyPrice ?? boat?.pricePerDay ?? boat?.price ?? 0
+    );
     const matchesPrice = priceFilter === 'all' || 
-                        (priceFilter === 'low' && boat.price < 300) ||
-                        (priceFilter === 'medium' && boat.price >= 300 && boat.price <= 500) ||
-                        (priceFilter === 'high' && boat.price > 500);
+                        (priceFilter === 'low' && normalizedPrice < 300) ||
+                        (priceFilter === 'medium' && normalizedPrice >= 300 && normalizedPrice <= 500) ||
+                        (priceFilter === 'high' && normalizedPrice > 500);
     
     // Filtre de capacité
     const matchesCapacity = capacityFilter === 'all' ||
@@ -163,11 +166,11 @@ const MotorBoats = () => {
           {/* Liste des bateaux */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
         {filteredBoats.length > 0 ? (
-          filteredBoats.map((boat) => (
-            <div key={boat.id} className={`boat-card ${boat.available ? 'available' : ''}`}>
+          filteredBoats.map((boat, index) => (
+            <div key={boat._id || boat.id || index} className={`boat-card ${(boat.status === 'disponible' || boat.available) ? 'available' : ''} animated-card delay-${index % 6 + 1}`}>
               {/* Image du bateau */}
               <div className="boat-image">
-                <img src={boat.photos} alt={boat.name} className="w-full h-full object-cover" />
+                <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} className="w-full h-full object-cover" />
               </div>
               
               <div className="boat-details">
@@ -203,7 +206,7 @@ const MotorBoats = () => {
                     {boat.status === "disponible" ? 'Disponible' : 'Indisponible'}
                   </span>
                   <Link 
-                    to={`/boats/motor/${boat._id}`}
+                    to={`/boats/${boat._id}`}
                     className="inline-flex items-center text-[#274991] hover:text-[#3C83C4]"
                   >
                     Voir détails

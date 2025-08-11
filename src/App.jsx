@@ -18,9 +18,9 @@ import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 
 // Pages des bateaux
 import MotorBoats from './pages/boats/MotorBoats';
+import YachtBoats from './pages/boats/YachtBoats';
 import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
-import SailingBoatDetail from './pages/boats/SailingBoatDetail';
 import AddBoat from './pages/boats/AddBoat';
 import EditBoat from './pages/boats/EditBoat';
 
@@ -83,8 +83,8 @@ function App() {
           
           {/* Routes des bateaux - avec Layout */}
           <Route path="/boats/motor" element={<Layout><MotorBoats /></Layout>} />
+          <Route path="/boats/yacht" element={<Layout><YachtBoats /></Layout>} />
           <Route path="/boats/sailing" element={<Layout><SailingBoats /></Layout>} />
-          <Route path="/boats/sailing/:id" element={<Layout><SailingBoatDetail /></Layout>} />
           <Route path="/boats/:id" element={<Layout><BoatDetail /></Layout>} />
           
           {/* Pages légales - avec Layout */}

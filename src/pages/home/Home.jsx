@@ -205,6 +205,14 @@ const Home = () => {
                   <img src={moteurImg} alt="Bateau à moteur" className="boat-type-icon" />
                   <span>Bateau à moteur</span>
                 </Link>
+                <Link 
+                  to="/boats/yacht"
+                  className={`boat-type-btn yacht ${selectedBoatType === 'yacht' ? 'active' : ''}`}
+                  onClick={() => setSelectedBoatType('yacht')}
+                >
+                  <span className="boat-type-emoji">🛥️</span>
+                  <span>Yacht</span>
+                </Link>
               </div>
               
 

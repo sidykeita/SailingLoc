@@ -63,14 +63,17 @@ const SailingBoats = () => {
     const matchesSearch = boat.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          boat.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Filtrage par prix
+    // Filtrage par prix (normalisé sur dailyPrice || pricePerDay || price)
+    const normalizedPrice = Number(
+      boat?.dailyPrice ?? boat?.pricePerDay ?? boat?.price ?? 0
+    );
     let matchesPrice = true;
     if (priceFilter === 'low') {
-      matchesPrice = boat.price < 300;
+      matchesPrice = normalizedPrice < 300;
     } else if (priceFilter === 'medium') {
-      matchesPrice = boat.price >= 300 && boat.price <= 450;
+      matchesPrice = normalizedPrice >= 300 && normalizedPrice <= 450;
     } else if (priceFilter === 'high') {
-      matchesPrice = boat.price > 450;
+      matchesPrice = normalizedPrice > 450;
     }
     
     // Filtrage par capacité
@@ -181,7 +184,7 @@ const SailingBoats = () => {
                 {filteredBoats.map((boat, index) => (
                   <div 
                     key={boat._id || boat.id || index}
-                    className={`boat-card ${boat.available ? 'available' : ''} animated-card delay-${index % 6 + 1}`}
+                    className={`boat-card ${(boat.status === 'disponible' || boat.available) ? 'available' : ''} animated-card delay-${index % 6 + 1}`}
                   >
                     <div className="boat-image">
                       <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} />
@@ -216,7 +219,7 @@ const SailingBoats = () => {
                           {boat.status === "disponible" ? 'Disponible' : 'Indisponible'}
                         </span>
                         <Link 
-                          to={`/boats/sailing/${boat._id}`} 
+                          to={`/boats/${boat._id}`} 
                           className="text-[#274991] hover:text-[#66C7C7] font-medium flex items-center transition-colors"
                         >
                           Voir détails
