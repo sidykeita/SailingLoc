@@ -169,6 +169,8 @@ const Layout = ({ children }) => {
                           <li className="submenu-item"><Link to="/boats/motor">Bateaux à moteur</Link></li>
                           <li className="submenu-item"><Link to="/boats/sailing">Voiliers</Link></li>
                           <li className="submenu-item"><Link to="/boats/yacht">Yachts</Link></li>
+                          <li className="submenu-item"><Link to="/boats/catamaran">Catamarans</Link></li>
+                          <li className="submenu-item"><Link to="/boats/semi-rigide">Semi-rigides</Link></li>
                         </ul>
                       )}
                     </div>
@@ -274,7 +276,7 @@ const Layout = ({ children }) => {
         </div>
         <div className="footer-bottom">
           <div className="footer-bottom-container">
-            <p>© SailingLoc 2025</p>
+            <p> SailingLoc 2025</p>
             <div className="footer-links">
               <Link to="/legal-notices">Mentions légales</Link>
               <Link to="/cgu-cgv">CGU / CGV</Link>

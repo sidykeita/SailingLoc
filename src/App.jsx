@@ -19,10 +19,13 @@ import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 // Pages des bateaux
 import MotorBoats from './pages/boats/MotorBoats';
 import YachtBoats from './pages/boats/YachtBoats';
+import CatamaranBoats from './pages/boats/CatamaranBoats';
+import SemiRigideBoats from './pages/boats/SemiRigideBoats';
 import BoatDetail from './pages/boats/BoatDetail';
 import SailingBoats from './pages/boats/SailingBoats';
 import AddBoat from './pages/boats/AddBoat';
 import EditBoat from './pages/boats/EditBoat';
+import AllBoats from './pages/boats/AllBoats';
 
 // Pages des destinations
 import Marseille from './pages/destinations/Marseille';
@@ -82,8 +85,11 @@ function App() {
           <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes des bateaux - avec Layout */}
+          <Route path="/boats" element={<Layout><AllBoats /></Layout>} />
           <Route path="/boats/motor" element={<Layout><MotorBoats /></Layout>} />
           <Route path="/boats/yacht" element={<Layout><YachtBoats /></Layout>} />
+          <Route path="/boats/catamaran" element={<Layout><CatamaranBoats /></Layout>} />
+          <Route path="/boats/semi-rigide" element={<Layout><SemiRigideBoats /></Layout>} />
           <Route path="/boats/sailing" element={<Layout><SailingBoats /></Layout>} />
           <Route path="/boats/:id" element={<Layout><BoatDetail /></Layout>} />
           

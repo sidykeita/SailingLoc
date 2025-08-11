@@ -99,12 +99,18 @@ const Home = () => {
   // Gestion de la soumission du formulaire de recherche
   const handleSearch = (e) => {
     e.preventDefault();
+    // Redirection vers la page résultats avec paramètres
+    setShowResults(false);
     if (selectedPort) {
-      // Redirection vers la page des bateaux avec les paramètres de recherche
-      navigate(`/boats?location=${selectedPort.id}&date=${selectedDate}`);
+      const params = new URLSearchParams();
+      params.set('location', selectedPort.name);
+      if (selectedDate) params.set('date', selectedDate);
+      navigate(`/boats?${params.toString()}`);
     } else if (searchQuery.trim()) {
-      // Si aucun port n'est sélectionné mais qu'il y a une requête, utiliser la requête
-      navigate(`/boats?query=${encodeURIComponent(searchQuery)}&date=${selectedDate}`);
+      const params = new URLSearchParams();
+      params.set('query', searchQuery.trim());
+      if (selectedDate) params.set('date', selectedDate);
+      navigate(`/boats?${params.toString()}`);
     }
   };
   
@@ -118,6 +124,22 @@ const Home = () => {
 
   // Ajout d'un log pour vérifier si le composant est rendu
   console.log('Composant Home rendu');
+
+  // Filtre des bateaux par ville/port saisis
+  const activeCityQuery = (selectedPort?.name || searchQuery || '').trim().toLowerCase();
+  const displayedBoats = activeCityQuery
+    ? boatsDynamiques.filter((boat) => {
+        const candidates = [
+          boat?.location,
+          boat?.city,
+          boat?.port,
+          boat?.destination,
+        ]
+          .filter(Boolean)
+          .map((v) => String(v).toLowerCase());
+        return candidates.some((v) => v.includes(activeCityQuery));
+      })
+    : boatsDynamiques;
 
   return (
     <Layout>
@@ -205,17 +227,8 @@ const Home = () => {
                   <img src={moteurImg} alt="Bateau à moteur" className="boat-type-icon" />
                   <span>Bateau à moteur</span>
                 </Link>
-                <Link 
-                  to="/boats/yacht"
-                  className={`boat-type-btn yacht ${selectedBoatType === 'yacht' ? 'active' : ''}`}
-                  onClick={() => setSelectedBoatType('yacht')}
-                >
-                  <span className="boat-type-emoji">🛥️</span>
-                  <span>Yacht</span>
-                </Link>
+                
               </div>
-              
-
             </div>
           </div>
         </div>
@@ -228,10 +241,10 @@ const Home = () => {
         <div className="boat-card loading">Chargement des bateaux...</div>
       ) : boatsError ? (
         <div className="boat-card error">{boatsError}</div>
-      ) : boatsDynamiques.length === 0 ? (
-        <div className="boat-card empty">Aucun bateau à afficher</div>
+      ) : displayedBoats.length === 0 ? (
+        <div className="boat-card empty">{activeCityQuery ? `Aucun bateau disponible pour \"${activeCityQuery}\"` : 'Aucun bateau à afficher'}</div>
       ) : (
-        boatsDynamiques.slice(0, 3).map((boat) => (
+        displayedBoats.slice(0, 3).map((boat) => (
           <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
             <div className="boat-card">
               <div className="boat-card-header">
