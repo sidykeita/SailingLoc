@@ -15,6 +15,7 @@ import {
   faWind
 } from '@fortawesome/free-solid-svg-icons';
 import boatService from '../../services/boat.service';
+import PourquoiLouerSection from '../../components/PourquoiLouerSection';
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import '../../assets/css/SailingBoats.css'; // Import du fichier CSS depuis le nouveau chemin
 
@@ -233,27 +234,8 @@ const SailingBoats = () => {
             )}
           </div>
       
-          {/* Section d'information */}
-          <div className="info-section">
-            <h2 className="text-2xl font-semibold text-[#274991] mb-6 text-center">Pourquoi louer un voilier avec nous ?</h2>
-            <div className="info-grid">
-              <div className="info-card">
-                <FontAwesomeIcon icon={faShip} className="info-icon" />
-                <h3 className="text-lg font-semibold text-[#274991] mb-2">Flotte moderne et entretenue</h3>
-                <p className="text-gray-600">Nos voiliers sont régulièrement entretenus et répondent aux normes de sécurité les plus strictes.</p>
-              </div>
-              <div className="info-card">
-                <FontAwesomeIcon icon={faCompass} className="info-icon" />
-                <h3 className="text-lg font-semibold text-[#274991] mb-2">Conseils personnalisés</h3>
-                <p className="text-gray-600">Notre équipe de marins expérimentés vous guide pour choisir le voilier adapté à votre niveau et vos besoins.</p>
-              </div>
-              <div className="info-card">
-                <FontAwesomeIcon icon={faAnchor} className="info-icon" />
-                <h3 className="text-lg font-semibold text-[#274991] mb-2">Assistance 24/7</h3>
-                <p className="text-gray-600">Une assistance technique est disponible à tout moment pendant votre location pour une navigation sereine.</p>
-              </div>
-            </div>
-          </div>
+          {/* Section d'information harmonisée */}
+            
         </div>
 
         {/* Bouton de scroll vers le haut */}
@@ -266,6 +248,7 @@ const SailingBoats = () => {
             <FontAwesomeIcon icon={faChevronUp} />
           </button>
         )}
+        <PourquoiLouerSection />
       </div>
     </>
   );

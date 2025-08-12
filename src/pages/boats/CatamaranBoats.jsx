@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faSearch, faFilter, faArrowRight, faChevronUp, faShip, faTachometerAlt, faWater } from '@fortawesome/free-solid-svg-icons';
 import boatService from '../../services/boat.service';
+import PourquoiLouerSection from '../../components/PourquoiLouerSection';
 import '../../assets/css/YachtBoats.css';
 
 const CatamaranBoats = () => {
@@ -127,7 +128,7 @@ const CatamaranBoats = () => {
                     <h2 className="text-xl font-bold text-[#274991]">{boat.name}</h2>
                     <span className="boat-price">{boat.dailyPrice}€/jour</span>
                   </div>
-                  <p className="text-[#333333] mb-4">{boat.description}</p>
+                  
                   <div className="boat-specs">
                     <div className="boat-spec">
                       <FontAwesomeIcon icon={faTachometerAlt} className="boat-spec-icon" />
@@ -176,9 +177,10 @@ const CatamaranBoats = () => {
             <FontAwesomeIcon icon={faChevronUp} />
           </button>
         )}
+          <PourquoiLouerSection />
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default CatamaranBoats;

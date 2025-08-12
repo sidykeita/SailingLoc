@@ -9,4 +9,7 @@ const reservationSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' }
 }, { timestamps: true });
 
+// Index pour accélérer la recherche d'overlaps lors du calcul de disponibilité
+reservationSchema.index({ boat: 1, startDate: 1, endDate: 1, status: 1 });
+
 module.exports = mongoose.model('Reservation', reservationSchema);

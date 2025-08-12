@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faUsers, faChevronUp, faShip, faTachometerAlt, faWater, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import boatService from '../../services/boat.service';
+import PourquoiLouerSection from '../../components/PourquoiLouerSection';
 import '../../assets/css/YachtBoats.css';
 
 const SemiRigideBoats = () => {
@@ -131,6 +132,7 @@ const SemiRigideBoats = () => {
                         <span className="boat-price">{Number(boat?.dailyPrice ?? boat?.pricePerDay ?? boat?.price ?? 0)}€/jour</span>
                       </div>
                       <p className="text-[#333333] mb-4">{boat?.description || '—'}</p>
+                      
                       <div className="boat-specs">
                         <div className="boat-spec">
                           <FontAwesomeIcon icon={faTachometerAlt} className="boat-spec-icon" />
@@ -160,7 +162,8 @@ const SemiRigideBoats = () => {
                     </div>
                   </div>
                 ))
-              ) : (
+              ) : 
+              (
                 <div className="col-span-3 text-center py-8">
                   <FontAwesomeIcon icon={faShip} className="text-4xl text-gray-400 mb-2" />
                   <p className="text-gray-600">Aucun semi-rigide ne correspond à vos critères de recherche.</p>
@@ -180,10 +183,13 @@ const SemiRigideBoats = () => {
               <FontAwesomeIcon icon={faChevronUp} />
             </button>
           )}
+          <PourquoiLouerSection />
         </div>
       </div>
     </>
   );
 };
+
+
 
 export default SemiRigideBoats;

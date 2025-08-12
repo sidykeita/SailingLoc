@@ -2,15 +2,33 @@
 const express = require('express');
 const router = express.Router();
 const reservationController = require('../controllers/reservationController');
+const { protect } = require('../controllers/authController');
 
-router.post('/', reservationController.createReservation);
+// Création d'une réservation (utilise req.user.id)
+router.post('/', protect, reservationController.createReservation);
+
+// Liste globale (peut rester publique)
 router.get('/', reservationController.getReservations);
-router.get('/user', reservationController.getUserReservations);
-router.get('/owner', reservationController.getOwnerReservations);
+
+// Réservations du locataire connecté
+router.get('/user', protect, reservationController.getUserReservations);
+
+// Réservations des bateaux du propriétaire connecté
+router.get('/owner', protect, reservationController.getOwnerReservations);
+
+// Détails (public ou protégé selon besoin)
 router.get('/:id', reservationController.getReservationById);
-router.put('/:id/status', reservationController.updateReservationStatus);
-router.put('/:id/cancel', reservationController.cancelReservation);
-router.post('/:id/review', reservationController.addReview);
-router.delete('/:id', reservationController.deleteReservation);
+
+// Mise à jour statut
+router.put('/:id/status', protect, reservationController.updateReservationStatus);
+
+// Annulation par le locataire
+router.put('/:id/cancel', protect, reservationController.cancelReservation);
+
+// Avis par le locataire
+router.post('/:id/review', protect, reservationController.addReview);
+
+// Suppression
+router.delete('/:id', protect, reservationController.deleteReservation);
 
 module.exports = router;

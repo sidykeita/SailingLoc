@@ -1,4 +1,5 @@
 const Boat = require('../models/boat');
+const Reservation = require('../models/reservation');
 
 // Créer un bateau
 exports.createBoat = async (req, res) => {
@@ -57,6 +58,50 @@ exports.getBoats = async (req, res) => {
     res.json(boats);
 
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Obtenir les bateaux disponibles sur une période
+exports.getAvailableBoats = async (req, res) => {
+  try {
+    const { start, end, port, type, capacity, name } = req.query;
+
+    if (!start || !end) {
+      return res.status(400).json({ message: "Paramètres 'start' et 'end' requis (YYYY-MM-DD)" });
+    }
+
+    const startDate = new Date(`${start}T00:00:00.000Z`);
+    const endDate = new Date(`${end}T23:59:59.999Z`);
+    if (isNaN(startDate) || isNaN(endDate) || startDate > endDate) {
+      return res.status(400).json({ message: 'Période invalide' });
+    }
+
+    // Filtres bateaux optionnels
+    const boatFilters = {};
+    if (name) boatFilters.name = { $regex: name, $options: 'i' };
+    if (type) boatFilters.type = type;
+    if (capacity) boatFilters.capacity = Number(capacity);
+    if (port) boatFilters.port = { $regex: port, $options: 'i' };
+    // Ex: n'afficher que les bateaux louables
+    // boatFilters.status = 'disponible';
+
+    // Réservations qui se chevauchent avec la période demandée
+    // Overlap si: startDate <= end ET endDate >= start
+    const overlapping = await Reservation.find({
+      status: { $in: ['pending', 'confirmed'] },
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate },
+    }).select('boat');
+
+    const excluded = new Set(overlapping.map(r => String(r.boat)));
+
+    const boats = await Boat.find(boatFilters).populate('owner', 'firstName lastName');
+    const available = boats.filter(b => !excluded.has(String(b._id)));
+
+    res.json(available);
+  } catch (err) {
+    console.error('getAvailableBoats error:', err);
     res.status(500).json({ message: err.message });
   }
 };

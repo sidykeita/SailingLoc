@@ -166,6 +166,7 @@ const Layout = ({ children }) => {
                       </h3>
                       {showModelsSubmenu && (
                         <ul className="submenu-list">
+                          <li className="submenu-item"><Link to="/boats">Tous les bateaux</Link></li>
                           <li className="submenu-item"><Link to="/boats/motor">Bateaux à moteur</Link></li>
                           <li className="submenu-item"><Link to="/boats/sailing">Voiliers</Link></li>
                           <li className="submenu-item"><Link to="/boats/yacht">Yachts</Link></li>

@@ -26,19 +26,29 @@ import profileImg2 from '../../assets/images/fanny.jpg';
 import profileImg3 from '../../assets/images/mathieu.jpg';
 import boatService from '../../services/boat.service';
 
+// Date range picker
+import { DateRange } from 'react-date-range';
+import fr from 'date-fns/locale/fr';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+
 const Home = () => {
   const [selectedBoatType, setSelectedBoatType] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [selectedPort, setSelectedPort] = useState(null);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(''); // legacy support (non utilisé avec le calendrier)
+  const [selectedEndDate, setSelectedEndDate] = useState(''); // legacy support
+  const [dateRange, setDateRange] = useState([{ startDate: null, endDate: null, key: 'selection' }]);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [expandedTestimonials, setExpandedTestimonials] = useState([false, false, false]);
   const [boatsDynamiques, setBoatsDynamiques] = useState([]);
   const [boatsLoading, setBoatsLoading] = useState(true);
   const [boatsError, setBoatsError] = useState('');
   const searchRef = useRef(null);
   const navigate = useNavigate();
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     setBoatsLoading(true);
@@ -47,15 +57,14 @@ const Home = () => {
       .catch(() => setBoatsError('Erreur lors du chargement des bateaux'))
       .finally(() => setBoatsLoading(false));
   }, []);
-  
+
   const scrollToContent = () => {
     const contentSection = document.querySelector('.community-favorites');
     if (contentSection) {
       contentSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
-  
-  // Recherche de ports en fonction de la requête
+
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
       const results = portService.searchPorts(searchQuery);
@@ -67,7 +76,6 @@ const Home = () => {
     }
   }, [searchQuery]);
 
-  // Gestion du clic en dehors des résultats de recherche
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -81,14 +89,12 @@ const Home = () => {
     };
   }, []);
 
-  // Gestion de la sélection d'un port
   const handleSelectPort = (port) => {
     setSelectedPort(port);
     setSearchQuery(port.name);
     setShowResults(false);
   };
 
-  // Effacer la recherche
   const clearSearch = () => {
     setSearchQuery('');
     setSelectedPort(null);
@@ -96,25 +102,33 @@ const Home = () => {
     setShowResults(false);
   };
 
-  // Gestion de la soumission du formulaire de recherche
   const handleSearch = (e) => {
     e.preventDefault();
-    // Redirection vers la page résultats avec paramètres
     setShowResults(false);
+    const r = dateRange[0] || {};
+    const toIso = (d) => (d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10) : '');
+    const startNorm = r.startDate ? toIso(r.startDate) : (selectedDate || (selectedEndDate ? selectedEndDate : ''));
+    const endNorm = r.endDate ? toIso(r.endDate) : selectedEndDate;
     if (selectedPort) {
       const params = new URLSearchParams();
       params.set('location', selectedPort.name);
-      if (selectedDate) params.set('date', selectedDate);
+      if (startNorm) params.set('start', startNorm);
+      if (endNorm) params.set('end', endNorm);
       navigate(`/boats?${params.toString()}`);
     } else if (searchQuery.trim()) {
       const params = new URLSearchParams();
       params.set('query', searchQuery.trim());
-      if (selectedDate) params.set('date', selectedDate);
+      if (startNorm) params.set('start', startNorm);
+      if (endNorm) params.set('end', endNorm);
       navigate(`/boats?${params.toString()}`);
     }
   };
-  
-  // Gestion du clic sur "Lire la suite" des témoignages
+
+  useEffect(() => {
+    const { startDate, endDate } = dateRange[0] || {};
+    if (startDate && endDate) setShowCalendar(false);
+  }, [dateRange]);
+
   const toggleTestimonial = (index, e) => {
     e.preventDefault();
     const newExpandedState = [...expandedTestimonials];
@@ -122,10 +136,19 @@ const Home = () => {
     setExpandedTestimonials(newExpandedState);
   };
 
-  // Ajout d'un log pour vérifier si le composant est rendu
   console.log('Composant Home rendu');
 
-  // Filtre des bateaux par ville/port saisis
+  const countByCity = (name) => {
+    const q = String(name || '').toLowerCase();
+    if (!q) return 0;
+    return boatsDynamiques.filter((boat) => {
+      const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
+        .filter(Boolean)
+        .map((v) => String(v).toLowerCase());
+      return fields.some((v) => v.includes(q));
+    }).length;
+  };
+
   const activeCityQuery = (selectedPort?.name || searchQuery || '').trim().toLowerCase();
   const displayedBoats = activeCityQuery
     ? boatsDynamiques.filter((boat) => {
@@ -149,7 +172,7 @@ const Home = () => {
             <div className="search-container">
               <h1>Louez votre bateau en un clic !</h1>
               <p>Comparez les offres pour votre bateau en un clic et réservez en ligne des voiliers et bateaux à moteur</p>
-              
+
               <div className="search-box">
                 <div className="search-input-group location-group" ref={searchRef}>
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="search-icon" />
@@ -174,7 +197,7 @@ const Home = () => {
                       <FontAwesomeIcon icon={faTimes} />
                     </button>
                   )}
-                  
+
                   {showResults && searchResults.length > 0 && (
                     <div className="search-results">
                       {searchResults.map((port) => (
@@ -189,18 +212,72 @@ const Home = () => {
                     </div>
                   )}
                 </div>
-                
-                <div className="search-input-group date-group">
+
+                <div className="search-input-group date-group" style={{ position: 'relative' }}>
                   <FontAwesomeIcon icon={faCalendarAlt} className="search-icon" />
-                  <input 
-                    type="date" 
-                    placeholder="Choisissez vos dates" 
-                    className="search-input" 
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                  />
+                  <button
+                    type="button"
+                    className="search-input date-trigger"
+                    onClick={() => setShowCalendar((v) => !v)}
+                    aria-label="Choisir une période"
+                    style={{
+                      textAlign: 'left',
+                      paddingLeft: 40,
+                      paddingRight: 36,
+                      backgroundColor: '#fff',
+                      color: (() => {
+                        const { startDate, endDate } = dateRange[0] || {};
+                        return startDate || endDate ? undefined : '#888';
+                      })(),
+                    }}
+                  >
+                    {(() => {
+                      const { startDate, endDate } = dateRange[0] || {};
+                      if (startDate && endDate) return `Du ${new Date(startDate).toLocaleDateString('fr-FR')} au ${new Date(endDate).toLocaleDateString('fr-FR')}`;
+                      if (startDate) return `À partir du ${new Date(startDate).toLocaleDateString('fr-FR')}`;
+                      return 'Choisissez vos dates';
+                    })()}
+                  </button>
+                  {(() => {
+                    const { startDate, endDate } = dateRange[0] || {};
+                    return (startDate || endDate) ? (
+                      <button
+                        type="button"
+                        className="clear-search-btn"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDateRange([{ startDate: null, endDate: null, key: 'selection' }]);
+                        }}
+                        aria-label="Effacer les dates"
+                        style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)' }}
+                      >
+                        <FontAwesomeIcon icon={faTimes} />
+                      </button>
+                    ) : null;
+                  })()}
+                  {showCalendar && (
+                    <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 1000, transform: 'scale(0.9)', transformOrigin: 'top left' }}>
+                      <style>{`
+                        /* Masque la zone de plages prédéfinies et tout bouton associé */
+                        .rdrDefinedRangesWrapper { display: none !important; }
+                        .rdrStaticRange { display: none !important; }
+                        .rdrInputRanges { display: none !important; }
+                      `}</style>
+                      <DateRange
+                        onChange={(item) => setDateRange([item.selection])}
+                        moveRangeOnFirstSelection={false}
+                        ranges={dateRange}
+                        months={1}
+                        direction="horizontal"
+                        locale={fr}
+                        minDate={new Date(todayStr)}
+                        rangeColors={["#274991"]}
+                      />
+                    </div>
+                  )}
                 </div>
-                
+
                 <button 
                   className="search-button" 
                   onClick={handleSearch}
@@ -209,7 +286,7 @@ const Home = () => {
                   Rechercher
                 </button>
               </div>
-              
+
               <div className="boat-type-selector">
                 <Link 
                   to="/boats/sailing"
@@ -227,52 +304,51 @@ const Home = () => {
                   <img src={moteurImg} alt="Bateau à moteur" className="boat-type-icon" />
                   <span>Bateau à moteur</span>
                 </Link>
-                
+
               </div>
             </div>
           </div>
         </div>
-        
-        <section className="community-favorites">
-  <div className="section-container">
-    <h2 className="section-title">Les coup de coeur de la communauté</h2>
-    <div className="boat-cards">
-      {boatsLoading ? (
-        <div className="boat-card loading">Chargement des bateaux...</div>
-      ) : boatsError ? (
-        <div className="boat-card error">{boatsError}</div>
-      ) : displayedBoats.length === 0 ? (
-        <div className="boat-card empty">{activeCityQuery ? `Aucun bateau disponible pour \"${activeCityQuery}\"` : 'Aucun bateau à afficher'}</div>
-      ) : (
-        displayedBoats.slice(0, 3).map((boat) => (
-          <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
-            <div className="boat-card">
-              <div className="boat-card-header">
-                <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} className="boat-image" />
-                <button className="favorite-btn" onClick={e => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
-              </div>
-              <div className="boat-info">
-                <div className="boat-header">
-                  <h3>{boat.location || boat.port || 'Port inconnu'}</h3>
-                  {/* Note : rating mocké, à remplacer si besoin plus tard */}
-                  <div className="boat-rating">★★★★★</div>
-                </div>
-                <p className="boat-description">{boat.name} • {boat.length || '?'}m • {boat.capacity || '?'} pers{boat.power ? ` • ${boat.power}` : ''}</p>
-                <p className="boat-owner">Proposé par <span>{boat.owner && (boat.owner.firstName || boat.owner.lastName) ? `${boat.owner.firstName || ''} ${boat.owner.lastName || ''}`.trim() : 'Propriétaire'}</span></p>
-                <div className="boat-price">
-                  <span className="price-label">à partir de</span>
-                  <div className="price-value">{boat.dailyPrice || boat.price || '?'} € / jour</div>
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))
-      )}
-    </div>
-  </div>
-</section>
 
-        
+        <section className="community-favorites">
+          <div className="section-container">
+            <h2 className="section-title">Les coup de coeur de la communauté</h2>
+            <div className="boat-cards">
+              {boatsLoading ? (
+                <div className="boat-card loading">Chargement des bateaux...</div>
+              ) : boatsError ? (
+                <div className="boat-card error">{boatsError}</div>
+              ) : displayedBoats.length === 0 ? (
+                <div className="boat-card empty">{activeCityQuery ? `Aucun bateau disponible pour \"${activeCityQuery}\"` : 'Aucun bateau à afficher'}</div>
+              ) : (
+                displayedBoats.slice(0, 3).map((boat) => (
+                  <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
+                    <div className="boat-card">
+                      <div className="boat-card-header">
+                        <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} className="boat-image" />
+                        <button className="favorite-btn" onClick={e => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
+                      </div>
+                      <div className="boat-info">
+                        <div className="boat-header">
+                          <h3>{boat.location || boat.port || 'Port inconnu'}</h3>
+                          {/* Note : rating mocké, à remplacer si besoin plus tard */}
+                          <div className="boat-rating">★★★★★</div>
+                        </div>
+                        <p className="boat-description">{boat.name} • {boat.length || '?'}m • {boat.capacity || '?'} pers{boat.power ? ` • ${boat.power}` : ''}</p>
+                        <p className="boat-owner">Proposé par <span>{boat.owner && (boat.owner.firstName || boat.owner.lastName) ? `${boat.owner.firstName || ''} ${boat.owner.lastName || ''}`.trim() : 'Propriétaire'}</span></p>
+                        <div className="boat-price">
+                          <span className="price-label">à partir de</span>
+                          <div className="price-value">{boat.dailyPrice || boat.price || '?'} € / jour</div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
         <section className="destinations">
           <div className="section-container">
             <h2 className="section-title">Choisissez votre destination<br />en France et en Europe</h2>
@@ -283,43 +359,43 @@ const Home = () => {
                   <div className="destination-name">Marseille</div>
                   <div className="destination-overlay">
                     <h3>Marseille</h3>
-                    <p>120 bateaux disponibles</p>
+                    <p>{countByCity('Marseille')} bateaux disponibles</p>
                     <span className="destination-link">Explorer</span>
                   </div>
                 </div>
               </Link>
-              
+
               <Link to="/destinations/porto-cristo" className="destination-card-link">
                 <div className="destination-card">
                   <img src={portoCristoImage} alt="Porto Cristo" className="destination-image" />
                   <div className="destination-name">Porto Cristo</div>
                   <div className="destination-overlay">
                     <h3>Porto Cristo</h3>
-                    <p>85 bateaux disponibles</p>
+                    <p>{countByCity('Porto Cristo')} bateaux disponibles</p>
                     <span className="destination-link">Explorer</span>
                   </div>
                 </div>
               </Link>
-              
+
               <Link to="/destinations/bastia" className="destination-card-link">
                 <div className="destination-card">
                   <img src={bastiaImage} alt="Bastia" className="destination-image" />
                   <div className="destination-name">Bastia</div>
                   <div className="destination-overlay">
                     <h3>Bastia</h3>
-                    <p>65 bateaux disponibles</p>
+                    <p>{countByCity('Bastia')} bateaux disponibles</p>
                     <span className="destination-link">Explorer</span>
                   </div>
                 </div>
               </Link>
             </div>
-            
+
             <div className="view-all-destinations">
               <Link to="/destinations" className="view-all-destinations-button">Découvrez nos autres destinations</Link>
             </div>
           </div>
         </section>
-        
+
         <section className="testimonials">
           <div className="section-container">
             <h2 className="section-title">Nos utilisateurs vous partagent<br />leur expérience inoubliable</h2>
