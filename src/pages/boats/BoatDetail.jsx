@@ -43,7 +43,11 @@ const BoatDetail = () => {
   const [endDate, setEndDate] = useState('');
   const [success, setSuccess] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
-  
+
+  // Ajout logique pour locataire
+  const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
+  const canBook = boat && boat.status === 'disponible' && isLocataire;
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -58,7 +62,7 @@ const BoatDetail = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -88,33 +92,41 @@ const BoatDetail = () => {
   if (error) return <div className="text-red-600">{error}</div>;
   if (!boat) return <div>Bateau introuvable</div>;
 
-  const handleReservation = (e) => {
+  const handleReservation = async (e) => {
     e.preventDefault();
-    
-    // Validation de base
-    if (!startDate || !endDate) {
-      setError('Veuillez sélectionner des dates de début et de fin');
-      return;
-    }
-    
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    if (start >= end) {
-      setError('La date de fin doit être postérieure à la date de début');
-      return;
-    }
-
-    // Dans une application réelle, vous enverriez ces données à votre API
-    // axios.post('/api/reservations', { boatId: id, startDate, endDate, userId: currentUser.id })
-    
-    setSuccess('Votre demande de réservation a été envoyée avec succès !');
     setError('');
-    
-    // Redirection après quelques secondes
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 3000);
+    setSuccess('');
+    if (!startDate || !endDate) {
+      setError("Veuillez sélectionner une date de début et de fin.");
+      return;
+    }
+    try {
+      const res = await fetch('/api/reservations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('token') ? `Bearer ${localStorage.getItem('token')}` : '',
+        },
+        body: JSON.stringify({
+          boatId: boat._id,
+          userId: currentUser._id,
+          startDate,
+          endDate,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Erreur lors de la réservation.");
+      }
+      setSuccess("Réservation effectuée avec succès !");
+      setStartDate('');
+      setEndDate('');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2500);
+    } catch (err) {
+      setError(err.message || "Erreur lors de la réservation.");
+    }
   };
 
   return (
@@ -243,7 +255,8 @@ const BoatDetail = () => {
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    disabled={!boat.available}
+                    disabled={!canBook}
+                    onFocus={e => e.target.showPicker && e.target.showPicker()}
                   />
                 </div>
               </div>
@@ -260,7 +273,8 @@ const BoatDetail = () => {
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     min={startDate || new Date().toISOString().split('T')[0]}
-                    disabled={!boat.available}
+                    disabled={!canBook}
+                    onFocus={e => e.target.showPicker && e.target.showPicker()}
                   />
                 </div>
               </div>
@@ -287,15 +301,15 @@ const BoatDetail = () => {
               <button
                 type="submit"
                 className={`booking-button ${
-                  boat.available
+                  canBook
                     ? 'booking-button-available'
                     : 'booking-button-unavailable'
                 }`}
-                disabled={!boat.available}
+                disabled={!canBook}
               >
-                {boat.available ? 'Réserver maintenant' : 'Non disponible'}
+                {canBook ? 'Réserver maintenant' : 'Non disponible'}
               </button>
-              {!boat.available && (
+              {boat.status !== 'disponible' && (
                 <p className="text-red-500 text-center mt-2">Ce bateau n'est pas disponible actuellement</p>
               )}
               {!currentUser && boat.available && (
