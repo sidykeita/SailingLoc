@@ -3,9 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 import boatService from '../../services/boat.service';
+import reservationService from '../../services/reservation.service';
 import { Link, useNavigate } from 'react-router-dom';
+import ReservationDetailModal from '../../components/ReservationDetailModal';
 
 const OwnerDashboard = () => {
+  const [selectedReservation, setSelectedReservation] = useState(null);
   // ...
   const handleDeleteBoat = async (boatId) => {
   try {
@@ -39,12 +42,13 @@ const [deleteDone, setDeleteDone] = useState(false);
         // Appel au service pour récupérer les bateaux du propriétaire connecté
         const boatsData = await boatService.getMyBoats();
         setBoats(Array.isArray(boatsData) ? boatsData : []);
-        // TODO: Ajouter ici l'appel réel pour les réservations si tu as une route dédiée
-        // const reservationsData = await reservationService.getMyReservations();
-        // setReservations(reservationsData);
+        // Appel réel pour les réservations
+        const reservationsData = await reservationService.getMyBoatsReservations();
+        setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       } catch (error) {
-        setError('Erreur lors du chargement des données bateaux.');
+        setError('Erreur lors du chargement des données bateaux ou réservations.');
         setBoats([]);
+        setReservations([]);
         console.error('Erreur lors du chargement des données:', error);
       } finally {
         setLoading(false);
@@ -53,8 +57,6 @@ const [deleteDone, setDeleteDone] = useState(false);
 
     fetchOwnerData();
   }, [currentUser]);
-
-
 
   useEffect(() => {
     // Affiche le message de succès si on vient d’ajouter un bateau
@@ -136,6 +138,10 @@ const [deleteDone, setDeleteDone] = useState(false);
               <div>
                 <p className="text-gray-500 text-sm">Email</p>
                 <p className="font-medium">{currentUser?.email || 'Non défini'}</p>
+              </div>
+              <div>
+                <p className="text-gray-500 text-sm">téléphone</p>
+                <p className="font-medium">{currentUser?.phone || 'Non défini'}</p>
               </div>
               <div>
                 <p className="text-gray-500 text-sm">Rôle</p>
@@ -323,13 +329,13 @@ const [deleteDone, setDeleteDone] = useState(false);
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {reservations.map((reservation) => (
+                  {reservations.filter(r => r && r.boat && r.user && r.status !== 'cancelled').map((reservation) => (
                     <tr key={reservation._id || reservation.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{reservation.boatName}</div>
+                        <div className="text-sm font-medium text-gray-900">{reservation.boat?.name || '-'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{reservation.tenantName}</div>
+                        <div className="text-sm text-gray-900">{reservation.user?.firstName} {reservation.user?.lastName}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
@@ -337,7 +343,11 @@ const [deleteDone, setDeleteDone] = useState(false);
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{reservation.totalPrice} €</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {reservation.totalPrice || reservation.price || (reservation.boat?.dailyPrice && reservation.startDate && reservation.endDate ?
+                            ((Math.ceil((new Date(reservation.endDate) - new Date(reservation.startDate)) / (1000*60*60*24))) * reservation.boat.dailyPrice) : '-')
+                          } €
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -350,15 +360,38 @@ const [deleteDone, setDeleteDone] = useState(false);
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
-                          <button className="text-secondary hover:text-primary">
-                            Détails
-                          </button>
+                          <button
+  className="text-blue-600 hover:text-blue-800 mr-2"
+  onClick={() => setSelectedReservation(reservation)}
+>
+  Détails
+</button>
                           {reservation.status === 'pending' && (
                             <>
-                              <button className="text-green-600 hover:text-green-800">
+                              <button
+                                className="text-green-600 hover:text-green-800"
+                                onClick={async () => {
+                                  try {
+                                    await reservationService.updateReservationStatus(reservation._id || reservation.id, { status: 'confirmed' });
+                                    setReservations(prev => prev.map(r => (r._id || r.id) === (reservation._id || reservation.id) ? { ...r, status: 'confirmed' } : r));
+                                  } catch (e) {
+                                    alert('Erreur lors de l\'acceptation de la réservation');
+                                  }
+                                }}
+                              >
                                 Accepter
                               </button>
-                              <button className="text-red-600 hover:text-red-800">
+                              <button
+                                className="text-red-600 hover:text-red-800"
+                                onClick={async () => {
+                                  try {
+                                    await reservationService.updateReservationStatus(reservation._id || reservation.id, { status: 'cancelled' });
+                                    setReservations(prev => prev.filter(r => (r._id || r.id) !== (reservation._id || reservation.id)));
+                                  } catch (e) {
+                                    alert('Erreur lors du refus de la réservation');
+                                  }
+                                }}
+                              >
                                 Refuser
                               </button>
                             </>
@@ -384,29 +417,31 @@ const [deleteDone, setDeleteDone] = useState(false);
               <span className="font-medium">Ajouter un bateau</span>
             </Link>
             
-            <button className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              <span className="font-medium">Calendrier</span>
-            </button>
+            <Link to="/owner/dashboard/calendrier" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+  </svg>
+  <span className="font-medium">Calendrier</span>
+</Link>
             
-            <button className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-              </svg>
-              <span className="font-medium">Réservations</span>
-            </button>
             
-            <button className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span className="font-medium">Revenus</span>
-            </button>
+            <Link to="/owner/dashboard/reservations" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+  </svg>
+  <span className="font-medium">Réservations</span>
+</Link>
+            
+            <Link to="/owner/dashboard/revenus" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <span className="font-medium">Revenus</span>
+</Link>
           </div>
         </div>
       </main>
+      <ReservationDetailModal reservation={selectedReservation} onClose={() => setSelectedReservation(null)} />
       
       {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">

@@ -6,7 +6,7 @@ const Review = require('../models/review');
 // Créer une réservation
 exports.createReservation = async (req, res) => {
   try {
-    const { boatId, startDate, endDate } = req.body;
+    const { boatId, startDate, endDate, price } = req.body;
     const user = req.user.id;
 
     // Vérifier la disponibilité du bateau
@@ -25,7 +25,8 @@ exports.createReservation = async (req, res) => {
       boat: boatId,
       user,
       startDate,
-      endDate
+      endDate,
+      price // <-- Ajout du champ price
     });
 
     await reservation.save();
@@ -145,7 +146,9 @@ exports.getOwnerReservations = async (req, res) => {
   try {
     const boats = await Boat.find({ owner: req.user.id });
     const boatIds = boats.map(boat => boat._id);
-    const reservations = await Reservation.find({ boat: { $in: boatIds } });
+    const reservations = await Reservation.find({ boat: { $in: boatIds }, status: { $ne: 'cancelled' } })
+      .populate('boat')
+      .populate('user');
     res.status(200).json(reservations);
   } catch (err) {
     res.status(500).json({ message: err.message });

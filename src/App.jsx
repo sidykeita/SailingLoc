@@ -59,6 +59,10 @@ import FAQ from './pages/help/FAQ';
 // Page de contact
 import Contact from './pages/contact/Contact';
 
+import Calendrier from './pages/dashboard/Calendrier';
+import Reservations from './pages/dashboard/Reservations';
+import Revenus from './pages/dashboard/Revenus';
+
 // La page d'accueil est maintenant importée depuis son propre fichier
 
 // Les composants de tableau de bord sont maintenant importés depuis leurs fichiers respectifs
@@ -154,6 +158,25 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/owner/dashboard/calendrier" element={
+            <ProtectedRoute userRole="propriétaire">
+              <Calendrier />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner/dashboard/reservations" element={
+            <ProtectedRoute userRole="propriétaire">
+              <Reservations />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner/dashboard/revenus" element={
+            <ProtectedRoute userRole="propriétaire">
+              <Revenus />
+            </ProtectedRoute>
+          } />
+          {/* Redirections anciennes URLs vers les nouvelles préfixées par /owner */}
+          <Route path="/dashboard/calendrier" element={<Navigate to="/owner/dashboard/calendrier" replace />} />
+          <Route path="/dashboard/reservations" element={<Navigate to="/owner/dashboard/reservations" replace />} />
+          <Route path="/dashboard/revenus" element={<Navigate to="/owner/dashboard/revenus" replace />} />
           {/* Redirection pour les routes inconnues */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

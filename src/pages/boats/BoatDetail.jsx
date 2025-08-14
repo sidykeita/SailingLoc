@@ -33,6 +33,18 @@ import visaIcon from '../../assets/images/visa.png';
 import applepayIcon from '../../assets/images/applepay.png';
 
 const BoatDetail = () => {
+  // ...
+  // Fonction utilitaire pour savoir si une date est réservée
+  function isDateReserved(dateStr) {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    return reservations.some(r => {
+      const rStart = new Date(r.startDate);
+      const rEnd = new Date(r.endDate);
+      return d >= rStart && d <= rEnd;
+    });
+  }
+
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -43,10 +55,27 @@ const BoatDetail = () => {
   const [endDate, setEndDate] = useState('');
   const [success, setSuccess] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [reservations, setReservations] = useState([]);
 
   // Ajout logique pour locataire
   const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
   const canBook = boat && boat.status === 'disponible' && isLocataire;
+
+  // Charger les réservations confirmées du bateau
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const reservationService = (await import('../../services/reservation.service')).default;
+        const res = await reservationService.getReservationsByBoat(id);
+        // On ne garde que les réservations confirmées
+        setReservations((res || []).filter(r => r.status === 'confirmed'));
+      } catch (err) {
+        // On n'empêche pas l'affichage du bateau si erreur
+        setReservations([]);
+      }
+    };
+    if (id) fetchReservations();
+  }, [id]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,6 +129,19 @@ const BoatDetail = () => {
       setError("Veuillez sélectionner une date de début et de fin.");
       return;
     }
+    // Vérifier la disponibilité
+    const s = new Date(startDate);
+    const eD = new Date(endDate);
+    const isOverlap = reservations.some(r => {
+      const rStart = new Date(r.startDate);
+      const rEnd = new Date(r.endDate);
+      // Chevauchement strict (inclusif)
+      return (s <= rEnd && eD >= rStart);
+    });
+    if (isOverlap) {
+      setError("Ce bateau est déjà réservé sur cette période. Veuillez choisir d'autres dates.");
+      return;
+    }
     try {
       const res = await fetch('/api/reservations', {
         method: 'POST',
@@ -112,6 +154,7 @@ const BoatDetail = () => {
           userId: currentUser._id,
           startDate,
           endDate,
+          price: boat.dailyPrice * Math.max(1, Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)))
         }),
       });
       if (!res.ok) {
@@ -257,7 +300,21 @@ const BoatDetail = () => {
                     min={new Date().toISOString().split('T')[0]}
                     disabled={!canBook}
                     onFocus={e => e.target.showPicker && e.target.showPicker()}
+                    style={{ backgroundColor: isDateReserved(startDate) ? '#f8d7da' : undefined }}
+                    onInput={e => {
+                      const val = e.target.value;
+                      if (isDateReserved(val)) {
+                        setError('Cette date de début est déjà réservée.');
+                        setStartDate('');
+                      } else {
+                        setError('');
+                        setStartDate(val);
+                      }
+                    }}
                   />
+                  {startDate && isDateReserved(startDate) && (
+                    <div className="text-red-500 text-xs mt-1">Cette date de début est déjà réservée.</div>
+                  )}
                 </div>
               </div>
               <div className="mb-6">
@@ -275,7 +332,21 @@ const BoatDetail = () => {
                     min={startDate || new Date().toISOString().split('T')[0]}
                     disabled={!canBook}
                     onFocus={e => e.target.showPicker && e.target.showPicker()}
+                    style={{ backgroundColor: isDateReserved(endDate) ? '#f8d7da' : undefined }}
+                    onInput={e => {
+                      const val = e.target.value;
+                      if (isDateReserved(val)) {
+                        setError('Cette date de fin est déjà réservée.');
+                        setEndDate('');
+                      } else {
+                        setError('');
+                        setEndDate(val);
+                      }
+                    }}
                   />
+                  {endDate && isDateReserved(endDate) && (
+                    <div className="text-red-500 text-xs mt-1">Cette date de fin est déjà réservée.</div>
+                  )}
                 </div>
               </div>
               <div className="mb-6">

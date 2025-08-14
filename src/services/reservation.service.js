@@ -24,7 +24,7 @@ class ReservationService {
   // Obtenir les réservations des bateaux d'un propriétaire
   async getMyBoatsReservations() {
     try {
-      const response = await apiClient.get('/reservations/owner/my-boats-reservations');
+      const response = await apiClient.get('/reservations/owner');
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -85,6 +85,15 @@ class ReservationService {
       message: error.message || 'Erreur de connexion au serveur',
       status: 500
     };
+  }
+  // Obtenir toutes les réservations d'un bateau donné
+  async getReservationsByBoat(boatId) {
+    try {
+      const response = await apiClient.get(`/reservations/boat/${boatId}`);
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
   }
 }
 
