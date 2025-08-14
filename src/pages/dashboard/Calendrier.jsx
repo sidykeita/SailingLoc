@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
 import boatService from '../../services/boat.service';
 import { useNavigate } from 'react-router-dom';
@@ -170,13 +171,15 @@ const Calendrier = () => {
       <header className="bg-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <div className="h-12">
-              <img src={logoColor} alt="SailingLOC" className="h-full" />
-            </div>
+          <Link to="/">
+              <div className="h-12">
+                <img src={logoColor} alt="SailingLOC" className="h-full" />
+              </div>
+            </Link>
           </div>
           
           <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || 'Céline'}</span>
+            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
             <button 
               onClick={handleLogout}
               className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
@@ -205,22 +208,7 @@ const Calendrier = () => {
               >
                 Mois
               </button>
-              <button
-                onClick={() => setView('week')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  view === 'week' 
-                    ? 'bg-white text-marine shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Semaine
-              </button>
             </div>
-            
-            <button className="btn-primary flex items-center space-x-2">
-              <PlusIcon className="h-4 w-4" />
-              <span>Nouvel événement</span>
-            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -374,37 +362,6 @@ const Calendrier = () => {
                 </div>
               </div>
 
-              {/* Upcoming Events */}
-              <div className="card p-4">
-                <h3 className="font-semibold text-marine mb-3">Événements à venir</h3>
-                <div className="space-y-3">
-                  {events
-                    .filter(event => event.date >= today)
-                    .sort((a, b) => a.date - b.date)
-                    .slice(0, 5)
-                    .map(event => (
-                      <div key={event.id} className="border-l-4 border-primary pl-3 py-2">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-sm text-gray-900 truncate">
-                            {event.title}
-                          </h4>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
-                            {event.status}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1 text-xs text-gray-600">
-                          <ClockIcon className="h-3 w-3" />
-                          <span>{event.date.toLocaleDateString('fr-FR')} à {event.time}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1 text-xs text-gray-600">
-                          <UserIcon className="h-3 w-3" />
-                          <span>{event.client}</span>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </div>
 
               {/* Event Statistics */}
               <div className="card p-4">

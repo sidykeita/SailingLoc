@@ -34,6 +34,25 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// PATCH /api/users/:id — met à jour uniquement email et téléphone
+exports.updateProfile = async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    const updates = {};
+    if (email) updates.email = email;
+    if (phone) updates.phone = phone;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updates },
+      { new: true, runValidators: true, select: '-password' }
+    );
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 // UPDATE user by ID
 exports.updateUser = async (req, res) => {
   try {

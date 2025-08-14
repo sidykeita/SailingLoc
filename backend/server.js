@@ -31,6 +31,9 @@ app.use('/api/photos', photoRoutes);
 const paymentRoutes = require('./src/routes/paymentRoutes');
 app.use('/api/payments', paymentRoutes);
 
+const userRoutes = require('./src/routes/userRoutes');
+app.use('/api/users', userRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');

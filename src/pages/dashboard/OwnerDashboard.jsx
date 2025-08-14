@@ -6,8 +6,12 @@ import boatService from '../../services/boat.service';
 import reservationService from '../../services/reservation.service';
 import { Link, useNavigate } from 'react-router-dom';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
+import EditProfileModal from '../../components/EditProfileModal';
+import userService from '../../services/user.service';
 
 const OwnerDashboard = () => {
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
   const [selectedReservation, setSelectedReservation] = useState(null);
   // ...
   const handleDeleteBoat = async (boatId) => {
@@ -147,7 +151,22 @@ const [deleteDone, setDeleteDone] = useState(false);
                 <p className="text-gray-500 text-sm">Rôle</p>
                 <p className="font-medium">Propriétaire</p>
               </div>
-              <button className="btn-secondary mt-4">Modifier mon profil</button>
+              <button className="btn-secondary mt-4" onClick={() => setEditModalOpen(true)}>Modifier mon profil</button>
+<EditProfileModal
+  isOpen={editModalOpen}
+  onClose={() => setEditModalOpen(false)}
+  currentEmail={currentUser?.email}
+  currentPhone={currentUser?.phone}
+  onSave={async ({ email, phone }) => {
+    await userService.updateProfile(currentUser._id, { email, phone });
+    // Met à jour currentUser côté front (contexte Auth)
+    if (currentUser) {
+      currentUser.email = email;
+      currentUser.phone = phone;
+    }
+    setSuccessMessage('Profil mis à jour !');
+  }}
+/>
             </div>
             
             {/* Résumé */}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
@@ -108,13 +109,15 @@ const Reservations = () => {
       <header className="bg-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <div className="h-12">
-              <img src={logoColor} alt="SailingLOC" className="h-full" />
-            </div>
+          <Link to="/">
+              <div className="h-12">
+                <img src={logoColor} alt="SailingLOC" className="h-full" />
+              </div>
+            </Link>
           </div>
           
           <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || 'Céline'}</span>
+            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
             <button 
               onClick={handleLogout}
               className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
@@ -149,37 +152,7 @@ const Reservations = () => {
                     <option value="cancelled">Annulées</option>
                   </select>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Trier par
-                  </label>
-                  <select 
-                    value={sortBy} 
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="date">Date de début</option>
-                    <option value="boat">Bateau</option>
-                    <option value="tenant">Locataire</option>
-                    <option value="price">Prix</option>
-                  </select>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <button className="btn-primary">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Nouvelle réservation
-                </button>
-                <button className="btn-secondary">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  Exporter
-                </button>
               </div>
             </div>
           </div>

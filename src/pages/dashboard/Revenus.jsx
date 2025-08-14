@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 
@@ -123,24 +124,26 @@ const Revenus = () => {
     <div className="min-h-screen bg-background">
       {/* Header - identique à OwnerDashboard */}
       <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="h-12">
-              <img src={logoColor} alt="SailingLOC" className="h-full" />
-            </div>
-          </div>
-          
-          <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || 'Céline'}</span>
-            <button 
-              onClick={handleLogout}
-              className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
+              <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div className="flex items-center">
+                <Link to="/">
+                    <div className="h-12">
+                      <img src={logoColor} alt="SailingLOC" className="h-full" />
+                    </div>
+                  </Link>
+                </div>
+                
+                <div className="flex items-center">
+                  <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
+                  <button 
+                    onClick={handleLogout}
+                    className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
+                  >
+                    Déconnexion
+                  </button>
+                </div>
+              </div>
+            </header>
 
       {/* Main content - même arrière-plan et titre que OwnerDashboard */}
       <main className="bg-background min-h-screen">
@@ -180,21 +183,6 @@ const Revenus = () => {
                     <option value="2023">2023</option>
                   </select>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button className="btn-primary">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                  Exporter rapport
-                </button>
-                <button className="btn-secondary">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                  </svg>
-                  Graphiques
-                </button>
               </div>
             </div>
           </div>
