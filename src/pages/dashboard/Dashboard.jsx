@@ -47,10 +47,10 @@ const Dashboard = () => {
               <Link to="/compte">Mon compte</Link>
             </li>
             <li className="text-gray-600 hover:text-teal-800">
-              <Link to="/avis">Mes avis</Link>
+              <Link to="/reviews">Mes avis</Link>
             </li>
             <li className="text-gray-600 hover:text-teal-800">
-              <Link to="/favoris">Mes favoris</Link>
+              <Link to="/favorites">Mes favoris</Link>
             </li>
           </ul>
         </div>
@@ -78,13 +78,13 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <button className="w-full bg-teal-400 text-white py-2 rounded-md hover:bg-teal-500 transition-colors mb-3">
+              <Link to="/account?section=modifier-informations" className="w-full bg-teal-400 text-white py-2 rounded-md hover:bg-teal-500 transition-colors mb-3 block text-center">
                 Compléter mon profil
-              </button>
+              </Link>
               
-              <button className="w-full border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-50 transition-colors mb-6">
+              <Link to="/account?section=modifier-informations" className="w-full border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-50 transition-colors mb-6 block text-center">
                 Voir mon profil
-              </button>
+              </Link>
               
               <div className="w-full space-y-4">
                 <div className="flex items-center justify-between">
@@ -183,13 +183,7 @@ const Dashboard = () => {
               <p className="text-gray-600">Aucune location à venir pour le moment</p>
             </div>
             
-            {/* Annonces */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-medium text-gray-800 mb-4">Annonces</h2>
-              <button className="w-full border border-gray-300 rounded-md py-3 text-center text-teal-600 hover:bg-gray-50 transition-colors">
-                + Ajouter une annonce.
-              </button>
-            </div>
+
           </div>
         </div>
       </div>

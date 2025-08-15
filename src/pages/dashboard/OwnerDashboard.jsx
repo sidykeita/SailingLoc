@@ -8,6 +8,16 @@ import cannesMoteur from '../../assets/images/cannes-moteur.jpeg';
 const OwnerDashboard = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+
+  // Style pour les boutons orange sans classe CSS
+  const orangeButtonStyle = {
+    backgroundColor: '#ff6600',
+    color: 'white',
+    border: 'none',
+    backgroundImage: 'none',
+    background: '#ff6600'
+  };
+
   const [boats, setBoats] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -189,6 +199,7 @@ onClick={() => {
                   }
                 }}
                 className="btn-primary"
+                style={orangeButtonStyle}
                 type="button"
               >
                 Ajouter un bateau
@@ -207,6 +218,7 @@ onClick={() => {
                     navigate('/owner/add-boat');
                   }}
                   className="btn-primary"
+                  style={orangeButtonStyle}
                 >
                   Ajouter mon premier bateau
                 </button>

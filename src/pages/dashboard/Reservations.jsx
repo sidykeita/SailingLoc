@@ -11,6 +11,15 @@ const Reservations = () => {
   const [filter, setFilter] = useState('all'); // all, pending, confirmed, cancelled
   const [sortBy, setSortBy] = useState('date'); // date, boat, tenant, price
 
+  // Style pour le bouton orange
+  const orangeButtonStyle = {
+    backgroundColor: '#ff6600',
+    color: 'white',
+    border: 'none',
+    backgroundImage: 'none',
+    background: '#ff6600'
+  };
+
   useEffect(() => {
     // Simuler le chargement des réservations depuis l'API
     const fetchReservations = async () => {
@@ -212,7 +221,7 @@ const Reservations = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="btn-primary">
+                <button className="btn-primary" style={orangeButtonStyle}>
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>

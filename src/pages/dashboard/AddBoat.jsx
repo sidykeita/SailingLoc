@@ -6,6 +6,15 @@ import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 const AddBoat = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+
+  // Style pour le bouton "Enregistrer le bateau" avec couleur orange
+  const saveButtonStyle = {
+    backgroundColor: '#ff6600',
+    color: 'white',
+    border: 'none',
+    backgroundImage: 'none',
+    background: '#ff6600'
+  };
   
   // État du formulaire
   const [formData, setFormData] = useState({
@@ -428,6 +437,7 @@ const AddBoat = () => {
               <button
                 type="submit"
                 className="btn-primary py-3 px-6"
+                style={saveButtonStyle}
               >
                 Enregistrer le bateau
               </button>

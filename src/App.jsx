@@ -14,6 +14,12 @@ import RegisterOwner from './pages/auth/RegisterOwner';
 // Pages du tableau de bord
 import SimpleDashboard from './pages/dashboard/SimpleDashboard';
 import TenantDashboard from './pages/dashboard/TenantDashboard';
+import TenantLocations from './pages/dashboard/TenantLocations';
+import TenantAccount from './pages/dashboard/TenantAccount';
+import TenantProfile from './pages/dashboard/TenantProfile';
+import TenantReviews from './pages/dashboard/TenantReviews';
+import TenantFavorites from './pages/dashboard/TenantFavorites';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
 import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 import EditProfile from './pages/dashboard/EditProfile';
 import AddBoat from './pages/dashboard/AddBoat';
@@ -121,6 +127,43 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/locations" element={
+            <ProtectedRoute>
+              <TenantLocations />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/account" element={
+            <ProtectedRoute>
+              <TenantAccount />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <TenantProfile />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reviews" element={
+            <ProtectedRoute>
+              <TenantReviews />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/favorites" element={
+            <ProtectedRoute>
+              <TenantFavorites />
+            </ProtectedRoute>
+          } />
+          
+          {/* Routes protégées pour les administrateurs */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           

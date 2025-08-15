@@ -112,9 +112,7 @@ const HomeNavigation = () => {
                       </div>
                     )}
                   </div>
-                  <div className="dropdown-list-item">
-                    <Link to="/add-boat" className="dropdown-item">Ajouter mon bateau</Link>
-                  </div>
+
                 </div>
               </div>
             )}

@@ -21,6 +21,15 @@ const Calendrier = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [view, setView] = useState('month'); // month, week, day
 
+  // Style pour les boutons orange
+  const orangeButtonStyle = {
+    backgroundColor: '#ff6600',
+    color: 'white',
+    border: 'none',
+    backgroundImage: 'none',
+    background: '#ff6600'
+  };
+
   const handleLogout = () => {
     logout();
     // La redirection sera gérée par le ProtectedRoute
@@ -201,7 +210,7 @@ const Calendrier = () => {
               </button>
             </div>
             
-            <button className="btn-primary flex items-center space-x-2">
+            <button className="btn-primary flex items-center space-x-2" style={orangeButtonStyle}>
               <PlusIcon className="h-4 w-4" />
               <span>Nouvel événement</span>
             </button>
@@ -469,7 +478,7 @@ const Calendrier = () => {
                     <div className="text-center py-8 text-gray-500">
                       <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                       <p>Aucun événement prévu pour cette date</p>
-                      <button className="mt-3 btn-primary">
+                      <button className="mt-3 btn-primary" style={orangeButtonStyle}>
                         Ajouter un événement
                       </button>
                     </div>

@@ -8,6 +8,15 @@ const EditProfile = () => {
   const { currentUser, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Style pour le bouton "Sauvegarder les modifications" avec couleur orange
+  const saveButtonStyle = {
+    backgroundColor: '#ff6600',
+    color: 'white',
+    border: 'none',
+    backgroundImage: 'none',
+    background: '#ff6600'
+  };
   const [profileData, setProfileData] = useState({
     firstName: 'Céline',
     lastName: 'Dupont',
@@ -390,6 +399,7 @@ const EditProfile = () => {
               type="submit"
               disabled={loading}
               className="btn-primary py-3 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={saveButtonStyle}
             >
               {loading ? (
                 <div className="flex items-center">

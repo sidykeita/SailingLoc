@@ -34,32 +34,42 @@ function Help() {
     {
       id: 1,
       question: "Comment réserver un bateau ?",
-      answer: "Pour réserver un bateau, suivez ces étapes simples :\n1. Utilisez notre moteur de recherche pour trouver un bateau qui correspond à vos critères (lieu, dates, type de bateau)\n2. Consultez les détails du bateau, les photos et les disponibilités\n3. Sélectionnez vos dates et options\n4. Procédez au paiement sécurisé\n5. Recevez votre confirmation de réservation par email"
+      answer: "1. Recherchez un bateau selon vos critères\n2. Consultez les détails et disponibilités\n3. Sélectionnez vos dates\n4. Procédez au paiement sécurisé\n5. Recevez votre confirmation par email"
     },
     {
       id: 2,
-      question: "Quelles sont les conditions pour louer un bateau ?",
-      answer: "Pour louer un bateau, vous devez :\n- Être âgé d'au moins 18 ans\n- Posséder un permis bateau valide pour les bateaux à moteur\n- Disposer d'une pièce d'identité valide\n- Effectuer le paiement de la location et de la caution"
+      question: "Quelles sont les conditions de location ?",
+      answer: "- Être âgé d'au moins 18 ans\n- Posséder un permis bateau valide\n- Présenter une pièce d'identité valide\n- Effectuer le paiement et la caution"
     },
     {
       id: 3,
-      question: "Comment fonctionne le dépôt de caution ?",
-      answer: "Une caution est demandée avant la prise en charge du bateau. Elle peut être déposée par carte bancaire ou en espèces selon les conditions du propriétaire. La caution est restituée intégralement à la fin de la location si aucun dommage n'est constaté."
+      question: "Comment fonctionne la caution ?",
+      answer: "La caution est bloquée sur votre carte bancaire avant la location. Elle est libérée intégralement après restitution du bateau en bon état."
     },
     {
       id: 4,
-      question: "Puis-je annuler ma réservation ?",
-      answer: "Oui, vous pouvez annuler votre réservation selon les conditions d'annulation choisies par le propriétaire. Ces conditions sont clairement indiquées sur la page de chaque bateau avant la validation de votre réservation. En général, plus l'annulation est proche de la date de location, moins le remboursement sera important."
+      question: "Que faire en cas d'annulation ?",
+      answer: "Conditions d'annulation :\n- Plus de 7 jours avant : remboursement intégral\n- Entre 3 et 7 jours : remboursement partiel\n- Moins de 3 jours : aucun remboursement"
     },
     {
       id: 5,
-      question: "Comment contacter le propriétaire du bateau ?",
-      answer: "Une fois votre réservation confirmée, vous recevrez les coordonnées du propriétaire dans votre email de confirmation. Vous pourrez également communiquer avec lui via notre messagerie intégrée dans votre espace personnel."
+      question: "Comment contacter le propriétaire ?",
+      answer: "Après réservation, vous recevez les coordonnées du propriétaire. Vous pouvez aussi utiliser notre messagerie interne."
     },
     {
       id: 6,
-      question: "Que faire en cas de problème pendant la location ?",
-      answer: "En cas de problème pendant la location, contactez immédiatement le propriétaire du bateau. Si vous ne parvenez pas à le joindre ou si le problème persiste, notre service client est disponible 7j/7 au +33 X XX XX XX XX ou par email à support@sailingloc.com."
+      question: "Que comprend la location ?",
+      answer: "Inclus : bateau, équipement de sécurité, gilets, navigation de base\nNon inclus : carburant, skipper, provisions"
+    },
+    {
+      id: 7,
+      question: "Puis-je modifier ma réservation ?",
+      answer: "Modifications possibles selon disponibilité. Contactez-nous rapidement. Des frais peuvent s'appliquer."
+    },
+    {
+      id: 8,
+      question: "Aide en urgence ?",
+      answer: "En urgence en mer :\n- CROSS : 196\n- VHF canal 16\n- Notre assistance 24h/24"
     }
   ];
   

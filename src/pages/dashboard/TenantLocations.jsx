@@ -1,47 +1,237 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import '../../assets/css/SimpleDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faChevronDown, faEnvelope, faMobileAlt, faIdCard, faFileAlt, faQuestionCircle, faChevronRight, faSignOutAlt, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSearch, 
+  faChevronDown, 
+  faEnvelope, 
+  faMobileAlt, 
+  faIdCard, 
+  faFileAlt, 
+  faQuestionCircle, 
+  faChevronRight, 
+  faSignOutAlt, 
+  faExchangeAlt,
+  faFilter,
+  faCalendarAlt,
+  faMapMarkerAlt,
+  faEuroSign,
+  faEye,
+  faDownload,
+  faStar,
+  faCheckCircle,
+  faClock,
+  faTimesCircle,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons';
 import logoBlc from '../../assets/images/logo-blc.png';
 import profileImage from '../../assets/images/profil.jpg';
+import '../../assets/css/SimpleDashboard.css';
+import '../../assets/css/TenantLocations.css';
 
-const SimpleDashboard = () => {
+const TenantLocations = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
-  const today = new Date();
-  const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()} ${today.getHours().toString().padStart(2, '0')}:${today.getMinutes().toString().padStart(2, '0')}`;
+  const [locations, setLocations] = useState([]);
+  const [filteredLocations, setFilteredLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
   
-  // Style pour le bouton orange
-  const orangeButtonStyle = {
-    backgroundColor: '#ff6600',
-    color: 'white',
-    border: 'none',
-    backgroundImage: 'none',
-    background: '#ff6600'
-  };
-  
-  // États pour gérer l'affichage des menus déroulants
+  // États pour les menus déroulants
   const [showDiscoverMenu, setShowDiscoverMenu] = useState(false);
   const [showBoatSubmenu, setShowBoatSubmenu] = useState(false);
   const [showDestinationsSubmenu, setShowDestinationsSubmenu] = useState(false);
   const [showModelsSubmenu, setShowModelsSubmenu] = useState(false);
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  
-  // Fonction pour gérer la déconnexion
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    filterLocations();
+  }, [locations, searchTerm, statusFilter, dateFilter]);
+
+  const fetchLocations = async () => {
+    try {
+      // Simulation de données de locations
+      const mockLocations = [
+        {
+          id: '1',
+          boatName: 'Jeanneau Prestige 36',
+          boatType: 'Bateau à moteur',
+          location: 'Marseille, France',
+          startDate: '2025-07-15',
+          endDate: '2025-07-18',
+          status: 'confirmed',
+          price: 1350,
+          totalPrice: 1485, // avec frais
+          imageUrl: '/api/placeholder/300/200',
+          bookingDate: '2025-06-10',
+          guests: 6,
+          owner: 'Marina Marseille',
+          features: ['GPS', 'Climatisation', 'Cuisine équipée']
+        },
+        {
+          id: '2',
+          boatName: 'Bayliner R42',
+          boatType: 'Yacht',
+          location: 'Cannes, France',
+          startDate: '2025-08-05',
+          endDate: '2025-08-10',
+          status: 'pending',
+          price: 2800,
+          totalPrice: 3080,
+          imageUrl: '/api/placeholder/300/200',
+          bookingDate: '2025-07-20',
+          guests: 8,
+          owner: 'Luxury Boats Cannes',
+          features: ['Jacuzzi', 'Bar', 'Équipement de plongée']
+        },
+        {
+          id: '3',
+          boatName: 'Catamaran Lagoon 42',
+          boatType: 'Catamaran',
+          location: 'Bastia, Corse',
+          startDate: '2025-06-20',
+          endDate: '2025-06-25',
+          status: 'completed',
+          price: 1950,
+          totalPrice: 2145,
+          imageUrl: '/api/placeholder/300/200',
+          bookingDate: '2025-05-15',
+          guests: 10,
+          owner: 'Corsica Sailing',
+          features: ['Voiles neuves', 'Équipement de pêche', 'Kayaks']
+        },
+        {
+          id: '4',
+          boatName: 'Azimut 55',
+          boatType: 'Yacht de luxe',
+          location: 'Monaco',
+          startDate: '2025-09-10',
+          endDate: '2025-09-15',
+          status: 'cancelled',
+          price: 4500,
+          totalPrice: 4950,
+          imageUrl: '/api/placeholder/300/200',
+          bookingDate: '2025-07-25',
+          guests: 12,
+          owner: 'Monaco Prestige',
+          features: ['Chef privé', 'Service de ménage', 'Jet ski']
+        }
+      ];
+      
+      setLocations(mockLocations);
+    } catch (error) {
+      console.error('Erreur lors du chargement des locations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterLocations = () => {
+    let filtered = locations;
+
+    // Filtre par terme de recherche
+    if (searchTerm) {
+      filtered = filtered.filter(location =>
+        location.boatName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        location.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        location.boatType.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtre par statut
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(location => location.status === statusFilter);
+    }
+
+    // Filtre par date
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(location => {
+        const startDate = new Date(location.startDate);
+        const endDate = new Date(location.endDate);
+        
+        switch (dateFilter) {
+          case 'upcoming':
+            return startDate > now;
+          case 'current':
+            return startDate <= now && endDate >= now;
+          case 'past':
+            return endDate < now;
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredLocations(filtered);
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'confirmed':
+        return <FontAwesomeIcon icon={faCheckCircle} className="status-icon confirmed" />;
+      case 'pending':
+        return <FontAwesomeIcon icon={faClock} className="status-icon pending" />;
+      case 'completed':
+        return <FontAwesomeIcon icon={faCheckCircle} className="status-icon completed" />;
+      case 'cancelled':
+        return <FontAwesomeIcon icon={faTimesCircle} className="status-icon cancelled" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'confirmed':
+        return 'Confirmée';
+      case 'pending':
+        return 'En attente';
+      case 'completed':
+        return 'Terminée';
+      case 'cancelled':
+        return 'Annulée';
+      default:
+        return status;
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
-      // La redirection sera gérée par le contexte d'authentification
     } catch (error) {
       console.error("Erreur lors de la déconnexion", error);
     }
   };
-  
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <p>Chargement de vos locations...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* Header */}
+      {/* Header identique au SimpleDashboard */}
       <header className="main-header">
         <div className="header-left">
           <div className="header-logo">
@@ -150,10 +340,10 @@ const SimpleDashboard = () => {
             </div>
             {showUserMenu && (
               <div className="dropdown-menu user-menu">
-                <Link to="/dashboard" className="dropdown-item active">
+                <Link to="/dashboard" className="dropdown-item">
                   <span>Tableau de bord</span>
                 </Link>
-                <Link to="/locations" className="dropdown-item">
+                <Link to="/locations" className="dropdown-item active">
                   <span>Mes locations</span>
                 </Link>
 
@@ -180,8 +370,8 @@ const SimpleDashboard = () => {
       {/* Menu de navigation secondaire */}
       <div className="secondary-nav">
         <div className="secondary-nav-container">
-          <Link to="/dashboard" className="nav-link active">Tableau de bord</Link>
-          <Link to="/locations" className="nav-link">Mes locations</Link>
+          <Link to="/dashboard" className="nav-link">Tableau de bord</Link>
+          <Link to="/locations" className="nav-link active">Mes locations</Link>
 
           <Link to="/account" className="nav-link">Mon compte</Link>
           <Link to="/reviews" className="nav-link">Mes avis</Link>
@@ -189,130 +379,151 @@ const SimpleDashboard = () => {
         </div>
       </div>
 
-      {/* Dashboard Content */}
-      <div className="dashboard-container">
-        {/* User Profile Section */}
-        <div className="user-profile">
-          <div className="profile-avatar">
-            <img src={profileImage} alt="Photo de profil" onError={(e) => {
-              e.target.onerror = null;
-              e.target.style.display = 'none';
-              e.target.parentNode.textContent = 'Ce';
-            }} />
+      {/* Contenu principal */}
+      <div className="dashboard-container" style={{ backgroundColor: 'white', minHeight: '100vh' }}>
+        <div className="locations-page">
+          <div className="page-header">
+            <h1>Mes locations</h1>
+            <p>Gérez toutes vos réservations de bateaux</p>
           </div>
-          <a href="#" className="add-photo">+ Ajouter une photo</a>
-          
-          <h2 className="profile-name">celine</h2>
-          <p className="member-since">Membre depuis 2025</p>
-          
-          <div className="profile-completion">
-            <div className="completion-text">
-              <span>Profil complété à</span>
-              <span>14%</span>
-            </div>
-            <div className="completion-bar">
-              <div className="completion-progress"></div>
-            </div>
-          </div>
-          
-          <div className="profile-buttons">
-            <Link to="/account?section=modifier-informations" className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</Link>
-            <Link to="/account?section=modifier-informations" className="btn btn-outline">Voir mon profil</Link>
-          </div>
-          
-          <div className="verification-list">
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faEnvelope} /> {/* Icône */}
-              <span>Adresse email</span>
-              <a href="#">valider</a>
-            </div>
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faMobileAlt} /> {/* Icône */}
-              <span>Numéro de téléphone</span>
-              <a href="#">vérifier</a>
-            </div>
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faIdCard} /> {/* Icône */}
-              <span>Carte d'identité</span>
-              <a href="#">vérifier</a>
-            </div>
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faFileAlt} /> {/* Icône */}
-              <span>CV Nautique</span>
-              <a href="#">compléter</a>
-            </div>
-          </div>
-          
-          {/* Liens utiles Section */}
-          <div className="useful-links-section">
-            <h4 className="useful-links-title">Liens utiles</h4>
-            <div className="useful-links-list">
-              <Link to="/help" className="useful-link-item">
-                <FontAwesomeIcon icon={faQuestionCircle} />
-                <span>Aide générale</span>
-              </Link>
-              <Link to="/contact" className="useful-link-item">
-                <FontAwesomeIcon icon={faEnvelope} />
-                <span>Contact</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-        
-        {/* Content Section */}
-        <div className="content-section">
-          {/* Notifications Card */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Notifications</h3>
-              <a href="#" className="card-action">Tout marquer comme lu</a>
-            </div>
-            <div className="card-body">
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Confirmez votre email et votre numéro de téléphone pour compléter votre profil</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Renseignez votre date d'anniversaire pour recevoir un coupon de réduction !</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Bienvenue sur Sailing Loc</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Messages Card */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Mes derniers messages</h3>
-            </div>
-            <div className="card-body">
-              <p className="message-empty">Vous n'avez pas de messages pour le moment</p>
-            </div>
-          </div>
-          
-          {/* Locations Card */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Locations à venir</h3>
-            </div>
-            <div className="card-body">
-              <p className="location-empty">Aucune location à venir pour le moment</p>
-            </div>
-          </div>
-          
 
+          {/* Barre de recherche et filtres */}
+          <div className="search-filters-section">
+            <div className="search-bar-locations">
+              <input
+                type="text"
+                placeholder="Rechercher par nom de bateau, destination..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            </div>
+            
+            <button 
+              className="filters-toggle"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <FontAwesomeIcon icon={faFilter} />
+              Filtres
+            </button>
+          </div>
+
+          {/* Filtres */}
+          {showFilters && (
+            <div className="filters-panel">
+              <div className="filter-group">
+                <label>Statut</label>
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                  <option value="all">Tous les statuts</option>
+                  <option value="confirmed">Confirmées</option>
+                  <option value="pending">En attente</option>
+                  <option value="completed">Terminées</option>
+                  <option value="cancelled">Annulées</option>
+                </select>
+              </div>
+              
+              <div className="filter-group">
+                <label>Période</label>
+                <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+                  <option value="all">Toutes les périodes</option>
+                  <option value="upcoming">À venir</option>
+                  <option value="current">En cours</option>
+                  <option value="past">Passées</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Statistiques rapides */}
+          <div className="stats-cards">
+            <div className="stat-card">
+              <h3>{locations.filter(l => l.status === 'confirmed').length}</h3>
+              <p>Locations confirmées</p>
+            </div>
+            <div className="stat-card">
+              <h3>{locations.filter(l => l.status === 'pending').length}</h3>
+              <p>En attente</p>
+            </div>
+            <div className="stat-card">
+              <h3>{locations.filter(l => l.status === 'completed').length}</h3>
+              <p>Terminées</p>
+            </div>
+            <div className="stat-card">
+              <h3>{locations.reduce((sum, l) => sum + l.totalPrice, 0).toLocaleString()}€</h3>
+              <p>Total dépensé</p>
+            </div>
+          </div>
+
+          {/* Liste des locations */}
+          <div className="locations-list">
+            {filteredLocations.length === 0 ? (
+              <div className="empty-state">
+                <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+                <h3>Aucune location trouvée</h3>
+                <p>Aucune location ne correspond à vos critères de recherche.</p>
+                <Link to="/boats/motor" className="cta-button">
+                  Découvrir nos bateaux
+                </Link>
+              </div>
+            ) : (
+              filteredLocations.map((location) => (
+                <div key={location.id} className="location-card">
+                  <div className="location-image">
+                    <img src={location.imageUrl} alt={location.boatName} />
+                    <div className="status-badge">
+                      {getStatusIcon(location.status)}
+                      <span>{getStatusText(location.status)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="location-details">
+                    <div className="location-header">
+                      <h3>{location.boatName}</h3>
+                      <span className="boat-type">{location.boatType}</span>
+                    </div>
+                    
+                    <div className="location-info">
+                      <div className="info-row">
+                        <FontAwesomeIcon icon={faMapMarkerAlt} />
+                        <span>{location.location}</span>
+                      </div>
+                      <div className="info-row">
+                        <FontAwesomeIcon icon={faCalendarAlt} />
+                        <span>{formatDate(location.startDate)} - {formatDate(location.endDate)}</span>
+                      </div>
+                      <div className="info-row">
+                        <FontAwesomeIcon icon={faEuroSign} />
+                        <span>{location.totalPrice.toLocaleString()}€ (total)</span>
+                      </div>
+                    </div>
+                    
+                    <div className="location-features">
+                      {location.features.slice(0, 3).map((feature, index) => (
+                        <span key={index} className="feature-tag">{feature}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="location-actions">
+                    <button className="action-btn primary">
+                      <FontAwesomeIcon icon={faEye} />
+                      Voir détails
+                    </button>
+                    <button className="action-btn secondary">
+                      <FontAwesomeIcon icon={faDownload} />
+                      Facture
+                    </button>
+                    {location.status === 'completed' && (
+                      <button className="action-btn secondary">
+                        <FontAwesomeIcon icon={faStar} />
+                        Laisser un avis
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
       
@@ -373,13 +584,8 @@ const SimpleDashboard = () => {
           </div>
         </div>
       </footer>
-      
-      {/* Help Button */}
-      <div className="help-button">
-        <FontAwesomeIcon icon={faQuestionCircle} />
-      </div>
     </div>
   );
 };
 
-export default SimpleDashboard;
+export default TenantLocations;
