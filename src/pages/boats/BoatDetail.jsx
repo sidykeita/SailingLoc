@@ -296,25 +296,25 @@ const BoatDetail = () => {
                     id="startDate"
                     className="form-input"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setStartDate(val);
+                    }}
                     min={new Date().toISOString().split('T')[0]}
                     disabled={!canBook}
                     onFocus={e => e.target.showPicker && e.target.showPicker()}
-                    style={{ backgroundColor: isDateReserved(startDate) ? '#f8d7da' : undefined }}
-                    onInput={e => {
-                      const val = e.target.value;
-                      if (isDateReserved(val)) {
-                        setError('Cette date de début est déjà réservée.');
-                        setStartDate('');
-                      } else {
-                        setError('');
-                        setStartDate(val);
-                      }
+                    style={{
+                      backgroundColor: isDateReserved(startDate) ? '#e5e7eb' : undefined,
+                      color: isDateReserved(startDate) ? '#a1a1aa' : undefined,
+                      cursor: isDateReserved(startDate) ? 'not-allowed' : undefined
                     }}
+                    // Désactive la sélection des dates réservées via un pattern HTML5
+                    pattern={reservations.map(r => {
+                      const rStart = new Date(r.startDate).toISOString().split('T')[0];
+                      const rEnd = new Date(r.endDate).toISOString().split('T')[0];
+                      return `^(?!${rStart}|${rEnd}).*$`;
+                    }).join('')}
                   />
-                  {startDate && isDateReserved(startDate) && (
-                    <div className="text-red-500 text-xs mt-1">Cette date de début est déjà réservée.</div>
-                  )}
                 </div>
               </div>
               <div className="mb-6">
@@ -328,25 +328,24 @@ const BoatDetail = () => {
                     id="endDate"
                     className="form-input"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setEndDate(val);
+                    }}
                     min={startDate || new Date().toISOString().split('T')[0]}
                     disabled={!canBook}
                     onFocus={e => e.target.showPicker && e.target.showPicker()}
-                    style={{ backgroundColor: isDateReserved(endDate) ? '#f8d7da' : undefined }}
-                    onInput={e => {
-                      const val = e.target.value;
-                      if (isDateReserved(val)) {
-                        setError('Cette date de fin est déjà réservée.');
-                        setEndDate('');
-                      } else {
-                        setError('');
-                        setEndDate(val);
-                      }
+                    style={{
+                      backgroundColor: isDateReserved(endDate) ? '#e5e7eb' : undefined,
+                      color: isDateReserved(endDate) ? '#a1a1aa' : undefined,
+                      cursor: isDateReserved(endDate) ? 'not-allowed' : undefined
                     }}
+                    pattern={reservations.map(r => {
+                      const rStart = new Date(r.startDate).toISOString().split('T')[0];
+                      const rEnd = new Date(r.endDate).toISOString().split('T')[0];
+                      return `^(?!${rStart}|${rEnd}).*$`;
+                    }).join('')}
                   />
-                  {endDate && isDateReserved(endDate) && (
-                    <div className="text-red-500 text-xs mt-1">Cette date de fin est déjà réservée.</div>
-                  )}
                 </div>
               </div>
               <div className="mb-6">

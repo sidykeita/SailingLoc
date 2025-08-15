@@ -16,6 +16,9 @@ router.get('/user', protect, reservationController.getUserReservations);
 // Réservations des bateaux du propriétaire connecté
 router.get('/owner', protect, reservationController.getOwnerReservations);
 
+// Réservations pour un bateau donné
+router.get('/boat/:boatId', reservationController.getReservationsByBoat);
+
 // Détails (public ou protégé selon besoin)
 router.get('/:id', reservationController.getReservationById);
 

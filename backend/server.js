@@ -34,6 +34,9 @@ app.use('/api/payments', paymentRoutes);
 const userRoutes = require('./src/routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+const ownerDocsRoutes = require('./src/routes/ownerDocs.routes');
+app.use('/api/owner-docs', ownerDocsRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');

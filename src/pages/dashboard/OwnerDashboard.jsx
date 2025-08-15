@@ -7,6 +7,7 @@ import reservationService from '../../services/reservation.service';
 import { Link, useNavigate } from 'react-router-dom';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
 import EditProfileModal from '../../components/EditProfileModal';
+import OwnerDocsSection from '../../components/OwnerDocsSection';
 import userService from '../../services/user.service';
 
 const OwnerDashboard = () => {
@@ -313,7 +314,12 @@ const [deleteDone, setDeleteDone] = useState(false);
             </div>
           </div>
         </div>
-        
+
+        {/* Section documents contractuels */}
+        <div className="md:col-span-2">
+          <OwnerDocsSection ownerId={currentUser?._id} token={localStorage.getItem('token')} />
+        </div>
+
         {/* Demandes de réservation */}
         <div className="card p-6 mt-8">
           <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Demandes de réservation</h2>
