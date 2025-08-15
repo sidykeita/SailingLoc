@@ -10,6 +10,7 @@ const RegisterTenant = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
@@ -47,7 +48,7 @@ const RegisterTenant = () => {
     }
     
     // Validation des champs
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !phoneNumber) {
       setError('Veuillez remplir tous les champs');
       return;
     }
@@ -73,14 +74,18 @@ const RegisterTenant = () => {
         lastName: name.split(' ').slice(1).join(' '),
         email,
         password,
+        phoneNumber,
         role: 'tenant' // Rôle fixé à locataire
       };
+      // Correction : phone = phoneNumber pour correspondre au backend
+      userData.phone = userData.phoneNumber;
+      delete userData.phoneNumber;
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
       
-      // Redirection vers le dashboard locataire
-      navigate('/dashboard');
+      // Redirection vers la page de connexion après inscription
+      navigate('/login');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
       if (!navigator.onLine) {
@@ -138,6 +143,19 @@ const RegisterTenant = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                className="form-input"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                pattern="[0-9+ ]{8,15}"
+                placeholder="Ex: 0612345678"
               />
             </div>
             

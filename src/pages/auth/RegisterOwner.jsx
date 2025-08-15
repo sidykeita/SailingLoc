@@ -85,6 +85,8 @@ const RegisterOwner = () => {
         homePort,
         role: 'propriétaire' // Rôle fixé à propriétaire (français)
       };
+      userData.phone = userData.phoneNumber;
+      delete userData.phoneNumber;
       
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);

@@ -85,11 +85,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError('');
       const data = await authService.register(userData);
-      
-      // Mise à jour de l'état utilisateur
-      setCurrentUser(data.user);
-      setUserRole(data.user.role);
-      
+      // Ne pas connecter automatiquement l'utilisateur après inscription
       return data.user;
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
