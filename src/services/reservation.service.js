@@ -48,7 +48,10 @@ class ReservationService {
   // Mettre à jour le statut d'une réservation (pour les propriétaires)
   async updateReservationStatus(id, statusData) {
     try {
-      const response = await axios.put(`${API_URL}/reservations/${id}/status`, statusData);
+      const token = localStorage.getItem('token');
+    const response = await axios.put(`${API_URL}/reservations/${id}/status`, statusData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
