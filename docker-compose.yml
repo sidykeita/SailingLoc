@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_sailingloc
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sailingadmin
+      MONGO_INITDB_ROOT_PASSWORD: sailingpass
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - sailingLocNet
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_sailingloc
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
+      - ./backend/.env:/app/.env
+    depends_on:
+      - mongo
+    networks:
+      - sailingLocNet
+
+networks:
+  sailingLocNet:
+    driver: bridge
+
+volumes:
+  mongo_data:

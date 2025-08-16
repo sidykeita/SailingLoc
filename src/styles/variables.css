@@ -1,0 +1,17 @@
+/* variables.css - Fichier centralisé pour toutes les variables CSS du projet */
+
+:root {
+  /* Couleurs de la charte graphique */
+  --primary-blue: #274991;
+  --secondary-blue: #3C83C4;
+  --turquoise: #66c8c6;
+  --gray: #D9D9D9;
+  --dark-gray: #333333;
+  --beige: #E0C9A6;
+  --orange: #FF7F50;
+  
+  /* Typographies */
+  --font-heading: 'Pacifico', cursive;
+  --font-primary: 'Montserrat', sans-serif;
+  --font-secondary: 'Poppins', sans-serif;
+}

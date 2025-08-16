@@ -1,0 +1,40 @@
+/* HeaderDashboard styles pour dashboard (exact design) */
+.dashboard-header {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-height: 52px;
+  position: relative;
+  z-index: 10;
+}
+.dashboard-header .logo img {
+  height: 38px;
+}
+.dashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.dashboard-greeting {
+  color: #444;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+.dashboard-logout-btn, .dashboard-header button.login-button {
+  background: #e0e0e0;
+  color: #222;
+  border: none;
+  border-radius: 7px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  box-shadow: none;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.dashboard-logout-btn:hover, .dashboard-header button.login-button:hover {
+  background: #cccccc;
+}

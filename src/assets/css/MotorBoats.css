@@ -1,0 +1,520 @@
+/* Styles spécifiques pour la page des bateaux à moteur */
+/* Charte graphique: 
+   - Bleu foncé: #274991
+   - Bleu moyen: #3C83C4
+   - Bleu-vert clair: #66C7C7
+   - Gris clair: #D9D9D9
+   - Beige: #E0C9A6
+   - Noir/Gris foncé: #333333
+   - Orange/Corail: #FF7F50
+*/
+
+/* Style pour le conteneur principal */
+.motor-boats-container {
+  background-color: #f0f2f5; /* Gris légèrement plus foncé */
+  min-height: 100vh;
+  padding-top: 100px !important; /* Ajouté pour éviter le chevauchement du menu */
+}
+
+/* Styles pour les boutons et interactions */
+
+/* Style pour les éléments de navigation */
+
+/* Style pour le conteneur de contenu avec marge pour le header fixe */
+.content-container {
+  margin-top: 6rem; /* Espace pour le header fixe */
+}
+
+/* Style pour le bouton de scroll vers le haut */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #66C7C7; /* Bleu-vert clair de la charte */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.scroll-top-btn:hover {
+  background-color: #274991; /* Bleu foncé de la charte */
+  transform: translateY(-5px);
+}
+
+/* Style pour le bouton hamburger du menu mobile */
+.hamburger-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #274991; /* Bleu foncé de la charte */
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 1000;
+}
+
+.hamburger-button:hover {
+  color: #66C7C7; /* Bleu-vert clair de la charte */
+}
+
+/* Style pour les titres avec typographie Pacifico */
+.cursive-title {
+  font-family: 'Pacifico', cursive;
+  color: #274991;
+  font-weight: normal;
+}
+
+/* Styles pour les titres principaux */
+h1, h2 {
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background-color: #66C7C7; /* Bleu-vert clair de la charte */
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background-color: #3C83C4; /* Bleu moyen de la charte */
+}
+
+/* Style pour l'en-tête de la page */
+.motor-boats-header {
+  background-color: #274991; /* Bleu foncé de la charte */
+  color: white;
+  padding: 1.5rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.motor-boats-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.motor-boats-header .logo img {
+  height: 2.5rem;
+  filter: brightness(0) invert(1); /* Pour s'assurer que le logo est bien visible en blanc sur fond bleu */
+}
+
+.motor-boats-header nav ul {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.motor-boats-header nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.motor-boats-header nav a:hover {
+  color: #66C7C7; /* Bleu-vert clair de la charte */
+}
+
+/* Styles pour le bouton hamburger */
+.hamburger-button {
+  display: none; /* Caché par défaut sur desktop */
+  color: white;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 100;
+}
+
+/* Styles pour la navigation */
+.main-nav ul {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  color: white;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.main-nav a:hover {
+  color: #66C7C7; /* Bleu-vert clair de la charte */
+}
+
+/* Styles responsive pour le menu */
+@media (max-width: 768px) {
+  .hamburger-button {
+    display: block; /* Afficher le bouton hamburger sur mobile */
+  }
+  
+  .main-nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: 100vh;
+    background-color: #274991; /* Bleu foncé de la charte */
+    z-index: 99;
+    transition: right 0.3s ease-in-out;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    padding: 5rem 1rem 2rem;
+  }
+  
+  .main-nav.open {
+    right: 0;
+  }
+  
+  .main-nav ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .main-nav li {
+    width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .main-nav a {
+    display: block;
+    padding: 0.5rem 0;
+  }
+}
+
+/* Style pour les cartes de bateaux */
+.boat-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+/* Badge pour les bateaux disponibles */
+.boat-card.available::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent #66C7C7 transparent transparent;
+  z-index: 1;
+}
+
+.boat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(39, 73, 145, 0.2), 0 4px 6px -2px rgba(39, 73, 145, 0.1);
+  border-color: #3C83C4; /* Bleu moyen de la charte */
+}
+
+.boat-image {
+  height: 12rem;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.boat-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.boat-card:hover .boat-image img {
+  transform: scale(1.05);
+}
+
+.boat-details {
+  padding: 1.5rem;
+}
+
+.boat-price {
+  background-color: #E0C9A6; /* Beige de la charte */
+  color: #333333; /* Gris foncé de la charte */
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.boat-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.boat-spec {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.boat-spec-icon {
+  color: #3C83C4; /* Bleu moyen de la charte */
+  margin-bottom: 0.25rem;
+}
+
+.boat-spec-label {
+  font-size: 0.75rem;
+  color: #333333; /* Gris foncé de la charte */
+}
+
+.boat-spec-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Style pour les filtres */
+.filters-section {
+  background-color: #66C7C7; /* Turquoise de la charte */
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid #3C83C4; /* Bordure gauche bleu moyen */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filter-input {
+  position: relative;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.filter-input input,
+.filter-input select {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-input input:focus,
+.filter-input select:focus {
+  border-color: #3C83C4; /* Bleu moyen de la charte */
+  box-shadow: 0 0 0 3px rgba(60, 131, 196, 0.25);
+}
+
+/* Style pour la section d'information */
+.info-section {
+  background-color: #D9D9D9; /* Gris clair de la charte */
+  border-radius: 0.5rem;
+  padding: 2rem;
+  border-top: 4px solid #274991; /* Bordure supérieure bleu foncé */
+  margin-bottom: 3rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .info-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.info-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border-bottom: 3px solid #66C7C7; /* Bordure inférieure bleu-vert clair */
+}
+
+.info-icon {
+  font-size: 1.875rem;
+  color: #274991; /* Bleu foncé de la charte */
+  margin-bottom: 1rem;
+}
+
+/* Styles pour le footer */
+.site-footer {
+  background-color: #274991; /* Bleu foncé de la charte */
+  color: white;
+  padding-top: 2.5rem;
+}
+
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+}
+
+.footer-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+/* Les styles du footer sont maintenant centralisés dans Layout.css */
+
+.footer-section p {
+  margin: 0.3rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.social-icon img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.social-icon:hover img {
+  transform: scale(1.1);
+}
+
+.payment-icons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  align-items: center;
+}
+
+.payment-icon {
+  height: 1.875rem;
+  max-width: 3.125rem;
+  object-fit: contain;
+}
+
+.footer-bottom {
+  background-color: #1a3366; /* Plus foncé que le bleu principal */
+  padding: 1rem 0;
+}
+
+.footer-bottom-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #66C7C7; /* Bleu-vert clair de la charte */
+}
+
+.rating-info strong {
+  color: #E0C9A6; /* Beige de la charte */
+}
+
+/* Responsive styles for footer */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+  }
+  
+  .footer-section {
+    flex-basis: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .footer-bottom-container {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .footer-links {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+}

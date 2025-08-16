@@ -1,0 +1,136 @@
+/* auth-common.css - Styles partagés pour toutes les pages d'authentification */
+
+@import './variables.css';
+
+/* Structure commune pour les conteneurs d'authentification */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Overlay semi-transparent pour toutes les pages d'authentification */
+.auth-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+}
+
+/* Conteneur de formulaire */
+.auth-box {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Conteneur de formulaire avec fond blanc */
+.auth-form-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+/* Titres pour les pages d'authentification */
+.auth-title {
+  font-family: var(--font-heading);
+  font-weight: bold;
+  color: var(--primary-blue);
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-subtitle {
+  font-family: var(--font-primary);
+  color: var(--dark-gray);
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Messages d'erreur */
+.error-alert {
+  background-color: #FED7D7;
+  border: 1px solid #F56565;
+  color: #C53030;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-primary);
+}
+
+/* Styles de formulaire communs */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  color: var(--dark-gray);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-primary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--gray);
+  outline: none;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  border-color: var(--secondary-blue);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+/* Boutons */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: var(--font-primary);
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1a365d;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-blue);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #2c5282;
+}

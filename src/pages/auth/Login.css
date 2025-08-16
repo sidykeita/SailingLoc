@@ -1,0 +1,112 @@
+/* Login.css */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url('../../assets/images/AdobeStock_198032487.jpeg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.login-form h2 {
+  margin-bottom: 1.5rem;
+  color: #274991;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #274991;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+  background-color: #1a3366;
+}
+
+.login-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.login-links a {
+  color: #274991;
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.home-link {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  z-index: 1;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-top: 1rem;
+  text-align: center;
+}
