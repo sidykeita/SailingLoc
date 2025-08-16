@@ -6,7 +6,14 @@ const connectDB = require('./src/models/db');
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://sailing-loc.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Connexion à MongoDB
