@@ -18,6 +18,7 @@ import {
 // Import des images
 import logo from './assets/images/logo-blc.png';
 import logoColor from './assets/images/logo-SailingLOC-couleur.png';
+import HeaderDashboard from './components/HeaderDashboard';
 import facebookIcon from './assets/images/picto-facebook.png';
 import instaIcon from './assets/images/picto-insta.png';
 import tiktokIcon from './assets/images/picto-tiktok.png';
@@ -102,42 +103,44 @@ const Layout = ({ children }) => {
     });
   };
 
+  const isDashboard = window.location.pathname.includes('/dashboard');
   return (
     <div className="layout-container">
-      {/* Header */}
-      <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
-        <div className="logo">
-          <Link to="/">
-            <img src={scrolled ? logoColor : logo} alt="SAILING.LOC" />
-          </Link>
-        </div>
-        <button 
-          onClick={toggleMobileMenu}
-          style={{
-            display: windowWidth <= 768 ? 'flex' : 'none',
-            backgroundColor: '#274991',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '8px 12px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            marginLeft: 'auto',
-            alignItems: 'center',
-            gap: '8px',
-            position: 'fixed',
-            right: '20px',
-            top: '20px',
-            zIndex: 9999
-          }}
-        >
-          <FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} /> 
-          {mobileMenuOpen ? 'Fermer' : 'Menu'}
-        </button>
-        
-        {/* Déplacé la navigation à droite et le bouton Mon compte à côté */}
-        <div className="header-right">
-          <nav className={`main-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+      {/* Header : dashboard OU classique */}
+      {isDashboard ? (
+        <HeaderDashboard />
+      ) : (
+        <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
+          <div className="logo">
+            <Link to="/">
+              <img src={scrolled ? logoColor : logo} alt="SAILING.LOC" />
+            </Link>
+          </div>
+          <button 
+            onClick={toggleMobileMenu}
+            style={{
+              display: windowWidth <= 768 ? 'flex' : 'none',
+              backgroundColor: '#274991',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              marginLeft: 'auto',
+              alignItems: 'center',
+              gap: '8px',
+              position: 'fixed',
+              right: '20px',
+              top: '20px',
+              zIndex: 9999
+            }}
+          >
+            <FontAwesomeIcon icon={mobileMenuOpen ? faTimes : faBars} /> 
+            {mobileMenuOpen ? 'Fermer' : 'Menu'}
+          </button>
+          <div className="header-right">
+            <nav className={`main-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
             <ul>
               <li className="mobile-account">
                 <Link to="/login" className="login-button-mobile">
@@ -220,6 +223,7 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </header>
+      )}
 
       {/* Main Content */}
       <main className="main-content">

@@ -14,6 +14,7 @@ import RegisterOwner from './pages/auth/RegisterOwner';
 // Pages du tableau de bord
 import SimpleDashboard from './pages/dashboard/SimpleDashboard';
 import TenantDashboard from './pages/dashboard/TenantDashboard';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
 import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 
 // Pages des bateaux
@@ -86,7 +87,7 @@ function App() {
         <Routes>
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />  {/* Home contient déjà Layout */}
-          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
+          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'admin' ? '/admin/dashboard' : userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes des bateaux - avec Layout */}
           <Route path="/boats" element={<Layout><AllBoats /></Layout>} />
@@ -141,6 +142,13 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* Routes protégées pour les admins */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute userRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+
           {/* Routes protégées pour les propriétaires */}
           <Route path="/owner/dashboard" element={
             <ProtectedRoute userRole="propriétaire">

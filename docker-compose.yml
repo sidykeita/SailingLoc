@@ -25,6 +25,7 @@ services:
       - "5000:5000"
     volumes:
       - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
       - ./backend/.env:/app/.env
     depends_on:
       - mongo

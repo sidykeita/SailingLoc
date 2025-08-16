@@ -95,6 +95,16 @@ class ReservationService {
       throw this.handleError(error);
     }
   }
+
+  // Obtenir toutes les réservations (admin/global)
+  async getAllReservations() {
+    try {
+      const response = await apiClient.get('/reservations');
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
 }
 
 export default new ReservationService();

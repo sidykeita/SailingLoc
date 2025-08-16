@@ -74,10 +74,21 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('[LOGIN] Email reçu:', email);
+    console.log('[LOGIN] Password reçu:', password);
 
     // Vérifier si l'utilisateur existe
     const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      console.log('[LOGIN] Aucun user trouvé pour cet email');
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+    }
+    console.log('[LOGIN] User trouvé, hash password:', user.password);
+    console.log('[DEBUG] password reçu:', password);
+    console.log('[DEBUG] hash stocké:', user.password);
+    const isMatch = await user.comparePassword(password);
+    console.log('[LOGIN] Résultat comparaison bcrypt:', isMatch);
+    if (!isMatch) {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
 
@@ -95,6 +106,7 @@ exports.login = async (req, res) => {
       user: userData
     });
   } catch (err) {
+    console.error('[LOGIN] Erreur catch:', err);
     res.status(400).json({ message: err.message });
   }
 };

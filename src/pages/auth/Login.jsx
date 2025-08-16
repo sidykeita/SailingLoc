@@ -59,10 +59,12 @@ const Login = () => {
       const user = await login(email, password);
       
       // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
-      if (user.role === 'propriétaire') {
-        navigate('/proprietaire/dashboard');
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (user.role === 'propriétaire') {
+        navigate('/owner/dashboard');
       } else {
-        navigate('/locataire/dashboard');
+        navigate('/dashboard');
       }
     } catch (err) {
       console.error('Erreur de connexion:', err);
