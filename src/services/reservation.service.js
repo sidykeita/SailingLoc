@@ -25,7 +25,10 @@ class ReservationService {
   // Obtenir les réservations des bateaux d'un propriétaire
   async getMyBoatsReservations() {
     try {
-      const response = await axios.get(`${API_URL}/reservations/owner`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/reservations/owner`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
