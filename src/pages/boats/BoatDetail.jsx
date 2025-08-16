@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../../lib/api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
@@ -143,7 +144,7 @@ const BoatDetail = () => {
       return;
     }
     try {
-      const res = await fetch('/api/reservations', {
+      const res = await fetch(`${API_URL}/reservations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,10 +1,11 @@
-import apiClient from './api.service';
+import axios from 'axios';
+import { API_URL } from '../lib/api';
 
 class ReservationService {
   // Créer une nouvelle réservation
   async createReservation(reservationData) {
     try {
-      const response = await apiClient.post('/reservations', reservationData);
+      const response = await axios.post(`${API_URL}/reservations`, reservationData);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -14,7 +15,7 @@ class ReservationService {
   // Obtenir les réservations d'un locataire
   async getMyReservations() {
     try {
-      const response = await apiClient.get('/reservations/user/my-reservations');
+      const response = await axios.get(`${API_URL}/reservations/user/my-reservations`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -24,7 +25,7 @@ class ReservationService {
   // Obtenir les réservations des bateaux d'un propriétaire
   async getMyBoatsReservations() {
     try {
-      const response = await apiClient.get('/reservations/owner');
+      const response = await axios.get(`${API_URL}/reservations/owner`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -34,7 +35,7 @@ class ReservationService {
   // Obtenir une réservation par son ID
   async getReservationById(id) {
     try {
-      const response = await apiClient.get(`/reservations/${id}`);
+      const response = await axios.get(`${API_URL}/reservations/${id}`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -44,7 +45,7 @@ class ReservationService {
   // Mettre à jour le statut d'une réservation (pour les propriétaires)
   async updateReservationStatus(id, statusData) {
     try {
-      const response = await apiClient.put(`/reservations/${id}/status`, statusData);
+      const response = await axios.put(`${API_URL}/reservations/${id}/status`, statusData);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -54,7 +55,7 @@ class ReservationService {
   // Annuler une réservation (pour les locataires)
   async cancelReservation(id, reason) {
     try {
-      const response = await apiClient.put(`/reservations/${id}/cancel`, { reason });
+      const response = await axios.put(`${API_URL}/reservations/${id}/cancel`, { reason });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -64,7 +65,7 @@ class ReservationService {
   // Ajouter un avis à une réservation
   async addReview(id, reviewData) {
     try {
-      const response = await apiClient.post(`/reservations/${id}/review`, reviewData);
+      const response = await axios.post(`${API_URL}/reservations/${id}/review`, reviewData);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -86,10 +87,11 @@ class ReservationService {
       status: 500
     };
   }
+
   // Obtenir toutes les réservations d'un bateau donné
   async getReservationsByBoat(boatId) {
     try {
-      const response = await apiClient.get(`/reservations/boat/${boatId}`);
+      const response = await axios.get(`${API_URL}/reservations/boat/${boatId}`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -99,7 +101,7 @@ class ReservationService {
   // Obtenir toutes les réservations (admin/global)
   async getAllReservations() {
     try {
-      const response = await apiClient.get('/reservations');
+      const response = await axios.get(`${API_URL}/reservations`);
       return response.data;
     } catch (error) {
       throw this.handleError(error);

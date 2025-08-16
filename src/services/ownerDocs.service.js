@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-const API_URL = '/api/owner-docs';
+import { API_URL } from '../lib/api';
 
 const getDocs = async (ownerId, token) => {
-  const res = await axios.get(`${API_URL}/${ownerId}`, {
+  const res = await axios.get(`${API_URL}/owner-docs/${ownerId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;

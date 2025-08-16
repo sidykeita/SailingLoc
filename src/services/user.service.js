@@ -1,11 +1,10 @@
 import axios from 'axios';
-
-  const API_URL = '/api/auth/users';
+import { API_URL } from '../lib/api';
 
 const updateProfile = async (userId, data) => {
   // Récupère le token du localStorage (ou autre selon ton AuthContext)
   const token = localStorage.getItem('token');
-  const res = await axios.patch(
+  const res = await axios.post(
     `${API_URL}/${userId}`,
     data,
     {

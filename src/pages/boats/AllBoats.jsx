@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useReducer, useCallback, useContext, useRef } from 'react';
+import { API_URL } from '../../lib/api';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faShip, faTachometerAlt, faUsers, faWater, faArrowRight, faFilter } from '@fortawesome/free-solid-svg-icons';
@@ -27,7 +28,7 @@ const AllBoats = () => {
   useEffect(() => {
   setLoading(true);
   setError('');
-  fetch('/api/boats', { credentials: 'include' })
+  fetch(`${API_URL}/boats`, { credentials: 'include' })
     .then(res => {
       if (!res.ok) throw new Error('Bad response');
       return res.json();
