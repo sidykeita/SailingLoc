@@ -15,6 +15,22 @@ import ReservationEditModal from '../../components/ReservationEditModal';
 const AdminDashboard = () => {
   // ... états existants
   const [recentActivities, setRecentActivities] = useState([]);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [editReservation, setEditReservation] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [activeSection, setActiveSection] = useState('overview');
+  const [users, setUsers] = useState([]);
+  const [boats, setBoats] = useState([]);
+  const [reservations, setReservations] = useState([]);
+  const [reservationsRaw, setReservationsRaw] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalBoats: 0,
+    totalReservations: 0,
+    totalRevenue: 0,
+    pendingValidations: 0
+  });
 
   // Génère les activités récentes à partir des users, boats et reservations
   useEffect(() => {
@@ -72,9 +88,6 @@ const AdminDashboard = () => {
     if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)}h`;
     return `Il y a ${Math.floor(diff / 86400)}j`;
   }
-  const [selectedReservation, setSelectedReservation] = useState(null);
-  const [editReservation, setEditReservation] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
 
   // fetchData doit être déclaré ici pour être accessible dans les handlers
   const fetchData = async () => {
@@ -154,7 +167,8 @@ const AdminDashboard = () => {
       // Gérer les erreurs (optionnel: afficher une notification)
       console.error('Erreur lors du chargement des données du dashboard :', error);
     }
-  };
+  }
+
 
   // Handlers pour les actions utilisateur
   const handleViewUser = (user) => {
@@ -221,116 +235,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const [activeSection, setActiveSection] = useState('overview');
-  const [users, setUsers] = useState([]);
-  const [boats, setBoats] = useState([]);
-  const [reservations, setReservations] = useState([]);
-const [reservationsRaw, setReservationsRaw] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalBoats: 0,
-    totalReservations: 0,
-    totalRevenue: 0,
-    pendingValidations: 0
-  });
 
-  useEffect(() => {
-    // Chargement dynamique des données depuis l'API
-    const fetchData = async () => {
-      try {
-        // Utilisateurs
-        const usersData = await userService.getAllUsers();
-    console.log('usersData:', usersData);
-        setUsers(usersData.map(u => ({
-          id: u._id,
-          name: `${u.firstName} ${u.lastName}`,
-          email: u.email,
-          type: u.role,
-          status: u.status || 'actif',
-          joinDate: u.createdAt || u.joinDate
-        })));
 
-        // Bateaux
-        const boatsData = await boatService.getAllBoats();
-    console.log('boatsData:', boatsData);
-        setBoats(boatsData.map(b => ({
-          id: b._id,
-          name: b.name,
-          owner: b.owner && (b.owner.firstName ? `${b.owner.firstName} ${b.owner.lastName}` : b.owner.name || b.owner),
-          type: b.type,
-          status: b.status,
-          price: b.dailyPrice,
-          location: b.port
-        })));
-
-        // Réservations
-        const reservationsData = await reservationService.getAllReservations ? await reservationService.getAllReservations() : [];
-        console.log('reservationsData:', reservationsData);
-        console.log('reservationsData.length:', reservationsData.length);
-        setReservationsRaw(reservationsData);
-        setReservations(reservationsData.map(r => ({
-          id: r._id,
-          boat: r.boat && (r.boat.name || r.boat),
-          tenant: r.user && (r.user.firstName ? `${r.user.firstName} ${r.user.lastName}` : r.user.name || r.user),
-          dates: r.startDate && r.endDate ? `${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()}` : '',
-          amount: r.price,
-          status: r.status
-        })));
-
-        // Statistiques
-        console.log('setStats values:', {
-          totalUsers: usersData.length,
-          totalBoats: boatsData.length,
-          totalReservations: reservationsData.length,
-          totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
-          pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
-        });
-        // Calcul du chiffre d'affaires du site (commission)
-        const totalSiteRevenue = reservationsData.reduce((acc, r) => {
-          // Utilise r.price ou r.amount ou r.totalPrice selon la structure
-          let price = typeof r.price === 'number' ? r.price : (typeof r.amount === 'number' ? r.amount : (typeof r.totalPrice === 'number' ? r.totalPrice : 0));
-          if (!price && r.startDate && r.endDate && r.boat?.dailyPrice) {
-            const start = new Date(r.startDate);
-            const end = new Date(r.endDate);
-            const msPerDay = 24 * 60 * 60 * 1000;
-            const days = Math.max(1, Math.ceil((end - start) / msPerDay));
-            price = Number(r.boat.dailyPrice) * days;
-          }
-          return acc + (price * 0.10);
-        }, 0);
-        setStats({
-          totalUsers: usersData.length,
-          totalBoats: boatsData.length,
-          totalReservations: reservationsData.length,
-          totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
-          totalSiteRevenue,
-          pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
-        });
-
-        // Avis (optionnel)
-        try {
-          const reviewsData = await reviewService.getAllReviews();
-          console.log('reviewsData:', reviewsData);
-          setReviews(reviewsData.map(rv => ({
-            id: rv._id,
-            boat: rv.boat && (rv.boat.name || rv.boat),
-            reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
-            rating: rv.rating,
-            comment: rv.comment,
-            date: rv.createdAt || rv.date
-          })));
-        } catch (err) {
-          console.warn('Erreur lors du chargement des reviews (non bloquant):', err);
-          setReviews([]);
-        }
-      } catch (error) {
-        // Gérer les erreurs (optionnel: afficher une notification)
-        console.error('Erreur lors du chargement des données du dashboard :', error);
-      }
-    };
-    fetchData();
-  }, []);
 
   const renderOverview = () => (
     <div className="admin-overview">
