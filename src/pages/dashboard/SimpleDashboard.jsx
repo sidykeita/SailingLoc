@@ -179,8 +179,6 @@ const SimpleDashboard = () => {
         <div className="secondary-nav-container">
           <Link to="/dashboard" className="nav-link active">Tableau de bord</Link>
           <Link to="/locations" className="nav-link">Mes locations</Link>
-
-          <Link to="/account" className="nav-link">Mon compte</Link>
           <Link to="/reviews" className="nav-link">Mes avis</Link>
           <Link to="/favorites" className="nav-link">Mes favoris</Link>
         </div>
