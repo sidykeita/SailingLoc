@@ -39,11 +39,12 @@ const AdminDashboard = () => {
     const activities = [];
     if (Array.isArray(users)) {
       users.slice(-10).forEach(u => {
+        const fullName = (u.firstName && u.lastName) ? `${u.firstName} ${u.lastName}` : (u.name || '');
         activities.push({
           type: 'user',
           date: new Date(u.createdAt || u.joinDate),
           icon: '👤',
-          text: `Nouvel utilisateur inscrit : ${u.firstName || ''} ${u.lastName || ''}`.trim(),
+          text: `Nouvel utilisateur inscrit : ${fullName}`.trim(),
         });
       });
     }
@@ -267,7 +268,9 @@ const AdminDashboard = () => {
         <div className="stat-card">
           <div className="stat-icon">🏦</div>
           <div className="stat-info">
-            <h3>{(stats.totalSiteRevenue || 0).toLocaleString()}€</h3>
+            <h3>{(
+              reservationsRaw.reduce((acc, r) => acc + ((r.price || 0) * 0.10), 0)
+            ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</h3>
             <p>Chiffre d'affaires du site (commission)</p>
           </div>
         </div>
