@@ -347,9 +347,6 @@ const TenantLocations = () => {
                   <span>Mes locations</span>
                 </Link>
 
-                <Link to="/account" className="dropdown-item">
-                  <span>Mon compte</span>
-                </Link>
                 <Link to="/reviews" className="dropdown-item">
                   <span>Mes avis</span>
                 </Link>
@@ -372,8 +369,6 @@ const TenantLocations = () => {
         <div className="secondary-nav-container">
           <Link to="/dashboard" className="nav-link">Tableau de bord</Link>
           <Link to="/locations" className="nav-link active">Mes locations</Link>
-
-          <Link to="/account" className="nav-link">Mon compte</Link>
           <Link to="/reviews" className="nav-link">Mes avis</Link>
           <Link to="/favorites" className="nav-link">Mes favoris</Link>
         </div>
