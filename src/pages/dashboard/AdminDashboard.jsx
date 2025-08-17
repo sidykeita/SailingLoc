@@ -81,6 +81,27 @@ const AdminDashboard = () => {
   const handleEditUser = (user) => {
     setEditUser(user);
   };
+
+  // Handlers pour les actions bateau
+  const handleViewBoat = (boat) => {
+    console.log('Voir bateau', boat);
+    // TODO : ouvrir un modal ou drawer avec les détails du bateau
+  };
+  const handleEditBoat = (boat) => {
+    console.log('Modifier bateau', boat);
+    // TODO : ouvrir un modal d'édition
+  };
+  const handleDeleteBoat = async (boat) => {
+    if(window.confirm(`Supprimer le bateau ${boat.name} ?`)) {
+      try {
+        await boatService.deleteBoat(boat.id || boat._id);
+        fetchData();
+      } catch (err) {
+        alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
+      }
+    }
+  };
+
   const handleSaveEditUser = async (data) => {
     if (!editUser) return;
     try {
@@ -390,10 +411,9 @@ const AdminDashboard = () => {
                 </td>
                 <td>
                   <div className="action-buttons">
-                    <button className="btn-icon" title="Voir">👁️</button>
-                    <button className="btn-icon" title="Modifier">✏️</button>
-                    <button className="btn-icon" title="Valider">✅</button>
-                    <button className="btn-icon danger" title="Supprimer">🗑️</button>
+                    <button className="btn-icon" title="Voir" onClick={() => handleViewBoat(boat)}>👁️</button>
+                    <button className="btn-icon" title="Modifier" onClick={() => handleEditBoat(boat)}>✏️</button>
+                    <button className="btn-icon danger" title="Supprimer" onClick={() => handleDeleteBoat(boat)}>🗑️</button>
                   </div>
                 </td>
               </tr>
