@@ -17,7 +17,7 @@ const uploadDoc = async (type, file, token, ownerId) => {
   await uploadBytes(storageRef, file);
   const url = await getDownloadURL(storageRef);
   // 2. Envoie l’URL au backend pour sauvegarde
-  const res = await axios.post(`${API_URL}/upload-url`, { type, url }, {
+  const res = await axios.post(`${API_URL}/owner-docs/upload-url`, { type, url }, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
