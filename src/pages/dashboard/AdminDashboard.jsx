@@ -65,8 +65,8 @@ const AdminDashboard = () => {
           owner: b.owner && (b.owner.firstName ? `${b.owner.firstName} ${b.owner.lastName}` : b.owner.name || b.owner),
           type: b.type,
           status: b.status,
-          price: b.pricePerDay || b.price,
-          location: b.location
+          price: b.dailyPrice,
+          location: b.port
         })));
 
         // Réservations
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
           boat: r.boat && (r.boat.name || r.boat),
           tenant: r.user && (r.user.firstName ? `${r.user.firstName} ${r.user.lastName}` : r.user.name || r.user),
           dates: r.startDate && r.endDate ? `${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()}` : '',
-          amount: r.totalPrice || r.amount,
+          amount: r.price,
           status: r.status
         })));
 
