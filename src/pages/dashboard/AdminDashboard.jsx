@@ -97,6 +97,13 @@ const AdminDashboard = () => {
         })));
 
         // Statistiques
+        console.log('setStats values:', {
+          totalUsers: usersData.length,
+          totalBoats: boatsData.length,
+          totalReservations: reservationsData.length,
+          totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
+          pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
+        });
         setStats({
           totalUsers: usersData.length,
           totalBoats: boatsData.length,
