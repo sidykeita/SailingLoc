@@ -84,18 +84,6 @@ const AdminDashboard = () => {
           status: r.status
         })));
 
-        // Avis
-        const reviewsData = await reviewService.getAllReviews();
-    console.log('reviewsData:', reviewsData);
-        setReviews(reviewsData.map(rv => ({
-          id: rv._id,
-          boat: rv.boat && (rv.boat.name || rv.boat),
-          reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
-          rating: rv.rating,
-          comment: rv.comment,
-          date: rv.createdAt || rv.date
-        })));
-
         // Statistiques
         console.log('setStats values:', {
           totalUsers: usersData.length,
@@ -111,6 +99,23 @@ const AdminDashboard = () => {
           totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
           pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
         });
+
+        // Avis (optionnel)
+        try {
+          const reviewsData = await reviewService.getAllReviews();
+          console.log('reviewsData:', reviewsData);
+          setReviews(reviewsData.map(rv => ({
+            id: rv._id,
+            boat: rv.boat && (rv.boat.name || rv.boat),
+            reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
+            rating: rv.rating,
+            comment: rv.comment,
+            date: rv.createdAt || rv.date
+          })));
+        } catch (err) {
+          console.warn('Erreur lors du chargement des reviews (non bloquant):', err);
+          setReviews([]);
+        }
       } catch (error) {
         // Gérer les erreurs (optionnel: afficher une notification)
         console.error('Erreur lors du chargement des données du dashboard :', error);
