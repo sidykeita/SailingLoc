@@ -10,6 +10,69 @@ import EditUserModal from '../../components/EditUserModal';
 
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // fetchData doit être déclaré ici pour être accessible dans les handlers
+  const fetchData = async () => {
+    try {
+      // Utilisateurs
+      const usersData = await userService.getAllUsers();
+      setUsers(usersData.map(u => ({
+        id: u._id,
+        name: `${u.firstName} ${u.lastName}`,
+        email: u.email,
+        type: u.role,
+        status: u.status || 'actif',
+        joinDate: u.createdAt || u.joinDate
+      })));
+      // Bateaux
+      const boatsData = await boatService.getAllBoats();
+      setBoats(boatsData.map(b => ({
+        id: b._id,
+        name: b.name,
+        owner: b.owner && (b.owner.firstName ? `${b.owner.firstName} ${b.owner.lastName}` : b.owner.name || b.owner),
+        type: b.type,
+        status: b.status,
+        price: b.dailyPrice,
+        location: b.port
+      })));
+      // Réservations
+      const reservationsData = await reservationService.getAllReservations ? await reservationService.getAllReservations() : [];
+      setReservations(reservationsData.map(r => ({
+        id: r._id,
+        boat: r.boat && (r.boat.name || r.boat),
+        tenant: r.user && (r.user.firstName ? `${r.user.firstName} ${r.user.lastName}` : r.user.name || r.user),
+        dates: r.startDate && r.endDate ? `${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()}` : '',
+        amount: r.price,
+        status: r.status
+      })));
+      // Statistiques
+      setStats({
+        totalUsers: usersData.length,
+        totalBoats: boatsData.length,
+        totalReservations: reservationsData.length,
+        totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
+        pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
+      });
+      // Avis (optionnel)
+      try {
+        const reviewsData = await reviewService.getAllReviews();
+        setReviews(reviewsData.map(rv => ({
+          id: rv._id,
+          boat: rv.boat && (rv.boat.name || rv.boat),
+          reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
+          rating: rv.rating,
+          comment: rv.comment,
+          date: rv.createdAt || rv.date
+        })));
+      } catch (err) {
+        setReviews([]);
+      }
+    } catch (error) {
+      // Gérer les erreurs (optionnel: afficher une notification)
+      console.error('Erreur lors du chargement des données du dashboard :', error);
+    }
+  };
+
   // Handlers pour les actions utilisateur
   const handleViewUser = (user) => {
     setSelectedUser(user);
