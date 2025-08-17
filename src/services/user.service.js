@@ -5,7 +5,7 @@ const updateProfile = async (userId, data) => {
   // Récupère le token du localStorage (ou autre selon ton AuthContext)
   const token = localStorage.getItem('token');
   const res = await axios.patch(
-    `${API_URL}/${userId}`,
+    `${API_URL}/users/${userId}`,
     data,
     {
       headers: {
