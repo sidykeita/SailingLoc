@@ -64,6 +64,7 @@ import Calendrier from './pages/dashboard/Calendrier';
 import Reservations from './pages/dashboard/Reservations';
 import Revenus from './pages/dashboard/Revenus';
 import TenantLocations from './pages/dashboard/TenantLocations';
+import TenantReviews from './pages/dashboard/TenantReviews';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -145,6 +146,11 @@ function App() {
           <Route path="/locations" element={
             <ProtectedRoute>
               <TenantLocations />
+            </ProtectedRoute>
+          } />
+          <Route path="/reviews" element={
+            <ProtectedRoute>
+              <TenantReviews />
             </ProtectedRoute>
           } />
           
