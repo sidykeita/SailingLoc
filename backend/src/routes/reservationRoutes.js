@@ -25,6 +25,9 @@ router.get('/:id', reservationController.getReservationById);
 // Mise à jour statut
 router.put('/:id/status', protect, reservationController.updateReservationStatus);
 
+// Mise à jour complète d'une réservation (admin/global)
+router.put('/:id', protect, reservationController.updateReservation);
+
 // Annulation par le locataire
 router.put('/:id/cancel', protect, reservationController.cancelReservation);
 
