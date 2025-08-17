@@ -18,14 +18,25 @@ const AdminDashboard = () => {
   const handleEditUser = (user) => {
     setEditUser(user);
   };
-  const handleSaveEditUser = (data) => {
-    // TODO : appeler l'API pour sauvegarder les changements
-    setEditUser(null);
-    // Optionnel : recharger la liste des users ou afficher une notification
+  const handleSaveEditUser = async (data) => {
+    if (!editUser) return;
+    try {
+      await userService.updateProfile(editUser.id || editUser._id, data);
+      setEditUser(null);
+      fetchData();
+    } catch (err) {
+      alert('Erreur lors de la modification : ' + (err?.message || 'inconnue'));
+    }
   };
-  const handleDeleteUser = (user) => {
+  const handleDeleteUser = async (user) => {
     if(window.confirm(`Supprimer l'utilisateur ${user.name} ?`)) {
-      alert('Suppression à implémenter');
+      try {
+        await userService.deleteUser(user.id || user._id);
+        // Recharger la liste des utilisateurs
+        fetchData();
+      } catch (err) {
+        alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
+      }
     }
   };
 

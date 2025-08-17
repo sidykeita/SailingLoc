@@ -28,7 +28,18 @@ const getAllUsers = async () => {
   return res.data;
 };
 
+const deleteUser = async (userId) => {
+  const token = localStorage.getItem('token');
+  const res = await axios.delete(`${API_URL}/users/${userId}`, {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : undefined,
+    },
+  });
+  return res.data;
+};
+
 export default {
   updateProfile,
   getAllUsers,
+  deleteUser,
 };
