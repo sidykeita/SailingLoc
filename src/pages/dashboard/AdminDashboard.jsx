@@ -169,6 +169,7 @@ const AdminDashboard = () => {
     }
   }
 
+  useEffect(() => { fetchData(); }, []);
 
   // Handlers pour les actions utilisateur
   const handleViewUser = (user) => {
