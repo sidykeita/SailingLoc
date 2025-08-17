@@ -98,7 +98,9 @@ const AdminDashboard = () => {
     setViewBoat(boat);
   };
   const handleEditBoat = (boat) => {
-    setEditBoat(boat);
+    // Chercher l'objet complet dans boats (issu de la BDD)
+    const fullBoat = boats.find(b => b.id === boat.id || b._id === boat._id) || boat;
+    setEditBoat(fullBoat);
   };
   const handleDeleteBoat = async (boat) => {
     if(window.confirm(`Supprimer le bateau ${boat.name} ?`)) {
