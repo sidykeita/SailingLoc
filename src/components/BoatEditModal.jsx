@@ -4,8 +4,8 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
   const [form, setForm] = useState({
     name: boat?.name || '',
     type: boat?.type || '',
-    dailyPrice: boat?.dailyPrice || '',
-    port: boat?.port || '',
+    dailyPrice: boat?.dailyPrice ?? boat?.price ?? '',
+    port: boat?.port ?? boat?.location ?? '',
     status: boat?.status || '',
   });
 
@@ -14,8 +14,8 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
       setForm({
         name: boat.name ?? '',
         type: boat.type ?? '',
-        dailyPrice: boat.dailyPrice ?? '',
-        port: boat.port ?? '',
+        dailyPrice: boat.dailyPrice ?? boat.price ?? '',
+        port: boat.port ?? boat.location ?? '',
         status: boat.status ?? '',
       });
     }
