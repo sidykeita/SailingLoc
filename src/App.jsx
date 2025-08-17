@@ -63,6 +63,7 @@ import Contact from './pages/contact/Contact';
 import Calendrier from './pages/dashboard/Calendrier';
 import Reservations from './pages/dashboard/Reservations';
 import Revenus from './pages/dashboard/Revenus';
+import TenantLocations from './pages/dashboard/TenantLocations';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -139,6 +140,11 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/locations" element={
+            <ProtectedRoute>
+              <TenantLocations />
             </ProtectedRoute>
           } />
           
