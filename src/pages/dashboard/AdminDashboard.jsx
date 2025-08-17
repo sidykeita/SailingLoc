@@ -62,15 +62,32 @@ const AdminDashboard = () => {
       });
       // Avis (optionnel)
       try {
-        const reviewsData = await reviewService.getAllReviews();
-        setReviews(reviewsData.map(rv => ({
-          id: rv._id,
-          boat: rv.boat && (rv.boat.name || rv.boat),
-          reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
-          rating: rv.rating,
-          comment: rv.comment,
-          date: rv.createdAt || rv.date
-        })));
+        // Agréger les reviews à partir des réservations existantes
+        const allReviews = [];
+        reservationsData.forEach(res => {
+          if (res.review) {
+            allReviews.push({
+              id: res.review._id,
+              boat: res.boat && (res.boat.name || res.boat),
+              reviewer: res.review.user && (res.review.user.firstName ? `${res.review.user.firstName} ${res.review.user.lastName}` : res.review.user.name || res.review.user),
+              rating: res.review.rating,
+              comment: res.review.comment,
+              date: res.review.createdAt || res.review.date
+            });
+          } else if (Array.isArray(res.reviews)) {
+            res.reviews.forEach(rv => {
+              allReviews.push({
+                id: rv._id,
+                boat: res.boat && (res.boat.name || res.boat),
+                reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
+                rating: rv.rating,
+                comment: rv.comment,
+                date: rv.createdAt || rv.date
+              });
+            });
+          }
+        });
+        setReviews(allReviews);
       } catch (err) {
         setReviews([]);
       }
