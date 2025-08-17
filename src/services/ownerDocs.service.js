@@ -24,7 +24,7 @@ const uploadDoc = async (type, file, token, ownerId) => {
 };
 
 const deleteDoc = async (ownerId, type, token) => {
-  const res = await axios.delete(`${API_URL}/${ownerId}/${type}`, {
+  const res = await axios.delete(`${API_URL}/owner-docs/${ownerId}/${type}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
