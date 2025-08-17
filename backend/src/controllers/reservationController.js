@@ -79,7 +79,7 @@ exports.updateReservationStatus = async (req, res) => {
 
     // Vérifier si l'utilisateur est le propriétaire du bateau
     const boat = await Boat.findById(reservation.boat);
-    if (!boat || boat.owner.toString() !== req.user.id) {
+    if (!boat || (boat.owner.toString() !== req.user.id && req.user.role !== 'admin')) {
       return res.status(403).json({ message: 'Accès non autorisé' });
     }
 
