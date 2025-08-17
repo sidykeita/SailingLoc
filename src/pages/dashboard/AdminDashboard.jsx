@@ -676,6 +676,7 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
             onClose={() => setEditReservation(null)}
             onSave={async (data) => {
               try {
+                console.log('DEBUG editReservation:', editReservation);
                 const reservationId = editReservation._id || editReservation.id;
                 if (!reservationId) {
                   console.error('Aucun id de réservation trouvé !', editReservation);
