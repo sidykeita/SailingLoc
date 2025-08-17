@@ -48,6 +48,7 @@ const AdminDashboard = () => {
       try {
         // Utilisateurs
         const usersData = await userService.getAllUsers();
+    console.log('usersData:', usersData);
         setUsers(usersData.map(u => ({
           id: u._id,
           name: `${u.firstName} ${u.lastName}`,
@@ -59,6 +60,7 @@ const AdminDashboard = () => {
 
         // Bateaux
         const boatsData = await boatService.getAllBoats();
+    console.log('boatsData:', boatsData);
         setBoats(boatsData.map(b => ({
           id: b._id,
           name: b.name,
@@ -71,6 +73,8 @@ const AdminDashboard = () => {
 
         // Réservations
         const reservationsData = await reservationService.getAllReservations ? await reservationService.getAllReservations() : [];
+        console.log('reservationsData:', reservationsData);
+        console.log('reservationsData.length:', reservationsData.length);
         setReservations(reservationsData.map(r => ({
           id: r._id,
           boat: r.boat && (r.boat.name || r.boat),
@@ -82,6 +86,7 @@ const AdminDashboard = () => {
 
         // Avis
         const reviewsData = await reviewService.getAllReviews();
+    console.log('reviewsData:', reviewsData);
         setReviews(reviewsData.map(rv => ({
           id: rv._id,
           boat: rv.boat && (rv.boat.name || rv.boat),
