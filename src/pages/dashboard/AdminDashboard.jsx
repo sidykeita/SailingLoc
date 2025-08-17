@@ -190,6 +190,7 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
         const reservationsData = await reservationService.getAllReservations ? await reservationService.getAllReservations() : [];
         console.log('reservationsData:', reservationsData);
         console.log('reservationsData.length:', reservationsData.length);
+        setReservationsRaw(reservationsData);
         setReservations(reservationsData.map(r => ({
           id: r._id,
           boat: r.boat && (r.boat.name || r.boat),
