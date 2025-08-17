@@ -10,14 +10,16 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
   });
 
   React.useEffect(() => {
-    setForm({
-      name: boat?.name || '',
-      type: boat?.type || '',
-      dailyPrice: boat?.dailyPrice || '',
-      port: boat?.port || '',
-      status: boat?.status || '',
-    });
-  }, [boat]);
+    if (boat) {
+      setForm({
+        name: boat.name ?? '',
+        type: boat.type ?? '',
+        dailyPrice: boat.dailyPrice ?? '',
+        port: boat.port ?? '',
+        status: boat.status ?? '',
+      });
+    }
+  }, [boat, open]);
 
   if (!open || !boat) return null;
 
