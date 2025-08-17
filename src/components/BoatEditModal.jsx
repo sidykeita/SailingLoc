@@ -4,8 +4,8 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
   const [form, setForm] = useState({
     name: boat?.name || '',
     type: boat?.type || '',
-    price: boat?.price || '',
-    location: boat?.location || '',
+    dailyPrice: boat?.dailyPrice || '',
+    port: boat?.port || '',
     status: boat?.status || '',
   });
 
@@ -13,8 +13,8 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
     setForm({
       name: boat?.name || '',
       type: boat?.type || '',
-      price: boat?.price || '',
-      location: boat?.location || '',
+      dailyPrice: boat?.dailyPrice || '',
+      port: boat?.port || '',
       status: boat?.status || '',
     });
   }, [boat]);
@@ -46,11 +46,11 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
           </div>
           <div style={{marginBottom:'14px'}}>
             <label style={{display:'block',fontWeight:500,color:'#888',marginBottom:4}}>Prix/jour (€)</label>
-            <input name="price" type="number" value={form.price} onChange={handleChange} style={{width:'100%',padding:'10px',borderRadius:'7px',border:'1px solid #ddd',marginBottom:8,fontSize:'1rem'}} />
+            <input name="dailyPrice" type="number" value={form.dailyPrice} onChange={handleChange} style={{width:'100%',padding:'10px',borderRadius:'7px',border:'1px solid #ddd',marginBottom:8,fontSize:'1rem'}} />
           </div>
           <div style={{marginBottom:'14px'}}>
             <label style={{display:'block',fontWeight:500,color:'#888',marginBottom:4}}>Localisation</label>
-            <input name="location" value={form.location} onChange={handleChange} style={{width:'100%',padding:'10px',borderRadius:'7px',border:'1px solid #ddd',marginBottom:8,fontSize:'1rem'}} />
+            <input name="port" value={form.port} onChange={handleChange} style={{width:'100%',padding:'10px',borderRadius:'7px',border:'1px solid #ddd',marginBottom:8,fontSize:'1rem'}} />
           </div>
           <div style={{marginBottom:'18px'}}>
             <label style={{display:'block',fontWeight:500,color:'#888',marginBottom:4}}>Statut</label>
