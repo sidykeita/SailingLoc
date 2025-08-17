@@ -498,7 +498,16 @@ const AdminDashboard = () => {
                   <div className="action-buttons">
                     <button className="btn-icon" title="Voir">👁️</button>
                     <button className="btn-icon" title="Modifier">✏️</button>
-                    <button className="btn-icon" title="Rembourser">💰</button>
+                    <button className="btn-icon danger" title="Supprimer" onClick={async () => {
+                      if(window.confirm('Supprimer cette réservation ?')) {
+                        try {
+                          await reservationService.deleteReservation(reservation.id);
+                          fetchData();
+                        } catch (err) {
+                          alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
+                        }
+                      }
+                    }}>🗑️</button>
                   </div>
                 </td>
               </tr>
