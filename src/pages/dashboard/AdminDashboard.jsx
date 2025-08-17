@@ -43,6 +43,7 @@ const AdminDashboard = () => {
       })));
       // Réservations
       const reservationsData = await reservationService.getAllReservations ? await reservationService.getAllReservations() : [];
+      setReservationsRaw(reservationsData);
       setReservations(reservationsData.map(r => ({
         id: r._id,
         boat: r.boat && (r.boat.name || r.boat),
@@ -146,6 +147,7 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [boats, setBoats] = useState([]);
   const [reservations, setReservations] = useState([]);
+const [reservationsRaw, setReservationsRaw] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -489,12 +491,12 @@ const AdminDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {reservations.map(reservation => (
-              <tr key={reservation.id}>
-                <td>{reservation.boat}</td>
-                <td>{reservation.tenant}</td>
-                <td>{reservation.dates}</td>
-                <td>{reservation.amount}€</td>
+            {reservationsRaw.map(reservation => (
+              <tr key={reservation._id}>
+                <td>{reservation.boat?.name || reservation.boat}</td>
+                <td>{reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : ''}</td>
+                <td>{reservation.startDate && reservation.endDate ? `${new Date(reservation.startDate).toLocaleDateString()} - ${new Date(reservation.endDate).toLocaleDateString()}` : ''}</td>
+                <td>{reservation.price}€</td>
                 <td>
                   <span className={`status ${reservation.status}`}>{reservation.status}</span>
                 </td>
