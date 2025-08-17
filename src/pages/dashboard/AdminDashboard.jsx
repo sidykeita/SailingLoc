@@ -273,13 +273,6 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">💰</div>
-          <div className="stat-info">
-            <h3>{stats.totalRevenue.toLocaleString()}€</h3>
-            <p>Chiffre d'affaires (brut)</p>
-          </div>
-        </div>
-        <div className="stat-card">
           <div className="stat-icon">🏦</div>
           <div className="stat-info">
             <h3>{(stats.totalSiteRevenue || 0).toLocaleString()}€</h3>
