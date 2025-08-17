@@ -13,6 +13,65 @@ import ReservationDetailModal from '../../components/ReservationDetailModal';
 import ReservationEditModal from '../../components/ReservationEditModal';
 
 const AdminDashboard = () => {
+  // ... états existants
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  // Génère les activités récentes à partir des users, boats et reservations
+  useEffect(() => {
+    // Supposons que users, boats, reservations sont déjà chargés via fetchData
+    // et stockés dans des états users, boats, reservations
+    const activities = [];
+    if (Array.isArray(users)) {
+      users.slice(-10).forEach(u => {
+        activities.push({
+          type: 'user',
+          date: new Date(u.createdAt || u.joinDate),
+          icon: '👤',
+          text: `Nouvel utilisateur inscrit : ${u.firstName || ''} ${u.lastName || ''}`.trim(),
+        });
+      });
+    }
+    if (Array.isArray(boats)) {
+      boats.slice(-10).forEach(b => {
+        activities.push({
+          type: 'boat',
+          date: new Date(b.createdAt),
+          icon: '⛵',
+          text: `Nouveau bateau en attente de validation : ${b.name}`,
+        });
+      });
+    }
+    if (Array.isArray(reservations)) {
+      reservations.slice(-10).forEach(r => {
+        const commission = r.price ? (r.price * 0.10).toFixed(2) : null;
+        activities.push({
+          type: 'reservation',
+          date: new Date(r.createdAt),
+          icon: '💰',
+          text: commission
+            ? `Nouvelle réservation : ${r.boat?.name || 'Bateau'} - Commission : ${commission}€`
+            : `Nouvelle réservation : ${r.boat?.name || 'Bateau'}`,
+        });
+      });
+    }
+    // Trie par date décroissante et limite à 5
+    activities.sort((a, b) => b.date - a.date);
+    const now = new Date();
+    const withTimeAgo = activities.slice(0, 5).map(act => ({
+      ...act,
+      timeAgo: getTimeAgo(act.date, now),
+    }));
+    setRecentActivities(withTimeAgo);
+  }, [users, boats, reservations]);
+
+  // Helper pour afficher "il y a Xh/min"
+  function getTimeAgo(date, now) {
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return `Il y a ${diff}s`;
+    if (diff < 3600) return `Il y a ${Math.floor(diff / 60)}min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)}h`;
+    return `Il y a ${Math.floor(diff / 86400)}j`;
+  }
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [editReservation, setEditReservation] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -328,23 +387,15 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
 
       <div className="recent-activity">
         <h3>Activité récente</h3>
-        <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-icon">👤</span>
-            <span>Nouvel utilisateur inscrit : Sophie Blanc</span>
-            <span className="activity-time">Il y a 2h</span>
+        <div className="flex flex-col gap-4">
+        {recentActivities.map((activity, idx) => (
+          <div className="activity-item" key={idx}>
+            <span className="activity-icon">{activity.icon}</span>
+            <span>{activity.text}</span>
+            <span className="activity-time">{activity.timeAgo}</span>
           </div>
-          <div className="activity-item">
-            <span className="activity-icon">⛵</span>
-            <span>Nouveau bateau en attente de validation</span>
-            <span className="activity-time">Il y a 4h</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-icon">💰</span>
-            <span>Paiement reçu : 750€</span>
-            <span className="activity-time">Il y a 6h</span>
-          </div>
-        </div>
+        ))}
+      </div>
       </div>
     </div>
   );
