@@ -69,12 +69,16 @@ const Register = () => {
       setNetworkError(false);
       
       // Préparation des données utilisateur pour l'inscription
+      // Adapter la valeur du rôle pour respecter l'énum backend
+      let roleToSend = role;
+      if (role === 'tenant') roleToSend = 'locataire';
+      if (role === 'owner') roleToSend = 'propriétaire';
       const userData = {
         firstName: name.split(' ')[0],
         lastName: name.split(' ').slice(1).join(' '),
         email,
         password,
-        role
+        role: roleToSend
       };
       
       // Appel de la fonction register du contexte d'authentification
