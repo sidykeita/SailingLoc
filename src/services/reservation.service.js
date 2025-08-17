@@ -49,9 +49,22 @@ class ReservationService {
   async updateReservationStatus(id, statusData) {
     try {
       const token = localStorage.getItem('token');
-    const response = await axios.put(`${API_URL}/reservations/${id}/status`, statusData, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+      const response = await axios.put(`${API_URL}/reservations/${id}/status`, statusData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Mettre à jour une réservation (admin/global)
+  async updateReservation(id, updateData) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`${API_URL}/reservations/${id}`, updateData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);

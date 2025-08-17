@@ -682,7 +682,7 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
                   alert('Erreur technique : id réservation introuvable.');
                   return;
                 }
-                await reservationService.updateReservationStatus(reservationId, {
+                await reservationService.updateReservation(reservationId, {
                   status: data.status,
                   startDate: data.startDate,
                   endDate: data.endDate,
