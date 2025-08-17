@@ -201,11 +201,25 @@ const AdminDashboard = () => {
           totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
           pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
         });
+        // Calcul du chiffre d'affaires du site (commission)
+        const totalSiteRevenue = reservationsData.reduce((acc, r) => {
+          // Utilise r.price ou r.amount ou r.totalPrice selon la structure
+          let price = typeof r.price === 'number' ? r.price : (typeof r.amount === 'number' ? r.amount : (typeof r.totalPrice === 'number' ? r.totalPrice : 0));
+          if (!price && r.startDate && r.endDate && r.boat?.dailyPrice) {
+            const start = new Date(r.startDate);
+            const end = new Date(r.endDate);
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const days = Math.max(1, Math.ceil((end - start) / msPerDay));
+            price = Number(r.boat.dailyPrice) * days;
+          }
+          return acc + (price * 0.10);
+        }, 0);
         setStats({
           totalUsers: usersData.length,
           totalBoats: boatsData.length,
           totalReservations: reservationsData.length,
           totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
+          totalSiteRevenue,
           pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
         });
 
@@ -262,7 +276,14 @@ const AdminDashboard = () => {
           <div className="stat-icon">💰</div>
           <div className="stat-info">
             <h3>{stats.totalRevenue.toLocaleString()}€</h3>
-            <p>Chiffre d'affaires</p>
+            <p>Chiffre d'affaires (brut)</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">🏦</div>
+          <div className="stat-info">
+            <h3>{(stats.totalSiteRevenue || 0).toLocaleString()}€</h3>
+            <p>Chiffre d'affaires du site (commission)</p>
           </div>
         </div>
       </div>
