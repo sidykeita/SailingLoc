@@ -7,6 +7,8 @@ import boatService from '../../services/boat.service';
 import reservationService from '../../services/reservation.service';
 import reviewService from '../../services/review.service';
 import EditUserModal from '../../components/EditUserModal';
+import BoatViewModal from '../../components/BoatViewModal';
+import BoatEditModal from '../../components/BoatEditModal';
 
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -82,14 +84,16 @@ const AdminDashboard = () => {
     setEditUser(user);
   };
 
+  // State pour modals bateau
+  const [viewBoat, setViewBoat] = useState(null);
+  const [editBoat, setEditBoat] = useState(null);
+
   // Handlers pour les actions bateau
   const handleViewBoat = (boat) => {
-    console.log('Voir bateau', boat);
-    // TODO : ouvrir un modal ou drawer avec les détails du bateau
+    setViewBoat(boat);
   };
   const handleEditBoat = (boat) => {
-    console.log('Modifier bateau', boat);
-    // TODO : ouvrir un modal d'édition
+    setEditBoat(boat);
   };
   const handleDeleteBoat = async (boat) => {
     if(window.confirm(`Supprimer le bateau ${boat.name} ?`)) {
@@ -97,8 +101,18 @@ const AdminDashboard = () => {
         await boatService.deleteBoat(boat.id || boat._id);
         fetchData();
       } catch (err) {
-        alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
+        alert('Erreur lors de la suppression du bateau : ' + (err?.response?.data?.message || err?.message || 'inconnue'));
       }
+    }
+  };
+  const handleSaveEditBoat = async (data) => {
+    if (!editBoat) return;
+    try {
+      await boatService.updateBoat(editBoat.id || editBoat._id, data);
+      setEditBoat(null);
+      fetchData();
+    } catch (err) {
+      alert('Erreur lors de la modification : ' + (err?.response?.data?.message || err?.message || 'inconnue'));
     }
   };
 
@@ -583,6 +597,21 @@ const AdminDashboard = () => {
             open={!!editUser}
             onClose={() => setEditUser(null)}
             onSave={handleSaveEditUser}
+          />
+        )}
+        {viewBoat && (
+          <BoatViewModal
+            boat={viewBoat}
+            open={!!viewBoat}
+            onClose={() => setViewBoat(null)}
+          />
+        )}
+        {editBoat && (
+          <BoatEditModal
+            boat={editBoat}
+            open={!!editBoat}
+            onClose={() => setEditBoat(null)}
+            onSave={handleSaveEditBoat}
           />
         )}
         <div className="admin-container">
