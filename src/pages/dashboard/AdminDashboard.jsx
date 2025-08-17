@@ -9,8 +9,12 @@ import reviewService from '../../services/review.service';
 import EditUserModal from '../../components/EditUserModal';
 import BoatViewModal from '../../components/BoatViewModal';
 import BoatEditModal from '../../components/BoatEditModal';
+import ReservationDetailModal from '../../components/ReservationDetailModal';
+import ReservationEditModal from '../../components/ReservationEditModal';
 
 const AdminDashboard = () => {
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [editReservation, setEditReservation] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
   // fetchData doit être déclaré ici pour être accessible dans les handlers
@@ -496,8 +500,8 @@ const AdminDashboard = () => {
                 </td>
                 <td>
                   <div className="action-buttons">
-                    <button className="btn-icon" title="Voir">👁️</button>
-                    <button className="btn-icon" title="Modifier">✏️</button>
+                    <button className="btn-icon" title="Voir" onClick={() => setSelectedReservation(reservation)}>👁️</button>
+                    <button className="btn-icon" title="Modifier" onClick={() => setEditReservation(reservation)}>✏️</button>
                     <button className="btn-icon danger" title="Supprimer" onClick={async () => {
                       if(window.confirm('Supprimer cette réservation ?')) {
                         try {
@@ -635,6 +639,33 @@ const AdminDashboard = () => {
             open={!!editBoat}
             onClose={() => setEditBoat(null)}
             onSave={handleSaveEditBoat}
+          />
+        )}
+        {selectedReservation && (
+          <ReservationDetailModal
+            reservation={selectedReservation}
+            onClose={() => setSelectedReservation(null)}
+          />
+        )}
+        {editReservation && (
+          <ReservationEditModal
+            reservation={editReservation}
+            open={!!editReservation}
+            onClose={() => setEditReservation(null)}
+            onSave={async (data) => {
+              try {
+                await reservationService.updateReservationStatus(editReservation.id, {
+                  status: data.status,
+                  startDate: data.startDate,
+                  endDate: data.endDate,
+                  price: data.price
+                });
+                setEditReservation(null);
+                fetchData();
+              } catch (err) {
+                alert('Erreur lors de la modification : ' + (err?.message || 'inconnue'));
+              }
+            }}
           />
         )}
         <div className="admin-container">
