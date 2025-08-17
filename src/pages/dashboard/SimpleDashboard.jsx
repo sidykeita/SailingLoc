@@ -157,9 +157,6 @@ const SimpleDashboard = () => {
                   <span>Mes locations</span>
                 </Link>
 
-                <Link to="/account" className="dropdown-item">
-                  <span>Mon compte</span>
-                </Link>
                 <Link to="/reviews" className="dropdown-item">
                   <span>Mes avis</span>
                 </Link>
