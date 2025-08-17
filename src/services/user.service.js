@@ -18,7 +18,7 @@ const updateProfile = async (userId, data) => {
 
 const getAllUsers = async () => {
   const token = localStorage.getItem('token');
-  const res = await axios.get(`${API_URL}/users`,
+  const res = await axios.get(`${API_URL}/auth/users`,
     {
       headers: {
         Authorization: token ? `Bearer ${token}` : undefined,
