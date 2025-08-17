@@ -527,7 +527,7 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
                     <button className="btn-icon danger" title="Supprimer" onClick={async () => {
                       if(window.confirm('Supprimer cette réservation ?')) {
                         try {
-                          await reservationService.deleteReservation(reservation.id);
+                          await reservationService.deleteReservation(reservation._id || reservation.id);
                           fetchData();
                         } catch (err) {
                           alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
