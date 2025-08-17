@@ -659,7 +659,13 @@ const [reservationsRaw, setReservationsRaw] = useState([]);
             onClose={() => setEditReservation(null)}
             onSave={async (data) => {
               try {
-                await reservationService.updateReservationStatus(editReservation.id, {
+                const reservationId = editReservation._id || editReservation.id;
+                if (!reservationId) {
+                  console.error('Aucun id de réservation trouvé !', editReservation);
+                  alert('Erreur technique : id réservation introuvable.');
+                  return;
+                }
+                await reservationService.updateReservationStatus(reservationId, {
                   status: data.status,
                   startDate: data.startDate,
                   endDate: data.endDate,
