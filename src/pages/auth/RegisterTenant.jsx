@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
 
-const RegisterTenant = () => {
+const RegisterLocataire = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,7 +75,7 @@ const RegisterTenant = () => {
         email,
         password,
         phoneNumber,
-        role: 'tenant' // Rôle fixé à locataire
+        role: 'locataire' // Rôle fixé à locataire
       };
       // Correction : phone = phoneNumber pour correspondre au backend
       userData.phone = userData.phoneNumber;
@@ -211,4 +211,4 @@ const RegisterTenant = () => {
   );
 };
 
-export default RegisterTenant;
+export default RegisterLocataire;
