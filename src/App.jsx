@@ -65,6 +65,7 @@ import Reservations from './pages/dashboard/Reservations';
 import Revenus from './pages/dashboard/Revenus';
 import TenantLocations from './pages/dashboard/TenantLocations';
 import TenantReviews from './pages/dashboard/TenantReviews';
+import TenantFavorites from './pages/dashboard/TenantFavorites';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -151,6 +152,11 @@ function App() {
           <Route path="/reviews" element={
             <ProtectedRoute>
               <TenantReviews />
+            </ProtectedRoute>
+          } />
+          <Route path="/favorites" element={
+            <ProtectedRoute>
+              <TenantFavorites />
             </ProtectedRoute>
           } />
           
