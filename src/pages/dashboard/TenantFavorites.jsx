@@ -284,7 +284,7 @@ const TenantFavorites = () => {
                     {Array.isArray(favorite.amenities) && favorite.amenities.slice(0, 3).map((amenity, index) => (
                       <span key={index} className="amenity-tag">{amenity}</span>
                     ))}
-                    {favorite.amenities.length > 3 && (
+                    {Array.isArray(favorite.amenities) && favorite.amenities.length > 3 && (
                       <span className="amenity-more">+{favorite.amenities.length - 3}</span>
                     )}
                   </div>
