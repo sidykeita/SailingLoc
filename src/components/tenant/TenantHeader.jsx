@@ -66,10 +66,6 @@ const TenantHeader = ({ activeSection }) => {
                 <Link to="/favorites" className={`dropdown-item${activeSection === 'favorites' ? ' active' : ''}`}>
                   <span>Mes favoris</span>
                 </Link>
-                <button className="dropdown-item role-switch" onClick={() => switchRole(userRole === 'owner' ? 'tenant' : 'owner')}>
-                  <span>Passer en {userRole === 'owner' ? 'locataire' : 'propriétaire'}</span>
-                  <FontAwesomeIcon icon={faExchangeAlt} />
-                </button>
                 <div className="dropdown-item logout-item" onClick={handleLogout}>
                   <span>Déconnexion</span>
                   <FontAwesomeIcon icon={faSignOutAlt} />
