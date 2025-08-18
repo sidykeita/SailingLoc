@@ -46,7 +46,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',        // <<< structure en colonne
-          overflow: 'hidden'              // on gère le scroll à l’intérieur
+          overflowY: 'auto'                // scroll vertical autorisé, footer toujours visible
         }}
       >
         {/* Bouton fermer */}
