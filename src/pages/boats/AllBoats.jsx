@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState, useReducer, useCallback, useContex
 import { API_URL } from '../../lib/api';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShip, faTachometerAlt, faUsers, faWater, faArrowRight, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShip, faTachometerAlt, faUsers, faWater, faArrowRight, faFilter, faHeart as faSolidHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faRegularHeart } from '@fortawesome/free-regular-svg-icons';
+import * as favoriteService from '../../services/favoriteService';
 import '../../assets/css/YachtBoats.css';
 
 function useQuery() {
@@ -11,6 +13,32 @@ function useQuery() {
 }
 
 const AllBoats = () => {
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [hoveredBoatId, setHoveredBoatId] = useState(null);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await favoriteService.getFavorites();
+      setFavoriteIds((res.data || []).map(fav => fav.boat?._id || fav.boatId || fav.id));
+    } catch (e) {
+      setFavoriteIds([]);
+    }
+  };
+
+  const toggleFavorite = async (boatId) => {
+    if (favoriteIds.includes(boatId)) {
+      await favoriteService.removeFavorite(boatId);
+      setFavoriteIds(favoriteIds.filter(id => id !== boatId));
+    } else {
+      await favoriteService.addFavorite(boatId);
+      setFavoriteIds([...favoriteIds, boatId]);
+    }
+  };
+
   const query = useQuery();
   const locationParam = (query.get('location') || '').trim();
   const textQuery = (query.get('query') || '').trim();
@@ -203,13 +231,46 @@ const AllBoats = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {displayedBoats.length > 0 ? (
               displayedBoats.map((boat, index) => (
-                <div key={boat?._id || boat?.id || index} className={`boat-card ${(boat?.status === 'disponible' || boat?.available) ? 'available' : ''} animated-card delay-${index % 6 + 1}`}>
-                  <div className="boat-image">
+                <div key={boat?._id || boat?.id || index} className={`boat-card ${(boat?.status === 'disponible' || boat?.available) ? 'available' : ''} animated-card delay-${index % 6 + 1}`}
+                  onMouseEnter={() => setHoveredBoatId(boat?._id || boat?.id)}
+                  onMouseLeave={() => setHoveredBoatId(null)}
+                >
+                  <div className="boat-image" style={{ position: 'relative' }}>
                     <img
                       src={(Array.isArray(boat?.photos) ? boat.photos[0] : boat?.photos) || 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'}
                       alt={boat?.name || 'Bateau'}
                       className="w-full h-full object-cover"
                     />
+                    <button
+                      className="favorite-btn"
+                      title={favoriteIds.includes(boat?._id || boat?.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                      onClick={e => { e.stopPropagation(); toggleFavorite(boat?._id || boat?.id); }}
+                      style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        background: 'white',
+                        borderRadius: '50%',
+                        border: 'none',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        width: 36,
+                        height: 36,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
+                        zIndex: 2
+                      }}
+                      onMouseEnter={() => setHoveredBoatId(boat?._id || boat?.id)}
+                      onMouseLeave={() => setHoveredBoatId(null)}
+                    >
+                      <FontAwesomeIcon
+                        icon={favoriteIds.includes(boat?._id || boat?.id) || hoveredBoatId === (boat?._id || boat?.id) ? faSolidHeart : faRegularHeart}
+                        color={favoriteIds.includes(boat?._id || boat?.id) || hoveredBoatId === (boat?._id || boat?.id) ? 'red' : '#aaa'}
+                        size="lg"
+                      />
+                    </button>
                   </div>
                   <div className="boat-details">
                     <div className="flex justify-between items-start mb-2">
