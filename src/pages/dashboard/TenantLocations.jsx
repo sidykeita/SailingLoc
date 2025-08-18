@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import reservationService from '../../backup/reservationService.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -57,78 +58,30 @@ const TenantLocations = () => {
   }, [locations, searchTerm, statusFilter, dateFilter]);
 
   const fetchLocations = async () => {
+    setLoading(true);
     try {
-      // Simulation de données de locations
-      const mockLocations = [
-        {
-          id: '1',
-          boatName: 'Jeanneau Prestige 36',
-          boatType: 'Bateau à moteur',
-          location: 'Marseille, France',
-          startDate: '2025-07-15',
-          endDate: '2025-07-18',
-          status: 'confirmed',
-          price: 1350,
-          totalPrice: 1485, // avec frais
-          imageUrl: '/api/placeholder/300/200',
-          bookingDate: '2025-06-10',
-          guests: 6,
-          owner: 'Marina Marseille',
-          features: ['GPS', 'Climatisation', 'Cuisine équipée']
-        },
-        {
-          id: '2',
-          boatName: 'Bayliner R42',
-          boatType: 'Yacht',
-          location: 'Cannes, France',
-          startDate: '2025-08-05',
-          endDate: '2025-08-10',
-          status: 'pending',
-          price: 2800,
-          totalPrice: 3080,
-          imageUrl: '/api/placeholder/300/200',
-          bookingDate: '2025-07-20',
-          guests: 8,
-          owner: 'Luxury Boats Cannes',
-          features: ['Jacuzzi', 'Bar', 'Équipement de plongée']
-        },
-        {
-          id: '3',
-          boatName: 'Catamaran Lagoon 42',
-          boatType: 'Catamaran',
-          location: 'Bastia, Corse',
-          startDate: '2025-06-20',
-          endDate: '2025-06-25',
-          status: 'completed',
-          price: 1950,
-          totalPrice: 2145,
-          imageUrl: '/api/placeholder/300/200',
-          bookingDate: '2025-05-15',
-          guests: 10,
-          owner: 'Corsica Sailing',
-          features: ['Voiles neuves', 'Équipement de pêche', 'Kayaks']
-        },
-        {
-          id: '4',
-          boatName: 'Azimut 55',
-          boatType: 'Yacht de luxe',
-          location: 'Monaco',
-          startDate: '2025-09-10',
-          endDate: '2025-09-15',
-          status: 'cancelled',
-          price: 4500,
-          totalPrice: 4950,
-          imageUrl: '/api/placeholder/300/200',
-          bookingDate: '2025-07-25',
-          guests: 12,
-          owner: 'Monaco Prestige',
-          features: ['Chef privé', 'Service de ménage', 'Jet ski']
-        }
-      ];
-      
-      setLocations(mockLocations);
+      const reservations = await reservationService.getMyReservations();
+      // Adapter le mapping selon la structure réelle de l'API
+      const mappedLocations = (reservations || []).map((res) => ({
+        id: res.id,
+        boatName: res.boat?.name || 'Bateau',
+        boatType: res.boat?.type || '',
+        location: res.boat?.location || '',
+        startDate: res.startDate,
+        endDate: res.endDate,
+        status: res.status,
+        price: res.price,
+        totalPrice: res.totalPrice || res.price,
+        imageUrl: res.boat?.imageUrl || '/api/placeholder/300/200',
+        bookingDate: res.createdAt || res.bookingDate,
+        guests: res.guests || res.nbGuests,
+        owner: res.boat?.owner?.name || '',
+        features: res.boat?.features || []
+      }));
+      setLocations(mappedLocations);
     } catch (error) {
       console.error('Erreur lors du chargement des locations:', error);
+      setLocations([]);
     } finally {
       setLoading(false);
     }
