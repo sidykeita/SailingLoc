@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LeaveReviewModal from '../../components/LeaveReviewModal';
 import reservationService from '../../backup/reservationService.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -44,6 +45,11 @@ const TenantLocations = () => {
 
   // États pour les menus déroulants
   const [showDiscoverMenu, setShowDiscoverMenu] = useState(false);
+
+  // Pour la modale d'avis
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewBoat, setReviewBoat] = useState(null);
+
   const [showBoatSubmenu, setShowBoatSubmenu] = useState(false);
   const [showDestinationsSubmenu, setShowDestinationsSubmenu] = useState(false);
   const [showModelsSubmenu, setShowModelsSubmenu] = useState(false);
@@ -665,10 +671,13 @@ const TenantLocations = () => {
                             </div>
                             <div style={{ marginBottom: 8 }}>{location.review?.comment}</div>
                             <button
-                              className="action-btn secondary"
-                              onClick={() => setOpenReviewId(location.id)}
+                              className="text-coral underline ml-2"
+                              onClick={() => {
+                                setReviewBoat({ name: location.boatName, type: location.boatType });
+                                setReviewModalOpen(true);
+                              }}
                             >
-                              Modifier mon avis
+                              Laisser un avis
                             </button>
                           </div>
                         )}
@@ -682,6 +691,17 @@ const TenantLocations = () => {
         </div>
       </div>
     )
+
+      {/* Modale d'avis */}
+      <LeaveReviewModal
+        open={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        boat={reviewBoat}
+        onSubmit={(reviewData) => {
+          // TODO : envoyer reviewData au backend ici
+          setReviewModalOpen(false);
+        }}
+      />
 
       {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">
