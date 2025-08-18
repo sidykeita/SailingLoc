@@ -675,14 +675,13 @@ const TenantLocations = () => {
                       </>
                     )}
                   </div>
-                </div>
-              ))
-            )
-          )
+                </div>  
+            )))}
+          </div>
           </div>
         </div>
       </div>
-    }
+    )
 
       {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">
@@ -733,8 +732,7 @@ const TenantLocations = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
-};
+}
+
 
 export default TenantLocations;
