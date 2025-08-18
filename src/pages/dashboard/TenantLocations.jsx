@@ -196,12 +196,6 @@ const TenantLocations = () => {
           </div>
         </div>
         
-        <div className="search-bar">
-          <input type="text" placeholder="Où souhaitez-vous louer ?" />
-          <button>
-            <FontAwesomeIcon icon={faSearch} />
-          </button>
-        </div>
         
         <div className="header-actions">
           <div className="dropdown">
