@@ -159,28 +159,14 @@ const TenantFavorites = () => {
       <header className="main-header">
         <div className="header-left">
           <div className="header-logo">
-            <img src={logoBlc} alt="Sailing Loc" />
+            <Link to="/">
+              <img src={logoBlc} alt="Sailing Loc" />
+            </Link>
           </div>
         </div>
         
         <div className="header-center">
           <nav className="main-nav">
-            <div className="nav-item dropdown">
-              <button 
-                className="nav-button"
-                onClick={() => setShowDiscoverMenu(!showDiscoverMenu)}
-              >
-                <span>Découvrir</span>
-                <FontAwesomeIcon icon={showDiscoverMenu ? faChevronDown : faChevronRight} />
-              </button>
-              {showDiscoverMenu && (
-                <div className="dropdown-menu">
-                  <Link to="/boats">Tous les bateaux</Link>
-                  <Link to="/destinations">Destinations</Link>
-                  <Link to="/experiences">Expériences</Link>
-                </div>
-              )}
-            </div>
             <Link to="/help" className="nav-button">Aide</Link>
           </nav>
         </div>
