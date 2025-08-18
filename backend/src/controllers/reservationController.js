@@ -142,6 +142,15 @@ exports.deleteReservation = async (req, res) => {
 };
 
 // Obtenir les réservations du locataire connecté
+exports.getMyReservations = async (req, res) => {
+  try {
+    const reservations = await Reservation.find({ user: req.user.id }).populate('boat user');
+    res.status(200).json(reservations);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getUserReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find({ user: req.user.id }).populate('boat user');
