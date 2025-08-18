@@ -423,10 +423,10 @@ const TenantLocations = () => {
               </div>
             ) : (
               filteredLocations.map((location) => (
-                <div key={location.id} className="location-card">
-                  <div className="location-image">
-  <img src={location.imageUrl && location.imageUrl !== '/api/placeholder/300/200' ? location.imageUrl : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'} alt={location.boatName} />
-  <div className="status-badge">
+  <div key={location.id} className="location-card">
+    <div className="location-image">
+      <img src={location.imageUrl && location.imageUrl !== '/api/placeholder/300/200' ? location.imageUrl : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'} alt={location.boatName} />
+      <div className="status-badge">
     {getStatusIcon(location.status)}
     <span>{getStatusText(location.status)}</span>
   </div>
@@ -461,20 +461,90 @@ const TenantLocations = () => {
   Voir détails
 </Link>
 {location.status === 'confirmed' && (
-  <button className="action-btn secondary">
-    <FontAwesomeIcon icon={faStar} />
-    Laisser un avis
-  </button>
+  <>
+    {(!location.review || location.editingReview) ? (
+      <>
+        <button
+          className="action-btn secondary"
+          onClick={() => setOpenReviewId(location.id)}
+          disabled={openReviewId === location.id}
+          aria-expanded={openReviewId === location.id}
+          aria-controls={`review-block-${location.id}`}
+        >
+          <FontAwesomeIcon icon={faStar} />
+          {location.review ? 'Modifier mon avis' : 'Laisser un avis'}
+        </button>
+        {openReviewId === location.id && (
+          <div
+            id={`review-block-${location.id}`}
+            className="review-block"
+            style={{ background: '#f6f8fa', borderRadius: 8, marginTop: 16, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'all .2s' }}
+            role="region"
+            aria-live="polite"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              {[1,2,3,4,5].map((star) => (
+                <span
+                  key={star}
+                  style={{ cursor: 'pointer', color: star <= reviewStars ? '#FFD700' : '#ccc', fontSize: 24 }}
+                  onClick={() => setReviewStars(star)}
+                  onKeyDown={(e) => (e.key === 'Enter' ? setReviewStars(star) : null)}
+                  tabIndex={0}
+                  aria-label={`Donner ${star} étoile${star > 1 ? 's' : ''}`}
+                  role="button"
+                >★</span>
+              ))}
+            </div>
+            <textarea
+              className="review-textarea"
+              style={{ width: '100%', minHeight: 60, borderRadius: 6, border: '1px solid #ddd', padding: 8, marginBottom: 8 }}
+              placeholder="Votre commentaire..."
+              value={reviewComment}
+              onChange={e => setReviewComment(e.target.value)}
+              aria-label="Votre commentaire"
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                className="action-btn primary"
+                onClick={() => handleSubmitReview(location)}
+                disabled={reviewStars === 0 || !reviewComment.trim() || reviewLoading}
+                aria-disabled={reviewStars === 0 || !reviewComment.trim() || reviewLoading}
+              >{reviewLoading ? 'Envoi...' : 'Envoyer mon avis'}</button>
+              <button
+                className="action-btn secondary"
+                onClick={handleCancelReview}
+                disabled={reviewLoading}
+              >Annuler</button>
+            </div>
+            {reviewError && <div style={{ color: 'red', marginTop: 8 }} role="alert">{reviewError}</div>}
+            {reviewSuccess && <div style={{ color: 'green', marginTop: 8 }} role="status">{reviewSuccess}</div>}
+          </div>
+        )}
+      </>
+    ) : (
+      // Affichage lecture seule si avis déjà laissé
+      <div className="review-block" style={{ background: '#f6f8fa', borderRadius: 8, marginTop: 16, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+          {[1,2,3,4,5].map((star) => (
+            <span key={star} style={{ color: star <= location.review.rating ? '#FFD700' : '#ccc', fontSize: 24 }}>★</span>
+          ))}
+        </div>
+        <div style={{ marginBottom: 8 }}>{location.review.comment}</div>
+        <button
+          className="action-btn secondary"
+          onClick={() => setOpenReviewId(location.id)}
+        >Modifier mon avis</button>
+      </div>
+    )}
+  </>
 )}
                   </div>
                 </div>
               ))
-            )}
+            )
           </div>
         </div>
       </div>
-      
-      {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -487,7 +557,6 @@ const TenantLocations = () => {
                 <li><a href="#" className="hover:underline">Mentions légales</a></li>
               </ul>
             </div>
-            
             <div>
               <h3 className="font-montserrat font-bold text-lg mb-4">NOUS FAIRE CONFIANCE</h3>
               <div className="flex items-center mb-2">
@@ -510,22 +579,15 @@ const TenantLocations = () => {
               <p>Note : 4.8 / 5 calculée à partir de 5 000 avis</p>
               <a href="#" className="text-coral hover:underline mt-2 inline-block">Avis de notre communauté</a>
             </div>
-            
             <div>
               <h3 className="font-montserrat font-bold text-lg mb-4">CONTACT</h3>
               <p className="mb-2">Besoin de conseils ?</p>
               <p className="mb-2">Nous sommes joignables :</p>
               <p className="mb-1">Du lundi au vendredi : 8h00 à 20h00</p>
               <p className="mb-2">Samedi et Dimanche : 10h00 à 18h00</p>
-              <a href="mailto:contact@sailingloc.com" className="flex items-center text-coral hover:underline">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-                contact@sailingloc.com
-              </a>
+              <a href="mailto:contact@sailingloc.com" className="flex items-center text-coral hover:underline">contact@sailingloc.com</a>
             </div>
           </div>
-          
           <div className="mt-8 pt-8 border-t border-blue-700 text-center">
             <p>&copy; 2025 SailingLoc. Tous droits réservés.</p>
           </div>
