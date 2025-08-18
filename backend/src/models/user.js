@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
     enum: ['locataire', 'propriétaire', 'admin'], 
     default: 'locataire' 
   },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Boat' }]
 });
 
 // Ajout de la méthode pour comparer les mots de passe

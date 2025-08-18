@@ -44,6 +44,9 @@ app.use('/api/users', userRoutes);
 const ownerDocsRoutes = require('./src/routes/ownerDocs.routes');
 app.use('/api/owner-docs', ownerDocsRoutes);
 
+const favoriteRoutes = require('./src/routes/favoriteRoutes');
+app.use('/api/favorites', favoriteRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');

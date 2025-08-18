@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getFavorites, removeFavorite as removeFavoriteApi } from '../../services/favoriteService';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,105 +39,37 @@ const TenantFavorites = () => {
   const [filterLocation, setFilterLocation] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
 
-  // Mock favorites data
-  const [favorites, setFavorites] = useState([
-    {
-      id: 1,
-      type: 'voilier',
-      name: 'Oceanis 40 - "Liberté"',
-      location: 'Marseille, France',
-      owner: 'Pierre Durand',
-      rating: 4.8,
-      reviewCount: 24,
-      price: 180,
-      capacity: 8,
-      images: [profileImage],
-      description: 'Magnifique voilier parfait pour découvrir les calanques marseillaises. Équipé de tout le confort moderne.',
-      amenities: ['WiFi', 'Cuisine équipée', 'Douche', 'GPS'],
-      dateAdded: '2024-03-10',
-      available: true
-    },
-    {
-      id: 2,
-      type: 'catamaran',
-      name: 'Lagoon 42 - "Évasion"',
-      location: 'Cannes, France',
-      owner: 'Marie Dubois',
-      rating: 4.9,
-      reviewCount: 31,
-      price: 320,
-      capacity: 10,
-      images: [profileImage],
-      description: 'Catamaran spacieux et confortable, idéal pour des vacances en famille ou entre amis sur la Côte d\'Azur.',
-      amenities: ['Climatisation', 'Plancha', 'Kayaks', 'Équipement snorkeling'],
-      dateAdded: '2024-02-28',
-      available: true
-    },
-    {
-      id: 3,
-      type: 'yacht',
-      name: 'Princess 50 - "Prestige"',
-      location: 'Monaco',
-      owner: 'Jean-Claude Martin',
-      rating: 5.0,
-      reviewCount: 18,
-      price: 850,
-      capacity: 12,
-      images: [profileImage],
-      description: 'Yacht de luxe pour une expérience exceptionnelle. Service haut de gamme et équipements premium.',
-      amenities: ['Jacuzzi', 'Bar', 'Jet ski', 'Service de conciergerie'],
-      dateAdded: '2024-01-15',
-      available: false
-    },
-    {
-      id: 4,
-      type: 'voilier',
-      name: 'Beneteau First 35 - "Aventure"',
-      location: 'Nice, France',
-      owner: 'Sophie Laurent',
-      rating: 4.7,
-      reviewCount: 15,
-      price: 150,
-      capacity: 6,
-      images: [profileImage],
-      description: 'Voilier sportif parfait pour les passionnés de navigation. Performances exceptionnelles et sensations garanties.',
-      amenities: ['Pilote automatique', 'Spi asymétrique', 'Winch électrique'],
-      dateAdded: '2024-01-20',
-      available: true
-    },
-    {
-      id: 5,
-      type: 'catamaran',
-      name: 'Fountaine Pajot 40 - "Sérénité"',
-      location: 'Saint-Tropez, France',
-      owner: 'Antoine Moreau',
-      rating: 4.6,
-      reviewCount: 22,
-      price: 280,
-      capacity: 8,
-      images: [profileImage],
-      description: 'Catamaran élégant et performant, parfait pour explorer les îles d\'Hyères en toute tranquillité.',
-      amenities: ['Panneaux solaires', 'Dessalinisateur', 'Annexe avec moteur'],
-      dateAdded: '2024-03-05',
-      available: true
-    }
-  ]);
-
+  // Données favoris dynamiques
+  const [favorites, setFavorites] = useState([]);
   const [stats] = useState({
-    totalFavorites: 5,
-    availableNow: 4,
-    averagePrice: 356,
-    locations: ['Marseille', 'Cannes', 'Monaco', 'Nice', 'Saint-Tropez']
+    totalFavorites: 0,
+    availableNow: 0,
+    averagePrice: 0,
+    locations: []
   });
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    setLoading(true);
+    getFavorites()
+      .then(res => {
+        setFavorites(res.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setFavorites([]);
+        setLoading(false);
+      });
   }, []);
 
-  const removeFavorite = (id) => {
-    setFavorites(prev => prev.filter(fav => fav.id !== id));
+  const removeFavorite = async (boatId) => {
+    setLoading(true);
+    try {
+      await removeFavoriteApi(boatId);
+      setFavorites(prev => prev.filter(fav => fav._id !== boatId));
+    } catch (e) {
+      // Optionally afficher une erreur
+    }
+    setLoading(false);
   };
 
   const getTypeIcon = (type) => {
@@ -383,13 +316,13 @@ const TenantFavorites = () => {
           {/* Favorites Grid */}
           <div className="favorites-grid">
             {filteredFavorites().map(favorite => (
-              <div key={favorite.id} className="favorite-card">
+              <div key={favorite._id || favorite.id} className="favorite-card">
                 <div className="card-image">
                   <img src={favorite.images[0]} alt={favorite.name} />
                   <div className="card-overlay">
                     <button 
                       className="favorite-btn active"
-                      onClick={() => removeFavorite(favorite.id)}
+                      onClick={() => removeFavorite(favorite._id || favorite.id)}
                     >
                       <FontAwesomeIcon icon={faHeart} />
                     </button>
