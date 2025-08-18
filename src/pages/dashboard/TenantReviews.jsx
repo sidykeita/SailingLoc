@@ -34,118 +34,16 @@ const TenantReviews = () => {
   const [filterRating, setFilterRating] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
 
-  // Mock reviews data
-  const [reviewsReceived] = useState([
-    {
-      id: 1,
-      reviewer: {
-        name: 'Marie Dubois',
-        avatar: profileImage,
-        memberSince: '2022'
-      },
-      rating: 5,
-      date: '2024-03-15',
-      booking: {
-        boat: 'Voilier Oceanis 40',
-        location: 'Marseille',
-        dates: '10-17 Mars 2024'
-      },
-      comment: 'Excellente expérience avec Timothy ! Le bateau était en parfait état, très propre et bien équipé. Timothy a été très accueillant et nous a donné de précieux conseils pour naviguer dans la région. Communication parfaite du début à la fin. Je recommande vivement !',
-      helpful: 12,
-      response: null
-    },
-    {
-      id: 2,
-      reviewer: {
-        name: 'Jean-Pierre Martin',
-        avatar: profileImage,
-        memberSince: '2021'
-      },
-      rating: 4,
-      date: '2024-02-28',
-      booking: {
-        boat: 'Catamaran Lagoon 42',
-        location: 'Cannes',
-        dates: '25-28 Février 2024'
-      },
-      comment: 'Très bon séjour ! Le catamaran était conforme à la description et Timothy a été disponible pour répondre à nos questions. Seul petit bémol : quelques équipements de sécurité auraient mérité d\'être renouvelés, mais rien de grave. Dans l\'ensemble, une expérience positive que je renouvellerai.',
-      helpful: 8,
-      response: {
-        date: '2024-03-01',
-        text: 'Merci Jean-Pierre pour votre retour constructif ! J\'ai pris note de vos remarques concernant les équipements de sécurité et je vais procéder aux renouvellements nécessaires. Au plaisir de vous revoir bientôt !'
-      }
-    },
-    {
-      id: 3,
-      reviewer: {
-        name: 'Sophie Laurent',
-        avatar: profileImage,
-        memberSince: '2023'
-      },
-      rating: 5,
-      date: '2024-01-20',
-      booking: {
-        boat: 'Voilier Beneteau First 35',
-        location: 'Nice',
-        dates: '18-22 Janvier 2024'
-      },
-      comment: 'Une semaine de rêve ! Timothy est un hôte exceptionnel, très professionnel et passionné. Le voilier est magnifique et parfaitement entretenu. Les explications techniques étaient claires et rassurantes. Merci pour cette belle découverte de la Côte d\'Azur !',
-      helpful: 15,
-      response: {
-        date: '2024-01-21',
-        text: 'Merci Sophie pour ce magnifique retour ! C\'était un plaisir de partager ma passion avec vous. À bientôt sur les flots !'
-      }
-    }
-  ]);
-
-  const [reviewsGiven] = useState([
-    {
-      id: 1,
-      owner: {
-        name: 'Pierre Durand',
-        avatar: profileImage,
-        memberSince: '2020'
-      },
-      rating: 5,
-      date: '2024-02-10',
-      booking: {
-        boat: 'Yacht Princess 50',
-        location: 'Monaco',
-        dates: '5-10 Février 2024'
-      },
-      comment: 'Bateau exceptionnel et propriétaire très accueillant ! Pierre nous a fait découvrir les plus beaux mouillages de la région. Tout était parfait : l\'accueil, l\'état du bateau, les conseils prodigués. Une expérience inoubliable que je recommande sans hésitation.',
-      helpful: 0
-    },
-    {
-      id: 2,
-      owner: {
-        name: 'Catherine Moreau',
-        avatar: profileImage,
-        memberSince: '2019'
-      },
-      rating: 4,
-      date: '2024-01-15',
-      booking: {
-        boat: 'Voilier Jeanneau Sun Odyssey',
-        location: 'Saint-Tropez',
-        dates: '12-16 Janvier 2024'
-      },
-      comment: 'Très belle expérience ! Le voilier était en bon état et Catherine très disponible. Quelques petits détails d\'entretien à prévoir mais rien qui n\'ait gâché notre plaisir. La région est magnifique et les conseils de navigation très utiles.',
-      helpful: 0
-    }
-  ]);
-
-  const [stats] = useState({
-    averageRating: 4.7,
-    totalReviews: 28,
-    ratingDistribution: {
-      5: 18,
-      4: 7,
-      3: 2,
-      2: 1,
-      1: 0
-    }
+  // Reviews dynamiques depuis l'API
+  const [reviewsReceived, setReviewsReceived] = useState([]);
+  const [reviewsGiven, setReviewsGiven] = useState([]);
+  const [stats, setStats] = useState({
+    averageRating: 0,
+    totalReviews: 0,
+    ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
   });
+
+  // Chargement des reviews depuis le backend à faire dans useEffect (à compléter)
 
   useEffect(() => {
     setTimeout(() => {
