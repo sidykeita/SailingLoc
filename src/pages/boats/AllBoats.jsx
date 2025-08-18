@@ -23,7 +23,7 @@ const AllBoats = () => {
   const fetchFavorites = async () => {
     try {
       const res = await favoriteService.getFavorites();
-      setFavoriteIds((res.data || []).map(fav => fav.boat?._id || fav.boatId || fav.id));
+      setFavoriteIds(Array.isArray(res.data) ? res.data.map(fav => fav.boat?._id || fav.boatId || fav.id) : []);
     } catch (e) {
       setFavoriteIds([]);
     }
@@ -237,7 +237,7 @@ const AllBoats = () => {
                 >
                   <div className="boat-image" style={{ position: 'relative' }}>
                     <img
-                      src={(Array.isArray(boat?.photos) ? boat.photos[0] : boat?.photos) || 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'}
+                      src={Array.isArray(boat?.photos) && boat.photos.length > 0 ? boat.photos[0] : (typeof boat?.photos === 'string' && boat.photos ? boat.photos : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop')}
                       alt={boat?.name || 'Bateau'}
                       className="w-full h-full object-cover"
                     />
