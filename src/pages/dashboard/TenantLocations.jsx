@@ -76,6 +76,7 @@ const TenantLocations = () => {
         }
         return {
           id: res.id,
+          boatId: res.boat?._id || res.boat?.id || '',
           boatName: res.boat?.name || 'Bateau',
           boatType: res.boat?.type || '',
           location: res.boat?.location || '',
@@ -455,20 +456,16 @@ const TenantLocations = () => {
                                       </div>
                   
                   <div className="location-actions">
-                    <button className="action-btn primary">
-                      <FontAwesomeIcon icon={faEye} />
-                      Voir détails
-                    </button>
-                    <button className="action-btn secondary">
-                      <FontAwesomeIcon icon={faDownload} />
-                      Facture
-                    </button>
-                    {location.status === 'completed' && (
-                      <button className="action-btn secondary">
-                        <FontAwesomeIcon icon={faStar} />
-                        Laisser un avis
-                      </button>
-                    )}
+                    <Link to={`/boats/${location.boatId || location.id || ''}`} className="action-btn primary">
+  <FontAwesomeIcon icon={faEye} />
+  Voir détails
+</Link>
+{location.status === 'confirmed' && (
+  <button className="action-btn secondary">
+    <FontAwesomeIcon icon={faStar} />
+    Laisser un avis
+  </button>
+)}
                   </div>
                 </div>
               ))
