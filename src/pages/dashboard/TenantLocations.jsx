@@ -62,22 +62,35 @@ const TenantLocations = () => {
     try {
       const reservations = await reservationService.getMyReservations();
       // Adapter le mapping selon la structure réelle de l'API
-      const mappedLocations = (reservations || []).map((res) => ({
-        id: res.id,
-        boatName: res.boat?.name || 'Bateau',
-        boatType: res.boat?.type || '',
-        location: res.boat?.location || '',
-        startDate: res.startDate,
-        endDate: res.endDate,
-        status: res.status,
-        price: res.price,
-        totalPrice: res.totalPrice || res.price,
-        imageUrl: res.boat?.imageUrl || '/api/placeholder/300/200',
-        bookingDate: res.createdAt || res.bookingDate,
-        guests: res.guests || res.nbGuests,
-        owner: res.boat?.owner?.name || '',
-        features: res.boat?.features || []
-      }));
+      const mappedLocations = (reservations || []).map((res) => {
+        // Cherche la meilleure image réelle du bateau loué
+        let boatImage = '';
+        if (Array.isArray(res.boat?.photos) && res.boat.photos.length > 0) {
+          boatImage = res.boat.photos[0];
+        } else if (Array.isArray(res.boat?.images) && res.boat.images.length > 0) {
+          boatImage = res.boat.images[0];
+        } else if (res.boat?.imageUrl) {
+          boatImage = res.boat.imageUrl;
+        } else {
+          boatImage = '/api/placeholder/300/200';
+        }
+        return {
+          id: res.id,
+          boatName: res.boat?.name || 'Bateau',
+          boatType: res.boat?.type || '',
+          location: res.boat?.location || '',
+          startDate: res.startDate,
+          endDate: res.endDate,
+          status: res.status,
+          price: res.price,
+          totalPrice: res.totalPrice || res.price,
+          imageUrl: boatImage,
+          bookingDate: res.createdAt || res.bookingDate,
+          guests: res.guests || res.nbGuests,
+          owner: res.boat?.owner?.name || '',
+          features: res.boat?.features || []
+        };
+      });
       setLocations(mappedLocations);
     } catch (error) {
       if (error && error.response) {
