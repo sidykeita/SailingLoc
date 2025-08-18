@@ -8,6 +8,7 @@ const connectDB = require('./src/models/db');
 const app = express();
 app.use(cors({
   origin: [
+    'https://dsp-dev023-g5.vercel.app',
     'https://sailing-loc.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
