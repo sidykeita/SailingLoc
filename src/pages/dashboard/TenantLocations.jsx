@@ -117,7 +117,8 @@ const TenantLocations = () => {
         
         switch (dateFilter) {
           case 'upcoming':
-            return startDate > now;
+            // Inclure toutes les réservations dont la date de fin est dans le futur
+            return endDate > now;
           case 'current':
             return startDate <= now && endDate >= now;
           case 'past':
