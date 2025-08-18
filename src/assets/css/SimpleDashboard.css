@@ -80,7 +80,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .dropdown-toggle {
@@ -607,4 +607,56 @@ body {
   cursor: pointer;
   color: var(--primary-blue);
   font-size: 24px;
+}
+
+/* Useful Links Section */
+.useful-links-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.useful-links-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.useful-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.useful-link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  color: #6B7280;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.useful-link-item:hover {
+  background-color: #F3F4F6;
+  color: #1E40AF;
+  text-decoration: none;
+}
+
+.useful-link-item svg {
+  width: 16px;
+  height: 16px;
+  color: #9CA3AF;
+}
+
+.useful-link-item:hover svg {
+  color: #1E40AF;
 }
