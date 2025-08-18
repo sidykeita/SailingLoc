@@ -80,7 +80,11 @@ const TenantLocations = () => {
       }));
       setLocations(mappedLocations);
     } catch (error) {
-      console.error('Erreur lors du chargement des locations:', error);
+      if (error && error.response) {
+        console.error('Erreur lors du chargement des locations:', error.response);
+      } else {
+        console.error('Erreur lors du chargement des locations:', error);
+      }
       setLocations([]);
     } finally {
       setLoading(false);
