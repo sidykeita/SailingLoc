@@ -440,7 +440,7 @@ const TenantLocations = () => {
                     </div>
                     
                     <div className="location-features">
-                      {location.features.slice(0, 3).map((feature, index) => (
+                      {Array.isArray(location.features) && location.features.slice(0, 3).map((feature, index) => (
                         <span key={index} className="feature-tag">{feature}</span>
                       ))}
                     </div>

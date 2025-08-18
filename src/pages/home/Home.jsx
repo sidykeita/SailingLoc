@@ -321,7 +321,7 @@ const Home = () => {
               ) : displayedBoats.length === 0 ? (
                 <div className="boat-card empty">{activeCityQuery ? `Aucun bateau disponible pour \"${activeCityQuery}\"` : 'Aucun bateau à afficher'}</div>
               ) : (
-                displayedBoats.slice(0, 3).map((boat) => (
+                Array.isArray(displayedBoats) && displayedBoats.slice(0, 3).map((boat) => (
                   <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
                     <div className="boat-card">
                       <div className="boat-card-header">
