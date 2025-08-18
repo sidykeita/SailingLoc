@@ -543,7 +543,7 @@ const TenantLocations = () => {
                           <>
                             <button
                               className="action-btn secondary"
-                              onClick={() => setOpenReviewId(location.id)}
+                              onClick={() => { setReviewBoat({ name: location.boatName, type: location.boatType }); setReviewModalOpen(true); }}
                               disabled={openReviewId === location.id}
                               aria-expanded={openReviewId === location.id}
                               aria-controls={`review-block-${location.id}`}
