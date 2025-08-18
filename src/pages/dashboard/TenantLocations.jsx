@@ -110,6 +110,36 @@ const TenantLocations = () => {
 
   useEffect(() => {
     fetchLocations();
+    // DEBUG: Ajoute une location confirmed si aucune n'existe
+    setTimeout(() => {
+      setLocations(prev => {
+        if (!prev.some(l => l.status === 'confirmed')) {
+          return [
+            ...prev,
+            {
+              id: 'debug-confirmed-1',
+              boatId: 'debug-boat-1',
+              boatName: 'Debug Boat',
+              boatType: 'Voilier',
+              location: 'La Rochelle',
+              startDate: '2025-08-20',
+              endDate: '2025-08-25',
+              status: 'confirmed',
+              price: 1200,
+              totalPrice: 1200,
+              imageUrl: '',
+              bookingDate: '2025-08-01',
+              guests: 4,
+              owner: 'Debug Owner',
+              features: [],
+              review: null,
+              editingReview: false
+            }
+          ];
+        }
+        return prev;
+      });
+    }, 1000);
   }, []);
 
   useEffect(() => {
