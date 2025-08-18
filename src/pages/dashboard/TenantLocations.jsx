@@ -199,10 +199,6 @@ const TenantLocations = () => {
         
         <div className="header-actions">
           <div className="dropdown">
-            <div className="dropdown-toggle" onClick={() => setShowDiscoverMenu(!showDiscoverMenu)}>
-              <span>Découvrir</span>
-              <FontAwesomeIcon icon={faChevronDown} />
-            </div>
             {showDiscoverMenu && (
               <div className="dropdown-menu discover-menu">
                 <div className="dropdown-list">
