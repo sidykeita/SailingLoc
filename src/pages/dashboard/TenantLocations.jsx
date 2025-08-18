@@ -628,12 +628,11 @@ const TenantLocations = () => {
                     )}
                   </div>
                 </div>  
-            )))}
-          </div>
+              )))}
           </div>
         </div>
       </div>
-    )
+    </div>)
 
       {/* Modale d'avis */}
       <LeaveReviewModal
