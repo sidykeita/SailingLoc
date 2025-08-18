@@ -145,7 +145,7 @@ const SimpleDashboard = () => {
                   e.target.parentNode.textContent = 'Ce';
                 }} />
               </div>
-              <span>celine</span>
+              <span>{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</span>
               <FontAwesomeIcon icon={faChevronDown} />
             </div>
             {showUserMenu && (
@@ -197,7 +197,7 @@ const SimpleDashboard = () => {
           </div>
           <a href="#" className="add-photo">+ Ajouter une photo</a>
           
-          <h2 className="profile-name">celine</h2>
+          <h2 className="profile-name">{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</h2>
           <p className="member-since">Membre depuis 2025</p>
           
           <div className="profile-completion">
