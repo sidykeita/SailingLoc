@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TenantHeader from '../../components/tenant/TenantHeader';
 import { getFavorites, removeFavorite as removeFavoriteApi } from '../../services/favoriteService';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -156,77 +157,7 @@ const TenantFavorites = () => {
   return (
     <div>
       {/* Header */}
-      <header className="main-header">
-        <div className="header-left">
-          <div className="header-logo">
-            <Link to="/">
-              <img src={logoBlc} alt="Sailing Loc" />
-            </Link>
-          </div>
-        </div>
-        
-        <div className="header-center">
-          <nav className="main-nav">
-            <Link to="/help" className="nav-button">Aide</Link>
-          </nav>
-        </div>
-
-        <div className="header-right">
-          <div className="search-container">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input type="text" placeholder="Rechercher..." />
-          </div>
-          
-          <div className="user-menu dropdown">
-            <button 
-              className="user-button"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            >
-              <img src={profileImage} alt="Profile" className="user-avatar" />
-              <FontAwesomeIcon icon={faChevronDown} />
-            </button>
-            {showUserMenu && (
-              <div className="dropdown-menu user-dropdown">
-                <div className="user-info">
-                  <img src={profileImage} alt="Profile" />
-                  <div>
-                    <p className="user-name">Timothy Miafouna</p>
-                    <p className="user-role">{userRole === 'owner' ? 'Propriétaire' : 'Locataire'}</p>
-                  </div>
-                </div>
-                <div className="dropdown-divider"></div>
-                <Link to="/profile" className="dropdown-item">
-                  <FontAwesomeIcon icon={faUser} />
-                  <span>Mon profil</span>
-                </Link>
-                <button 
-                  className="dropdown-item role-switch"
-                  onClick={() => switchRole(userRole === 'owner' ? 'tenant' : 'owner')}
-                >
-                  <FontAwesomeIcon icon={faExchangeAlt} />
-                  <span>Passer en {userRole === 'owner' ? 'locataire' : 'propriétaire'}</span>
-                </button>
-                <div className="dropdown-divider"></div>
-                <button className="dropdown-item logout" onClick={logout}>
-                  <FontAwesomeIcon icon={faSignOutAlt} />
-                  <span>Se déconnecter</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Secondary Navigation */}
-      <div className="secondary-nav">
-        <div className="secondary-nav-container">
-          <Link to="/dashboard" className="nav-link">Tableau de bord</Link>
-          <Link to="/locations" className="nav-link">Mes locations</Link>
-          <Link to="/account" className="nav-link">Mon compte</Link>
-          <Link to="/reviews" className="nav-link">Mes avis</Link>
-          <Link to="/favorites" className="nav-link active">Mes favoris</Link>
-        </div>
-      </div>
+      <TenantHeader activeSection="favorites" />
 
       {/* Main Content */}
       <div className="dashboard-container">

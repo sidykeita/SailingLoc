@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TenantHeader from '../../components/tenant/TenantHeader';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/SimpleDashboard.css';
@@ -42,68 +43,7 @@ const SimpleDashboard = () => {
   return (
     <div>
       {/* Header */}
-      <header className="main-header">
-        <div className="header-left">
-          <div className="header-logo">
-            <Link to="/">
-              <img src={logoBlc} alt="Sailing Loc" />
-            </Link>
-          </div>
-        </div>
-        
-        
-        <div className="header-actions">
-          
-          <div className="dropdown">
-            <div className="user-dropdown" onClick={() => setShowUserMenu(!showUserMenu)}>
-              <div className="flag-icon">
-                <img src="/france-flag.svg" alt="Drapeau français" />
-              </div>
-              <div className="user-avatar">
-                <img src={profileImage} alt="Photo de profil" onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                  e.target.parentNode.textContent = 'Ce';
-                }} />
-              </div>
-              <span>{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</span>
-              <FontAwesomeIcon icon={faChevronDown} />
-            </div>
-            {showUserMenu && (
-              <div className="dropdown-menu user-menu">
-                <Link to="/dashboard" className="dropdown-item active">
-                  <span>Tableau de bord</span>
-                </Link>
-                <Link to="/locations" className="dropdown-item">
-                  <span>Mes locations</span>
-                </Link>
-
-                <Link to="/reviews" className="dropdown-item">
-                  <span>Mes avis</span>
-                </Link>
-                <Link to="/favorites" className="dropdown-item">
-                  <span>Mes favoris</span>
-                </Link>
-
-                <div className="dropdown-item logout-item" onClick={handleLogout}>
-                  <span>Déconnexion</span>
-                  <FontAwesomeIcon icon={faSignOutAlt} />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Menu de navigation secondaire */}
-      <div className="secondary-nav">
-        <div className="secondary-nav-container">
-          <Link to="/dashboard" className="nav-link active">Tableau de bord</Link>
-          <Link to="/locations" className="nav-link">Mes locations</Link>
-          <Link to="/reviews" className="nav-link">Mes avis</Link>
-          <Link to="/favorites" className="nav-link">Mes favoris</Link>
-        </div>
-      </div>
+      <TenantHeader activeSection="dashboard" />
 
       {/* Dashboard Content */}
       <div className="dashboard-container">
