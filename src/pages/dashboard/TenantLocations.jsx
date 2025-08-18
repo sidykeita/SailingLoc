@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LeaveReviewModal from '../../components/LeaveReviewModal';
-import reservationService from '../../backup/reservationService.js';
+import reservationService from '../../services/reservation.service.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -454,20 +454,28 @@ const TenantLocations = () => {
               setReviewBoat(null);
             }}
             boat={reviewBoat}
-            onSubmit={(reviewData) => {
-              // reviewData attendu: { rating, comment, ... }
-              if (reviewBoat?.locationId) {
-                setLocations(prev =>
-                  prev.map(l =>
-                    l.id === reviewBoat.locationId
-                      ? { ...l, review: { rating: reviewData.rating, comment: reviewData.comment } }
-                      : l
-                  )
-                );
-              }
-              setReviewModalOpen(false);
-              setReviewBoat(null);
-            }}
+            onSubmit={async (reviewData) => {
+  if (!reviewBoat?.locationId) return;
+  setLoading(true);
+  try {
+    // Appel API pour enregistrer l'avis
+    await reservationService.addReview(reviewBoat.locationId, reviewData);
+    // Mise à jour locale après succès
+    setLocations(prev =>
+      prev.map(l =>
+        l.id === reviewBoat.locationId
+          ? { ...l, review: { rating: reviewData.rating, comment: reviewData.comment } }
+          : l
+      )
+    );
+    setReviewModalOpen(false);
+    setReviewBoat(null);
+  } catch (error) {
+    alert('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+  } finally {
+    setLoading(false);
+  }
+}}
           />
         </div>
       </div>
