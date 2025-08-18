@@ -112,3 +112,4 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
     </div>
   );
 };
+export default LeaveReviewModal;
