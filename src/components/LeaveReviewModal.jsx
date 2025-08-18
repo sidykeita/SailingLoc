@@ -1,3 +1,13 @@
+import React, { useState } from 'react';
+
+/**
+ * Modal pour laisser un avis (review) sur une location/bateau
+ * Props :
+ *   - open: bool (affiche ou non la modale)
+ *   - onClose: fonction de fermeture
+ *   - boat: { name, type }
+ *   - onSubmit: fonction de soumission (reviewData)
+ */
 // LeaveReviewModal.jsx
 const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
   const [rating, setRating] = useState(5);
