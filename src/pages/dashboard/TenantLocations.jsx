@@ -26,12 +26,41 @@ import {
   faTimesCircle,
   faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faSolidHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faRegularHeart } from '@fortawesome/free-regular-svg-icons';
+import * as favoriteService from '../../services/favoriteService';
 import logoBlc from '../../assets/images/logo-blc.png';
 import profileImage from '../../assets/images/profil.jpg';
 import '../../assets/css/SimpleDashboard.css';
 import '../../assets/css/TenantLocations.css';
 
 const TenantLocations = () => {
+  // ...
+  const [favoriteIds, setFavoriteIds] = useState([]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await favoriteService.getFavorites();
+      setFavoriteIds((res.data || []).map(fav => fav.boat?._id || fav.boatId || fav.id));
+    } catch (e) {
+      setFavoriteIds([]);
+    }
+  };
+
+  const toggleFavorite = async (boatId) => {
+    if (favoriteIds.includes(boatId)) {
+      await favoriteService.removeFavorite(boatId);
+      setFavoriteIds(favoriteIds.filter(id => id !== boatId));
+    } else {
+      await favoriteService.addFavorite(boatId);
+      setFavoriteIds([...favoriteIds, boatId]);
+    }
+  };
+
   const { currentUser, logout, userRole, switchRole } = useAuth();
   const [locations, setLocations] = useState([]);
   const [filteredLocations, setFilteredLocations] = useState([]);
@@ -117,8 +146,7 @@ const TenantLocations = () => {
         
         switch (dateFilter) {
           case 'upcoming':
-            // Inclure toutes les réservations dont la date de fin est dans le futur
-            return endDate > now;
+            return startDate > now;
           case 'current':
             return startDate <= now && endDate >= now;
           case 'past':
@@ -423,6 +451,14 @@ const TenantLocations = () => {
                     <div className="location-header">
                       <h3>{location.boatName}</h3>
                       <span className="boat-type">{location.boatType}</span>
+                      <button
+                        className="favorite-btn"
+                        title={favoriteIds.includes(location.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                        onClick={() => toggleFavorite(location.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: 8 }}
+                      >
+                        <FontAwesomeIcon icon={favoriteIds.includes(location.id) ? faSolidHeart : faRegularHeart} color={favoriteIds.includes(location.id) ? 'red' : 'gray'} size="lg" />
+                      </button>
                     </div>
                     
                     <div className="location-info">
