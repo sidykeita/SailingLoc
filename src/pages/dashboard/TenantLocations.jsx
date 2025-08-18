@@ -295,7 +295,7 @@ const TenantLocations = () => {
                   e.target.parentNode.textContent = 'Ce';
                 }} />
               </div>
-              <span>{currentUser?.firstName || currentUser?.name || 'Utilisateur'}</span>
+              <span>{currentUser?.email || 'Utilisateur'}</span>
               <FontAwesomeIcon icon={faChevronDown} />
             </div>
             {showUserMenu && (
