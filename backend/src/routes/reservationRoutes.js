@@ -11,6 +11,7 @@ router.post('/', protect, reservationController.createReservation);
 router.get('/', reservationController.getReservations);
 
 // Réservations du locataire connecté
+router.get('/my-reservations', protect, reservationController.getMyReservations);
 router.get('/user', protect, reservationController.getUserReservations);
 
 // Réservations des bateaux du propriétaire connecté
