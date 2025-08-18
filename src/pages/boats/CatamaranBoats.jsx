@@ -121,7 +121,7 @@ const CatamaranBoats = () => {
             filteredBoats.map((boat, index) => (
               <div key={boat._id || boat.id || index} className={`boat-card ${(boat.status === 'disponible' || boat.available) ? 'available' : ''} animated-card delay-${index % 6 + 1}`}>
                 <div className="boat-image">
-                  <img src={Array.isArray(boat.photos) ? boat.photos[0] : boat.photos} alt={boat.name} className="w-full h-full object-cover" />
+                  <img src={Array.isArray(boat.photos) && boat.photos.length > 0 ? boat.photos[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'} alt={boat.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="boat-details">
                   <div className="flex justify-between items-start mb-2">

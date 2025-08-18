@@ -91,7 +91,7 @@ const OwnerDocsSection = ({ ownerId, token }) => {
                   style={{ display: 'none' }}
                   ref={el => (fileInputs.current[type] = el)}
                   onChange={e => {
-                    if (e.target.files[0]) handleUpload(type, e.target.files[0]);
+                    if (e.target.files && e.target.files.length > 0) handleUpload(type, e.target.files[0]);
                   }}
                   disabled={loading}
                 />

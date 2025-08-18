@@ -88,7 +88,7 @@ const AddBoat = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files && e.target.files[0];
+    const file = e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));

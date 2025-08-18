@@ -70,7 +70,7 @@ const EditBoat = () => {
         });
         setFeatures(Array.isArray(data.features) ? data.features : []);
         setTechnicalSpecs(data.technicalSpecs || { year: '', engine: '', fuelCapacity: '', maxSpeed: '', weight: '' });
-        if (data.photos && data.photos.length > 0) {
+        if (Array.isArray(data.photos) && data.photos.length > 0) {
           setImagePreview(data.photos[0]);
         }
       } catch (e) {
