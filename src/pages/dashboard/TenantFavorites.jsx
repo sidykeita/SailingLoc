@@ -42,12 +42,12 @@ const TenantFavorites = () => {
 
   // Données favoris dynamiques
   const [favorites, setFavorites] = useState([]);
-  const [stats] = useState({
-    totalFavorites: 0,
-    availableNow: 0,
-    averagePrice: 0,
+  const stats = {
+    totalFavorites: favorites.length,
+    availableNow: favorites.filter(fav => fav.status === 'disponible' || fav.available).length,
+    averagePrice: favorites.length ? Math.round(favorites.reduce((acc, fav) => acc + (fav.dailyPrice || fav.price || 0), 0) / favorites.length) : 0,
     locations: []
-  });
+  };
 
   useEffect(() => {
     setLoading(true);
