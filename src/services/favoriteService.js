@@ -1,4 +1,4 @@
-import api from '../lib/api';
+import api from '../backup/api';
 
 export const getFavorites = () => api.get('/favorites');
 export const addFavorite = (boatId) => api.post(`/favorites/${boatId}`);
