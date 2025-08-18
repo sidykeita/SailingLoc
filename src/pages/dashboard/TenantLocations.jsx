@@ -86,9 +86,12 @@ const TenantLocations = () => {
             : l
         )
       );
-      setOpenReviewId(null);
-      setReviewStars(0);
-      setReviewComment('');
+      setTimeout(() => {
+        setOpenReviewId(null);
+        setReviewStars(0);
+        setReviewComment('');
+        setReviewSuccess('');
+      }, 1500);
     } catch (e) {
       setReviewError("Erreur lors de l’envoi de l’avis.");
     } finally {
@@ -729,6 +732,7 @@ const TenantLocations = () => {
           />
           <div className="text-xs text-gray-400 mb-2">{reviewComment.length}/1000 caractères</div>
           {reviewError && <div style={{ color: 'red', marginBottom: 8 }}>{reviewError}</div>}
+          {reviewSuccess && <div style={{ color: 'green', marginBottom: 8 }}>{reviewSuccess}</div>}
           <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
             <button type="button" className="action-btn secondary" onClick={handleCancelReview}>Annuler</button>
             <button type="button" className="action-btn primary" onClick={()=>{
