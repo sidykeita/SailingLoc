@@ -75,7 +75,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
           {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
           <div style={{display:'flex',justifyContent:'flex-end',gap:16}}>
             <button type="button" onClick={onClose} style={{padding:'10px 18px',border:'1px solid #e0e0e0',borderRadius:'8px',background:'#fff',color:'#3a3a3a',fontWeight:500,fontSize:'1rem'}}>Annuler</button>
-            <button type="submit" style={{padding:'10px 18px',border:'none',borderRadius:'8px',background:'linear-gradient(90deg,#5a84f7,#8e5bf7)',color:'#fff',fontWeight:600,fontSize:'1rem'}}>Envoyer</button>
+            <button type="submit" style={{padding:'10px 18px',border:'none',borderRadius:'8px',background:'linear-gradient(90deg,#5a84f7,#8e5bf7)',color:'#fff',fontWeight:600,fontSize:'1rem',opacity:1,visibility:'visible',filter:'none',boxShadow:'0 2px 8px rgba(90,132,247,0.18)',zIndex:999}}>Envoyer</button>
           </div>
         </form>
       </div>
