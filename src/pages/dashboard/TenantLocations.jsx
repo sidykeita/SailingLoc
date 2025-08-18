@@ -411,12 +411,12 @@ const TenantLocations = () => {
               filteredLocations.map((location) => (
                 <div key={location.id} className="location-card">
                   <div className="location-image">
-                    <img src={location.imageUrl} alt={location.boatName} />
-                    <div className="status-badge">
-                      {getStatusIcon(location.status)}
-                      <span>{getStatusText(location.status)}</span>
-                    </div>
-                  </div>
+  <img src={location.imageUrl && location.imageUrl !== '/api/placeholder/300/200' ? location.imageUrl : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'} alt={location.boatName} />
+  <div className="status-badge">
+    {getStatusIcon(location.status)}
+    <span>{getStatusText(location.status)}</span>
+  </div>
+</div>
                   
                   <div className="location-details">
                     <div className="location-header">
@@ -439,12 +439,7 @@ const TenantLocations = () => {
                       </div>
                     </div>
                     
-                    <div className="location-features">
-                      {Array.isArray(location.features) && location.features.slice(0, 3).map((feature, index) => (
-                        <span key={index} className="feature-tag">{feature}</span>
-                      ))}
-                    </div>
-                  </div>
+                                      </div>
                   
                   <div className="location-actions">
                     <button className="action-btn primary">
