@@ -186,7 +186,6 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
                 border: 'none',
                 borderRadius: 8,
                 background: 'linear-gradient(90deg,#5a84f7,#8e5bf7)',
-                color: '#fff',
                 fontWeight: 600,
                 display: 'inline-flex',
                 opacity: isInvalid ? 0.6 : 1,
