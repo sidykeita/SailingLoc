@@ -171,6 +171,7 @@ const Home = () => {
           <div className="hero-content">
             <div className="search-container">
               <h1>Louez votre bateau en un clic !</h1>
+<div className="hero-title-underline"></div>
               <p>Comparez les offres pour votre bateau en un clic et réservez en ligne des voiliers et bateaux à moteur</p>
 
               <div className="search-box">

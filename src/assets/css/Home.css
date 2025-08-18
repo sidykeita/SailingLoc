@@ -23,6 +23,15 @@ p, div, span, a, button, input, select, textarea {
   background-color: #ffffff;
 }
 
+/* Trait décoratif centré sous le titre hero */
+.hero-title-underline {
+  width: 80px;
+  height: 4px;
+  background: #66c8c6;
+  margin: 0 auto 18px auto;
+  border-radius: 2px;
+}
+
 /* Hero Section */
 .hero-section {
   position: relative;
