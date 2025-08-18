@@ -426,15 +426,6 @@ const BoatDetail = () => {
           </div>
         </div>
 
-        {/* Skipper obligatoire : badge mis en avant */}
-        {boat.skipper && (
-          <div className="mb-6 mt-2 flex items-center">
-            <span className="inline-block px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-base shadow-md animate-pulse">
-              <FontAwesomeIcon icon={faAnchor} className="mr-2" />
-              Skipper obligatoire
-            </span>
-          </div>
-        )}
 
         {/* Bouton pour remonter en haut de la page */}
         {showScrollTop && (
