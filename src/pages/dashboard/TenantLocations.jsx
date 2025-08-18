@@ -552,61 +552,7 @@ const TenantLocations = () => {
                               {location.review ? 'Modifier mon avis' : 'Laisser un avis'}
                             </button>
 
-                            {openReviewId === location.id && (
-                              <div
-                                id={`review-block-${location.id}`}
-                                className="review-block"
-                                style={{
-                                  background: '#fff',
-                                  borderRadius: 16,
-                                  marginTop: 16,
-                                  padding: 24,
-                                  boxShadow: '0 4px 32px rgba(0,0,0,0.10)',
-                                  maxWidth: 480,
-                                  marginLeft: 'auto',
-                                  marginRight: 'auto',
-                                  marginBottom: 24,
-                                  border: '1px solid #f0f0f0',
-                                }}
-                              >
-                                <div style={{fontWeight:600, marginBottom: 8}}>Laisser un avis</div>
-                                <div style={{marginBottom: 6}}>
-                                  <span style={{fontWeight:500}}>Bateau :</span> <span>{location.boatName}</span> <span style={{fontSize:12, color:'#888', marginLeft:8}}>Type : {location.boatType}</span>
-                                </div>
-                                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-                                  {[1,2,3,4,5].map(star => (
-                                    <span
-                                      key={star}
-                                      style={{fontSize:'2rem',color:star<=reviewStars?'#FFD600':'#E0E0E0',cursor:'pointer'}}
-                                      onClick={()=>setReviewStars(star)}
-                                      aria-label={star+' étoiles'}
-                                    >★</span>
-                                  ))}
-                                </div>
-                                <div className="text-xs text-gray-500 mb-2">{['Médiocre','Passable','Bien','Très bien','Excellent'][reviewStars-1] || ''}</div>
-                                <textarea
-                                  className="review-textarea"
-                                  style={{width:'100%',minHeight:60,borderRadius:6,border:'1px solid #ddd',padding:8,marginBottom:8}}
-                                  placeholder="Partagez votre expérience avec ce bateau... (minimum 10 caractères)"
-                                  value={reviewComment}
-                                  onChange={e=>setReviewComment(e.target.value)}
-                                  maxLength={1000}
-                                />
-                                <div className="text-xs text-gray-400 mb-2">{reviewComment.length}/1000 caractères</div>
-                                {reviewError && <div style={{ color: 'red', marginBottom: 8 }}>{reviewError}</div>}
-                                <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-                                  <button type="button" className="action-btn secondary" onClick={handleCancelReview}>Annuler</button>
-                                  <button type="button" className="action-btn primary" onClick={()=>{
-                                    if(reviewComment.trim().length<10){setReviewError('Votre avis doit contenir au moins 10 caractères.');return;}
-                                    setReviewError('');
-                                    handleSubmitReview(location);
-                                  }} disabled={reviewStars===0 || reviewComment.trim().length<10 || reviewLoading}>
-                                    {reviewLoading ? 'Envoi...' : 'Envoyer'}
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-
+                            
                                                       </>
                         ) : (
                           // Lecture seule si avis déjà laissé
@@ -711,12 +657,93 @@ const TenantLocations = () => {
               <a href="mailto:contact@sailingloc.com" className="flex items-center text-coral hover:underline">contact@sailingloc.com</a>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-blue-700 text-center">
-            <p>&copy; 2025 SailingLoc. Tous droits réservés.</p>
+          </div>
+          </footer>
+
+  // Bloc d'avis extérieur (hors mapping)
+  const locationToReview = locations.find(l => l.id === openReviewId);
+
+  return (
+    <div className="tenant-locations-wrapper">
+      {/* ... mapping des locations ... */}
+      {filteredLocations.map((location) => (
+        <div key={location.id} className="location-card">
+          {/* Ici, ton rendu habituel de la carte location, exemple simplifié : */}
+          <div className="flex items-center gap-4">
+            <img src={location.boatImage} alt={location.boatName} style={{width:80,height:60,borderRadius:8,objectFit:'cover'}} />
+            <div className="flex-1">
+              <div className="font-semibold text-lg">{location.boatName}</div>
+              <div className="text-xs text-gray-500">{location.boatType}</div>
+              <div className="text-xs text-gray-400">{location.startDate} - {location.endDate}</div>
+              <div className="mt-2">
+                <button className="action-btn secondary" onClick={() => setOpenReviewId(location.id)}>
+                  <FontAwesomeIcon icon={faStar} /> {location.review ? 'Modifier mon avis' : 'Laisser un avis'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </footer>
-}
+      ))}
 
+      {/* Bloc d'avis extérieur */}
+      {openReviewId && locationToReview && (
+        <div
+          id={`review-block-${openReviewId}`}
+          className="review-block"
+          style={{
+            background: '#fff',
+            borderRadius: 16,
+            margin: '32px auto',
+            padding: 24,
+            boxShadow: '0 4px 32px rgba(0,0,0,0.10)',
+            maxWidth: 480,
+            border: '1px solid #f0f0f0',
+            position: 'relative',
+            zIndex: 100,
+            left: 0,
+            right: 0
+          }}
+        >
+          <div style={{fontWeight:600, marginBottom: 8}}>Laisser un avis</div>
+          <div style={{marginBottom: 6}}>
+            <span style={{fontWeight:500}}>Bateau :</span> <span>{locationToReview.boatName}</span> <span style={{fontSize:12, color:'#888', marginLeft:8}}>Type : {locationToReview.boatType}</span>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+            {[1,2,3,4,5].map(star => (
+              <span
+                key={star}
+                style={{fontSize:'2rem',color:star<=reviewStars?'#FFD600':'#E0E0E0',cursor:'pointer'}}
+                onClick={()=>setReviewStars(star)}
+                aria-label={star+' étoiles'}
+              >★</span>
+            ))}
+          </div>
+          <div className="text-xs text-gray-500 mb-2">{['Médiocre','Passable','Bien','Très bien','Excellent'][reviewStars-1] || ''}</div>
+          <textarea
+            className="review-textarea"
+            style={{width:'100%',minHeight:60,borderRadius:6,border:'1px solid #ddd',padding:8,marginBottom:8}}
+            placeholder="Partagez votre expérience avec ce bateau... (minimum 10 caractères)"
+            value={reviewComment}
+            onChange={e=>setReviewComment(e.target.value)}
+            maxLength={1000}
+          />
+          <div className="text-xs text-gray-400 mb-2">{reviewComment.length}/1000 caractères</div>
+          {reviewError && <div style={{ color: 'red', marginBottom: 8 }}>{reviewError}</div>}
+          <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+            <button type="button" className="action-btn secondary" onClick={handleCancelReview}>Annuler</button>
+            <button type="button" className="action-btn primary" onClick={()=>{
+              if(reviewComment.trim().length<10){setReviewError('Votre avis doit contenir au moins 10 caractères.');return;}
+              setReviewError('');
+              handleSubmitReview(locationToReview);
+            }} disabled={reviewStars===0 || reviewComment.trim().length<10 || reviewLoading}>
+              {reviewLoading ? 'Envoi...' : 'Envoyer'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default TenantLocations;
+
