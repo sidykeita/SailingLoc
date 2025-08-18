@@ -183,9 +183,19 @@ const BoatDetail = () => {
           </Link>
         </div>
 
-        {/* En-tête avec nom et prix */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <h1 className="boat-title">{boat.name}</h1>
+        {/* En-tête avec nom, prix et badge Skipper obligatoire */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-2">
+          <div>
+            <h1 className="boat-title flex items-center gap-3">
+              {boat.name}
+              {boat.skipper && (
+                <span className="inline-block px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-base shadow-md animate-pulse align-middle">
+                  <FontAwesomeIcon icon={faAnchor} className="mr-2" />
+                  Skipper obligatoire
+                </span>
+              )}
+            </h1>
+          </div>
           <div className="price-tag">
             <span className="text-2xl font-bold">{boat.dailyPrice}€</span>
             <span className="text-gray-600"> / jour</span>
