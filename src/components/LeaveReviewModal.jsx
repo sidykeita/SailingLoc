@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
   const [rating, setRating] = useState(5);
@@ -6,19 +6,32 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState('');
 
+  // reset propre à chaque ouverture
+  useEffect(() => {
+    if (open) {
+      setRating(5);
+      setComment('');
+      setPhotos([]);
+      setError('');
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const handlePhotoChange = (e) => setPhotos([...e.target.files]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (comment.trim().length < 10) {
+    const isInvalid = rating === 0 || comment.trim().length < 10;
+    if (isInvalid) {
       setError('Votre avis doit contenir au moins 10 caractères.');
       return;
     }
     setError('');
     onSubmit({ rating, comment, photos });
   };
+
+  const isInvalid = rating === 0 || comment.trim().length < 10;
 
   return (
     <div
@@ -41,15 +54,15 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
           borderRadius: 16,
           width: '520px',
           maxWidth: '96vw',
-          maxHeight: '92vh',              // <<< limite la hauteur
+          maxHeight: '92vh',
           boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
           position: 'relative',
           display: 'flex',
-          flexDirection: 'column',        // <<< structure en colonne
-          overflowY: 'auto'                // scroll vertical autorisé, footer toujours visible
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
-        {/* Bouton fermer */}
+        {/* Fermer */}
         <button
           onClick={onClose}
           aria-label="Fermer la modale"
@@ -67,7 +80,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
           ✖️
         </button>
 
-        {/* En-tête */}
+        {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #eee' }}>
           <h2 className="font-semibold text-xl" style={{ margin: 0 }}>Laisser un avis</h2>
           <div style={{ marginTop: 8 }}>
@@ -76,13 +89,14 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
           </div>
         </div>
 
-        {/* Corps scrollable */}
+        {/* Formulaire */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+          {/* Corps scrollable */}
           <div
             className="modal-body"
             style={{
               padding: '16px 24px',
-              overflow: 'auto',           // <<< le scroll est ici
+              overflow: 'auto',
               flex: 1,
               minHeight: 0
             }}
@@ -129,11 +143,11 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
             {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
           </div>
 
-          {/* Footer sticky : toujours visible */}
+          {/* Footer sticky (toujours visible) */}
           <div
             className="modal-footer"
             style={{
-              position: 'sticky',          // <<< reste accroché en bas
+              position: 'sticky',
               bottom: 0,
               background: '#fff',
               borderTop: '1px solid #eee',
@@ -157,9 +171,16 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
             >
               Annuler
             </button>
+            {/* PAS de disabled pour éviter les CSS globaux qui masquent les boutons désactivés */}
             <button
               type="submit"
-              disabled={rating === 0 || comment.trim().length < 10}
+              aria-disabled={isInvalid}
+              onClick={(e) => {
+                if (isInvalid) {
+                  e.preventDefault();
+                  setError('Votre avis doit contenir au moins 10 caractères.');
+                }
+              }}
               style={{
                 padding: '10px 18px',
                 border: 'none',
@@ -167,7 +188,9 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
                 background: 'linear-gradient(90deg,#5a84f7,#8e5bf7)',
                 color: '#fff',
                 fontWeight: 600,
-                opacity: rating === 0 || comment.trim().length < 10 ? 0.6 : 1
+                display: 'inline-flex',
+                opacity: isInvalid ? 0.6 : 1,
+                cursor: isInvalid ? 'not-allowed' : 'pointer'
               }}
             >
               Envoyer
