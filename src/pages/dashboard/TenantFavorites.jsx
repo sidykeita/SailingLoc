@@ -260,14 +260,6 @@ const TenantFavorites = () => {
               <div className="stat-number">{stats.availableNow}</div>
               <div className="stat-label">Disponibles maintenant</div>
             </div>
-            <div className="stats-card">
-              <div className="stat-number">{stats.averagePrice}€</div>
-              <div className="stat-label">Prix moyen/jour</div>
-            </div>
-            <div className="stats-card">
-              <div className="stat-number">{stats.locations.length}</div>
-              <div className="stat-label">Destinations</div>
-            </div>
           </div>
 
           {/* Filters and Sort */}
