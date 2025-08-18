@@ -227,7 +227,7 @@ const TenantFavorites = () => {
             {filteredFavorites().map(favorite => (
               <div key={favorite._id || favorite.id} className="favorite-card">
                 <div className="card-image">
-                  <img src={favorite.images[0]} alt={favorite.name} />
+                  <img src={Array.isArray(favorite.images) && favorite.images.length > 0 ? favorite.images[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop'} alt={favorite.name} />
                   <div className="card-overlay">
                     <button 
                       className="favorite-btn active"
