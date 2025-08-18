@@ -397,8 +397,8 @@ const TenantLocations = () => {
               <p>En attente</p>
             </div>
             <div className="stat-card">
-              <h3>{locations.filter(l => l.status === 'completed').length}</h3>
-              <p>Terminées</p>
+              <h3>{locations.filter(l => l.status === 'cancelled').length}</h3>
+              <p>Annulées</p>
             </div>
             <div className="stat-card">
               <h3>{locations.reduce((sum, l) => sum + l.totalPrice, 0).toLocaleString()}€</h3>
