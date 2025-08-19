@@ -427,7 +427,7 @@ const TenantLocations = () => {
                         className="action-btn secondary"
                         onClick={() => {
                           setReviewBoat({
-                            locationId: location.id,
+                            locationId: location._id || location.id || location.reservationId,
                             boatId: location.boatId,
                             name: location.boatName,
                             type: location.boatType,
