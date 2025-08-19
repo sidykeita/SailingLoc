@@ -57,7 +57,11 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
       setComment('');
       setPhotos([]);
     } catch (error) {
-      setError('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+      if (error?.status === 409) {
+        setError('Vous avez déjà laissé un avis pour cette réservation.');
+      } else {
+        setError('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+      }
       console.error('[DEBUG] Erreur envoi avis direct', error);
     }
   };

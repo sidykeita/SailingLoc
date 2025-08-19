@@ -4,9 +4,17 @@ const Review = require('../models/review');
 exports.createReview = async (req, res) => {
   try {
     const review = await Review.create(req.body);
-    res.status(201).json(review);
+    return res.status(201).json(review);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    // Duplication (unique index reservation+user)
+    if (err && (err.code === 11000 || err.name === 'MongoServerError')) {
+      return res.status(409).json({ message: 'Vous avez déjà laissé un avis pour cette réservation.' });
+    }
+    // Erreurs de validation mongoose
+    if (err && err.name === 'ValidationError') {
+      return res.status(400).json({ message: err.message });
+    }
+    return res.status(500).json({ message: 'Erreur serveur lors de la création de l\'avis.' });
   }
 };
 
