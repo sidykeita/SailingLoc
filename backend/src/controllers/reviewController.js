@@ -18,10 +18,53 @@ exports.createReview = async (req, res) => {
   }
 };
 
-// Récupérer toutes les reviews
+// Récupérer toutes les reviews (avec filtres)
 exports.getReviews = async (req, res) => {
   try {
-    const reviews = await Review.find();
+    const { tenant, author } = req.query;
+
+    // Base query
+    let query = {};
+    if (author) query.user = author; // auteur de l'avis
+
+    // On récupère et populate pour fournir les infos nécessaires au front
+    let reviews = await Review.find(query)
+      .populate({
+        path: 'reservation',
+        populate: [
+          { path: 'boat' },
+          { path: 'user' }
+        ]
+      })
+      .exec();
+
+    // Filtrer par locataire (avis reçus par un utilisateur)
+    if (tenant) {
+      reviews = reviews.filter(r => String(r?.reservation?.user?._id || r?.reservation?.user) === String(tenant));
+    }
+
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Récupérer mes reviews (avis donnés par l'utilisateur connecté)
+exports.getMyReviews = async (req, res) => {
+  try {
+    const userId = req.user && (req.user.id || req.user._id);
+    if (!userId) return res.status(401).json({ message: 'Non authentifié' });
+
+    const reviews = await Review.find({ user: userId })
+      .populate({
+        path: 'reservation',
+        populate: [
+          { path: 'boat' },
+          { path: 'user' }
+        ]
+      })
+      .exec();
+
     res.json(reviews);
   } catch (err) {
     res.status(500).json({ message: err.message });
