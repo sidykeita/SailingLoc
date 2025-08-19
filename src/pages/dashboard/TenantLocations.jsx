@@ -73,7 +73,7 @@ const TenantLocations = () => {
           boatId: res.boat?._id || res.boat?.id || '',
           boatName: res.boat?.name || 'Bateau',
           boatType: res.boat?.type || '',
-          location: res.boat?.location || '',
+          port: res.boat?.port || res.boat?.location || '',
           startDate: res.startDate,
           endDate: res.endDate,
           status: res.status,
@@ -408,7 +408,7 @@ const TenantLocations = () => {
                     <div className="location-info">
                       <div className="info-row">
                         <FontAwesomeIcon icon={faMapMarkerAlt} />
-                        <span>{location.location}</span>
+                        <span>{location.port || 'Port inconnu'}</span>
                       </div>
                       <div className="info-row">
                         <FontAwesomeIcon icon={faCalendarAlt} />
@@ -464,6 +464,14 @@ const TenantLocations = () => {
             }}
             boat={reviewBoat}
             userId={currentUser?._id || currentUser?.id}
+            onSuccess={(createdReview) => {
+              // marquer la réservation comme commentée localement
+              setLocations((prev) => prev.map((loc) =>
+                (loc.id === (reviewBoat?._id || reviewBoat?.locationId || loc.id))
+                  ? { ...loc, review: createdReview || { _id: 'temp', rating: 5 } }
+                  : loc
+              ));
+            }}
             onSubmit={async (reviewData) => {
   if (!reviewBoat?.locationId) return;
   try {
@@ -480,6 +488,12 @@ const TenantLocations = () => {
       comment: reviewData.comment
     });
     console.log('[DEBUG] Résultat reviewService.createReview', result);
+    // en plus, mettre à jour localement pour étoile jaune immédiate
+    setLocations((prev) => prev.map((loc) =>
+      (loc.id === (reviewBoat?._id || reviewBoat?.locationId || loc.id))
+        ? { ...loc, review: result }
+        : loc
+    ));
     setReviewModalOpen(false);
     setReviewBoat(null);
   } catch (error) {

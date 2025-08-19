@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
+const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [photos, setPhotos] = useState([]);
@@ -56,6 +56,9 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
       setRating(5);
       setComment('');
       setPhotos([]);
+      if (typeof onSuccess === 'function') {
+        try { onSuccess(result); } catch (_) { /* no-op */ }
+      }
     } catch (error) {
       if (error?.status === 409) {
         setError('Vous avez déjà laissé un avis pour cette réservation.');
