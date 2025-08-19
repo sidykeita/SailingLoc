@@ -458,15 +458,23 @@ const TenantLocations = () => {
             onSubmit={async (reviewData) => {
   if (!reviewBoat?.locationId) return;
   try {
-    await reviewService.createReview({
+    console.log('[DEBUG] Données envoyées à reviewService.createReview', {
       boat: reviewBoat.boatId,
       reservation: reviewBoat.locationId,
       rating: reviewData.rating,
       comment: reviewData.comment
     });
+    const result = await reviewService.createReview({
+      boat: reviewBoat.boatId,
+      reservation: reviewBoat.locationId,
+      rating: reviewData.rating,
+      comment: reviewData.comment
+    });
+    console.log('[DEBUG] Résultat reviewService.createReview', result);
     setReviewModalOpen(false);
     setReviewBoat(null);
   } catch (error) {
+    console.error('[DEBUG] Erreur reviewService.createReview', error);
     alert('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
   }
 }}
