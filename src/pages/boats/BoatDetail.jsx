@@ -3,6 +3,8 @@ import { API_URL } from '../../lib/api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
+import reviewService from '../../services/review.service';
+import LeaveReviewModal from '../../components/LeaveReviewModal';
 import { 
   faAnchor, 
   faWater, 
@@ -57,6 +59,9 @@ const BoatDetail = () => {
   const [success, setSuccess] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [reservations, setReservations] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   // Ajout logique pour locataire
   const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
@@ -116,6 +121,24 @@ const BoatDetail = () => {
       }
     };
     fetchBoat();
+  }, [id]);
+
+  // Charger les avis du bateau
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!id) return;
+      setReviewsLoading(true);
+      try {
+        const data = await reviewService.getReviewsByBoat(id).catch(() => []);
+        const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+        setReviews(list);
+      } catch (e) {
+        setReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    fetchReviews();
   }, [id]);
 
   if (loading) return <div>Chargement...</div>;
@@ -403,6 +426,94 @@ const BoatDetail = () => {
             </form>
           </div>
         </div>
+
+        {/* Avis des clients */}
+        <div className="why-choose" style={{ marginTop: 24 }}>
+          <h2 className="why-choose-title">Avis des clients</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              {(() => {
+                const count = reviews.length;
+                const avg = count ? (reviews.reduce((a, r) => a + (Number(r.rating) || 0), 0) / count).toFixed(1) : '0.0';
+                return <span className="text-gray-700">Note moyenne: <strong>{avg}</strong> ({count} avis)</span>;
+              })()}
+            </div>
+            <div>
+              {(() => {
+                const myRes = reservations.find(r => (r.user?._id || r.user) === (currentUser?._id));
+                const canLeave = Boolean(currentUser && myRes);
+                return (
+                  <button
+                    className="booking-button booking-button-available"
+                    onClick={() => setIsReviewModalOpen(true)}
+                    disabled={!canLeave}
+                    title={canLeave ? 'Laisser un avis' : 'Réservations requises pour laisser un avis'}
+                  >
+                    Laisser un avis
+                  </button>
+                );
+              })()}
+            </div>
+          </div>
+
+          {reviewsLoading ? (
+            <div>Chargement des avis...</div>
+          ) : reviews.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <div style={{ fontSize: 32 }}>💬</div>
+              <div>Aucun avis pour le moment</div>
+              <div className="text-sm">Soyez le premier à laisser un avis !</div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((r) => (
+                <div key={r._id || r.id} className="p-4 rounded-lg border border-gray-200 bg-white">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-medium">
+                      {(r.user && (r.user.firstName || r.user.lastName))
+                        ? `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim()
+                        : 'Utilisateur'}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR')}
+                    </div>
+                  </div>
+                  <div className="text-yellow-500" style={{ letterSpacing: 2 }}>
+                    {'★'.repeat(Number(r.rating) || 0)}{'☆'.repeat(Math.max(0, 5 - (Number(r.rating) || 0)))}
+                  </div>
+                  <div className="mt-2 text-gray-700">{r.comment || r.text}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modale Laisser un avis */}
+        {isReviewModalOpen && (
+          <LeaveReviewModal
+            open={isReviewModalOpen}
+            onClose={() => setIsReviewModalOpen(false)}
+            boat={{
+              boatId: boat?._id,
+              id: boat?._id,
+              name: boat?.name,
+              type: boat?.type,
+              locationId: (reservations.find(r => (r.user?._id || r.user) === (currentUser?._id))?._id) || undefined,
+              reservationId: (reservations.find(r => (r.user?._id || r.user) === (currentUser?._id))?._id) || undefined,
+            }}
+            userId={currentUser?._id}
+            onSubmit={() => {}}
+            onSuccess={async () => {
+              // rafraîchir la liste
+              try {
+                const data = await reviewService.getReviewsByBoat(id).catch(() => []);
+                const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                setReviews(list);
+              } catch (_) {}
+              setIsReviewModalOpen(false);
+            }}
+          />
+        )}
 
         {/* Informations supplémentaires (optionnel, mock) */}
         <div className="why-choose">
