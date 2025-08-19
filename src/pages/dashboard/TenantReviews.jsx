@@ -56,11 +56,15 @@ const TenantReviews = () => {
     async function load() {
       try {
         setLoading(true);
-        // Avis donnés par l'utilisateur (reviews que j'ai postées)
-        const given = await reviewService.getMyReviews().catch(() => []);
-
-        // Normaliser en tableaux
-        const givenList = Array.isArray(given?.data) ? given.data : (Array.isArray(given) ? given : []);
+        // Récupération depuis l'API (peut renvoyer plusieurs formes)
+        const resp = await reviewService.getMyReviews().catch(() => []);
+        // Normaliser
+        const payload = resp && typeof resp === 'object' ? resp : { data: Array.isArray(resp) ? resp : [] };
+        const nested = (payload && payload.data && typeof payload.data === 'object') ? payload.data : null;
+        const givenRaw = Array.isArray(nested?.given)
+          ? nested.given
+          : (Array.isArray(payload?.data) ? payload.data : Array.isArray(resp) ? resp : []);
+        const receivedRaw = Array.isArray(nested?.received) ? nested.received : [];
 
         // Mapper pour l'UI
         const mapToCard = (r, direction = 'received') => {
@@ -74,7 +78,7 @@ const TenantReviews = () => {
           return {
             id: r._id || r.id,
             rating: Number(r.rating || 0),
-            comment: r.comment || r.text || '',
+            comment: r.comment || r.text || r.content || r.message || '',
             date: createdAt,
             reviewer: {
               id: reviewer._id || reviewer.id || r.user || r.author || null,
@@ -199,9 +203,9 @@ const TenantReviews = () => {
           }
         }
         // Avis reçus = réponses à mes avis
-        const receivedCards = givenList
-          .filter(r => r.ownerResponse && r.ownerResponse.text)
-          .map(r => mapToCard(r, 'received'));
+        const receivedCards = receivedCardsFromApi.length > 0
+          ? receivedCardsFromApi
+          : givenRaw.filter(r => r.ownerResponse && r.ownerResponse.text).map(r => mapToCard(r, 'received'));
 
         // Calcul des stats à partir de mes avis donnés
         const total = givenCards.length;
