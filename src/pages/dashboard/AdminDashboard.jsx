@@ -133,35 +133,21 @@ const AdminDashboard = () => {
         totalRevenue: reservationsData.reduce((acc, r) => acc + (r.totalPrice || r.amount || 0), 0),
         pendingValidations: boatsData.filter(b => b.status === 'en_attente').length
       });
-      // Avis (optionnel)
+      // Avis: charger tous les avis depuis l'API admin
       try {
-        // Agréger les reviews à partir des réservations existantes
-        const allReviews = [];
-        reservationsData.forEach(res => {
-          if (res.review) {
-            allReviews.push({
-              id: res.review._id,
-              boat: res.boat && (res.boat.name || res.boat),
-              reviewer: res.review.user && (res.review.user.firstName ? `${res.review.user.firstName} ${res.review.user.lastName}` : res.review.user.name || res.review.user),
-              rating: res.review.rating,
-              comment: res.review.comment,
-              date: res.review.createdAt || res.review.date
-            });
-          } else if (Array.isArray(res.reviews)) {
-            res.reviews.forEach(rv => {
-              allReviews.push({
-                id: rv._id,
-                boat: res.boat && (res.boat.name || res.boat),
-                reviewer: rv.user && (rv.user.firstName ? `${rv.user.firstName} ${rv.user.lastName}` : rv.user.name || rv.user),
-                rating: rv.rating,
-                comment: rv.comment,
-                date: rv.createdAt || rv.date
-              });
-            });
-          }
-        });
-        setReviews(allReviews);
+        const all = await reviewService.getAllReviews();
+        const arr = Array.isArray(all?.data) ? all.data : (Array.isArray(all) ? all : []);
+        const mapped = arr.map(r => ({
+          id: r._id || r.id,
+          boat: r.boat?.name || r.boat || 'Bateau',
+          reviewer: r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur'),
+          rating: Number(r.rating || 0),
+          comment: r.comment || r.text || '',
+          date: r.createdAt || r.date
+        }));
+        setReviews(mapped);
       } catch (err) {
+        console.error('Erreur chargement avis admin:', err);
         setReviews([]);
       }
     } catch (error) {
