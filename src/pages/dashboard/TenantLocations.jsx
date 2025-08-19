@@ -393,7 +393,15 @@ const TenantLocations = () => {
 
                   <div className="location-details">
                     <div className="location-header">
-                      <h3>{location.boatName}</h3>
+                      <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {location.boatName}
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          title={location.review ? 'Avis déjà envoyé' : 'Aucun avis encore'}
+                          style={{ color: location.review ? '#FFD600' : '#E0E0E0' }}
+                          aria-label={location.review ? 'Avis déjà envoyé' : 'Aucun avis encore'}
+                        />
+                      </h3>
                       <span className="boat-type">{location.boatType}</span>
                     </div>
 
