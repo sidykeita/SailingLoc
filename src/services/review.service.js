@@ -2,6 +2,15 @@ import axios from 'axios';
 import { API_URL } from '../lib/api';
 
 class ReviewService {
+  // Créer un avis (review)
+  async createReview(reviewData) {
+    try {
+      const response = await axios.post(`${API_URL}/reviews`, reviewData);
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
   // Obtenir tous les avis (avec filtres et pagination)
   async getAllReviews(params = {}) {
     try {
