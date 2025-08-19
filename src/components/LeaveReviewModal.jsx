@@ -5,6 +5,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
   const [comment, setComment] = useState('');
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   // reset propre à chaque ouverture
   useEffect(() => {
@@ -13,6 +14,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
       setComment('');
       setPhotos([]);
       setError('');
+      setSuccess('');
     }
   }, [open]);
 
@@ -48,8 +50,12 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
         rating,
         comment
       }));
-      alert('Avis envoyé avec succès !');
-      if (typeof onClose === 'function') onClose();
+      setSuccess('Votre avis a été envoyé avec succès. Merci !');
+      setError('');
+      // Optionnel: reset des champs après succès
+      setRating(5);
+      setComment('');
+      setPhotos([]);
     } catch (error) {
       setError('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
       console.error('[DEBUG] Erreur envoi avis direct', error);
@@ -166,6 +172,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
             </div>
 
             {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+            {success && <div className="text-green-600 text-sm mb-2">{success}</div>}
           </div>
 
           {/* Footer sticky (toujours visible) */}
