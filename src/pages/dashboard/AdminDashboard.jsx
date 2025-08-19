@@ -167,6 +167,18 @@ const AdminDashboard = () => {
     setEditUser(user);
   };
 
+  // Handler pour supprimer un avis (admin)
+  const handleDeleteReview = async (review) => {
+    if (window.confirm('Supprimer cet avis ?')) {
+      try {
+        await reviewService.deleteReview(review.id || review._id);
+        fetchData();
+      } catch (err) {
+        alert('Erreur lors de la suppression : ' + (err?.message || 'inconnue'));
+      }
+    }
+  };
+
   // State pour modals bateau
   const [viewBoat, setViewBoat] = useState(null);
   const [editBoat, setEditBoat] = useState(null);
@@ -512,21 +524,37 @@ const AdminDashboard = () => {
         <input type="text" placeholder="Rechercher..." />
       </div>
 
-      <div className="reviews-grid">
-        {reviews.map(review => (
-          <div key={review.id} className="review-card">
-            <div className="review-header">
-              <h4>{review.boat}</h4>
-              <div className="review-rating">
-                {'⭐'.repeat(review.rating)}
-              </div>
-            </div>
-            <p className="review-comment">{review.comment}</p>
-            <div className="review-footer">
-              <span>Par {review.reviewer}</span>
-            </div>
-          </div>
-        ))}
+      <div className="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Bateau</th>
+              <th>Locataire</th>
+              <th>Note</th>
+              <th>Commentaire</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reviews.map((review) => (
+              <tr key={review.id}>
+                <td>{review.boat}</td>
+                <td>{review.reviewer}</td>
+                <td>{'⭐'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}</td>
+                <td style={{maxWidth: '420px'}}>{review.comment}</td>
+                <td>{review.date ? new Date(review.date).toLocaleDateString() : ''}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button className="btn-icon" title="Voir">👁️</button>
+                    <button className="btn-icon" title="Modifier">✏️</button>
+                    <button className="btn-icon danger" title="Supprimer" onClick={() => handleDeleteReview(review)}>🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
