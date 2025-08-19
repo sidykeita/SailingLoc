@@ -21,6 +21,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
   const handlePhotoChange = (e) => setPhotos([...e.target.files]);
 
   const handleSubmit = (e) => {
+    console.log('[DEBUG] handleSubmit called', { rating, comment, photos });
     e.preventDefault();
     const isInvalid = rating === 0 || comment.trim().length < 10;
     if (isInvalid) {
@@ -176,6 +177,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
               type="submit"
               aria-disabled={isInvalid}
               onClick={(e) => {
+                console.log('[DEBUG] Bouton Envoyer cliqué');
                 if (isInvalid) {
                   e.preventDefault();
                   setError('Votre avis doit contenir au moins 10 caractères.');
