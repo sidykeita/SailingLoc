@@ -21,7 +21,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
   const handlePhotoChange = (e) => setPhotos([...e.target.files]);
 
   const handleSubmit = (e) => {
-    console.log('[DEBUG] handleSubmit called', { rating, comment, photos });
+    console.log('[DEBUG] onSubmit prop', onSubmit);
     e.preventDefault();
     const isInvalid = rating === 0 || comment.trim().length < 10;
     if (isInvalid) {
@@ -29,6 +29,10 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
       return;
     }
     setError('');
+    if (typeof onSubmit !== 'function') {
+      console.error('[DEBUG] onSubmit n\'est pas une fonction !', onSubmit);
+      return;
+    }
     onSubmit({ rating, comment, photos });
   };
 
