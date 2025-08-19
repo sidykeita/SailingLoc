@@ -322,7 +322,7 @@ const TenantReviews = () => {
                     <div className="review-response">
                       <div className="response-header">
                         <FontAwesomeIcon icon={faReply} />
-                        <span>Réponse du propriétaire • {formatDate(review.response.date)}</span>
+                        <span>{formatDate(review.response.date)}</span>
                       </div>
                       <p>{review.response.text}</p>
                     </div>
@@ -354,9 +354,9 @@ const TenantReviews = () => {
                 <div key={review.id} className="review-card">
                   <div className="review-header">
                     <div className="reviewer-info">
-                      <img src={review.owner.avatar} alt={review.booking.boat} />
+                      <img src={review.owner.avatar} alt={review.owner.name} />
                       <div>
-                        <h4>{review.booking.boat}</h4>
+                        <h4>{review.owner.name}</h4>
                         <p>Propriétaire depuis {review.owner.memberSince}</p>
                       </div>
                     </div>
