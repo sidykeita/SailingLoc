@@ -354,10 +354,10 @@ const TenantReviews = () => {
                 <div key={review.id} className="review-card">
                   <div className="review-header">
                     <div className="reviewer-info">
-                      <img src={review.owner.avatar} alt={review.owner.name} />
+                      <img src={review.reviewer.avatar} alt={review.reviewer.name} />
                       <div>
-                        <h4>{review.owner.name}</h4>
-                        <p>Propriétaire depuis {review.owner.memberSince}</p>
+                        <h4>{review.reviewer.name}</h4>
+                        <p>Locataire depuis {review.reviewer.memberSince}</p>
                       </div>
                     </div>
                     <div className="review-meta">
