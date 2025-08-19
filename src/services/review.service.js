@@ -33,7 +33,11 @@ class ReviewService {
   // Obtenir les avis d'un bateau
   async getReviewsByBoat(boatId, params = {}) {
     try {
-      const { data } = await apiClient.get(`/reviews/boat/${boatId}`, { params });
+      const merged = { ...params, boat: boatId };
+      const { data } = await apiClient.get(`/reviews`, { params: merged });
+      if (typeof window !== 'undefined') {
+        console.debug('[review.service] getReviewsByBoat payload:', data);
+      }
       return data;
     } catch (error) {
       throw this.handleError(error);

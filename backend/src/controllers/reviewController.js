@@ -21,7 +21,7 @@ exports.createReview = async (req, res) => {
 // Récupérer toutes les reviews (avec filtres)
 exports.getReviews = async (req, res) => {
   try {
-    const { tenant, author } = req.query;
+    const { tenant, author, boat } = req.query;
 
     // Base query
     let query = {};
@@ -41,6 +41,11 @@ exports.getReviews = async (req, res) => {
     // Filtrer par locataire (avis reçus par un utilisateur)
     if (tenant) {
       reviews = reviews.filter(r => String(r?.reservation?.user?._id || r?.reservation?.user) === String(tenant));
+    }
+
+    // Filtrer par bateau (avis d'un bateau)
+    if (boat) {
+      reviews = reviews.filter(r => String(r?.reservation?.boat?._id || r?.reservation?.boat) === String(boat));
     }
 
     res.json(reviews);

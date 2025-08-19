@@ -138,8 +138,25 @@ const BoatDetail = () => {
       if (!id) return;
       setReviewsLoading(true);
       try {
-        const data = await reviewService.getReviewsByBoat(id).catch(() => []);
-        const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+        const resp = await reviewService.getReviewsByBoat(id).catch((e) => {
+          console.error('[BoatDetail] getReviewsByBoat error', e);
+          return [];
+        });
+        console.log('[BoatDetail] getReviewsByBoat raw resp:', resp);
+        // Normalisation des différentes formes possibles
+        const pickArray = (obj) => {
+          if (!obj) return [];
+          if (Array.isArray(obj)) return obj;
+          if (Array.isArray(obj.data)) return obj.data;
+          if (Array.isArray(obj.reviews)) return obj.reviews;
+          if (obj.data && Array.isArray(obj.data.reviews)) return obj.data.reviews;
+          if (Array.isArray(obj.items)) return obj.items;
+          if (obj.data && Array.isArray(obj.data.items)) return obj.data.items;
+          if (obj.results && Array.isArray(obj.results)) return obj.results;
+          return [];
+        };
+        const list = pickArray(resp);
+        console.log('[BoatDetail] normalized reviews list length:', list.length);
         setReviews(list);
       } catch (e) {
         setReviews([]);
@@ -537,8 +554,19 @@ const BoatDetail = () => {
             onSuccess={async () => {
               // rafraîchir la liste
               try {
-                const data = await reviewService.getReviewsByBoat(id).catch(() => []);
-                const list = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                const resp = await reviewService.getReviewsByBoat(id).catch(() => []);
+                const pickArray = (obj) => {
+                  if (!obj) return [];
+                  if (Array.isArray(obj)) return obj;
+                  if (Array.isArray(obj.data)) return obj.data;
+                  if (Array.isArray(obj.reviews)) return obj.reviews;
+                  if (obj.data && Array.isArray(obj.data.reviews)) return obj.data.reviews;
+                  if (Array.isArray(obj.items)) return obj.items;
+                  if (obj.data && Array.isArray(obj.data.items)) return obj.data.items;
+                  if (obj.results && Array.isArray(obj.results)) return obj.results;
+                  return [];
+                };
+                const list = pickArray(resp);
                 setReviews(list);
               } catch (_) {}
               setIsReviewModalOpen(false);
