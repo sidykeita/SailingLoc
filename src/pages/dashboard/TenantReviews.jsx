@@ -106,67 +106,9 @@ const TenantReviews = () => {
               : null,
             helpful: Number(r.helpful || 0)
           };
-
-  const openEdit = (review) => {
-    setEditForm({ rating: review.rating || 5, comment: review.comment || '' });
-    setEditModal({ open: true, review });
-  };
-
-  const closeEdit = () => {
-    setEditModal({ open: false, review: null });
-  };
-
-  const submitEdit = async (e) => {
-    e.preventDefault();
-    if (!editModal.review?.id) return;
-    try {
-      setSaving(true);
-      await reviewService.updateReview(editModal.review.id, {
-        rating: Number(editForm.rating) || 5,
-        comment: editForm.comment || ''
-      });
-      // refresh my reviews
-      const given = await reviewService.getMyReviews().catch(() => []);
-      const givenList = Array.isArray(given?.data) ? given.data : (Array.isArray(given) ? given : []);
-      // reuse minimal mapping to keep UI in sync without re-fetching users
-      const remap = (r) => ({
-        id: r._id || r.id,
-        rating: Number(r.rating || 0),
-        comment: r.comment || r.text || '',
-        date: r.createdAt || r.date || new Date().toISOString(),
-        reviewer: {
-          id: r.user?._id || r.user || null,
-          name: (r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur')),
-          avatar: r.user?.avatar || r.user?.photo || profileImage,
-          memberSince: (r.user?.createdAt ? new Date(r.user.createdAt).toLocaleDateString('fr-FR') : '—')
-        },
-        booking: {
-          boat: (r.boat?.name || 'Bateau'),
-          location: (r.boat?.port || '—'),
-          dates: ''
-        },
-        response: r.ownerResponse ? { text: r.ownerResponse.text, date: r.ownerResponse.createdAt || r.ownerResponse.date } : null,
-        helpful: Number(r.helpful || 0)
-      });
-      const refreshed = givenList.map(remap);
-      setReviewsGiven(refreshed);
-      // recalculer stats simples
-      const total = refreshed.length;
-      const sum = refreshed.reduce((acc, r) => acc + (r.rating || 0), 0);
-      const average = total > 0 ? +(sum / total).toFixed(1) : 0;
-      const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-      refreshed.forEach(r => { const k = Math.round(r.rating || 0); if (distribution[k] !== undefined) distribution[k] += 1; });
-      setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
-      closeEdit();
-    } catch (err) {
-      console.error('[TenantReviews] updateReview error', err);
-      alert(err?.message || 'Erreur lors de la mise à jour de votre avis');
-    } finally {
-      setSaving(false);
-    }
-  };
         };
 
+        const givenList = Array.isArray(givenRaw) ? givenRaw : [];
         let givenCards = givenList.map(r => mapToCard(r, 'given'));
         // Récupérer les infos locataire (reviewer) via leur ID si disponible
         const reviewerIds = Array.from(new Set(givenCards
@@ -202,10 +144,10 @@ const TenantReviews = () => {
             // ignore fetch errors silently
           }
         }
-        // Avis reçus = réponses à mes avis
-        const receivedCards = receivedCardsFromApi.length > 0
-          ? receivedCardsFromApi
-          : givenRaw.filter(r => r.ownerResponse && r.ownerResponse.text).map(r => mapToCard(r, 'received'));
+        // Avis reçus = réponses du propriétaire à mes avis
+        const receivedCards = givenRaw
+          .filter(r => r.ownerResponse && r.ownerResponse.text)
+          .map(r => mapToCard(r, 'received'));
 
         // Calcul des stats à partir de mes avis donnés
         const total = givenCards.length;
@@ -232,6 +174,70 @@ const TenantReviews = () => {
     load();
     return () => { mounted = false; };
   }, [currentUser]);
+
+  // Handlers for editing a given review
+  const openEdit = (review) => {
+    setEditForm({ rating: review.rating || 5, comment: review.comment || '' });
+    setEditModal({ open: true, review });
+  };
+
+  const closeEdit = () => {
+    setEditModal({ open: false, review: null });
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    if (!editModal.review?.id) return;
+    try {
+      setSaving(true);
+      await reviewService.updateReview(editModal.review.id, {
+        rating: Number(editForm.rating) || 5,
+        comment: editForm.comment || ''
+      });
+      // Refresh minimal: refetch my reviews and rebuild 'given' cards
+      const resp = await reviewService.getMyReviews().catch(() => []);
+      const payload = resp && typeof resp === 'object' ? resp : { data: Array.isArray(resp) ? resp : [] };
+      const nested = (payload && payload.data && typeof payload.data === 'object') ? payload.data : null;
+      const givenRaw = Array.isArray(nested?.given)
+        ? nested.given
+        : (Array.isArray(payload?.data) ? payload.data : Array.isArray(resp) ? resp : []);
+
+      const simpleMap = (r) => ({
+        id: r._id || r.id,
+        rating: Number(r.rating || 0),
+        comment: r.comment || r.text || '',
+        date: r.createdAt || r.date || new Date().toISOString(),
+        reviewer: {
+          id: r.user?._id || r.user || null,
+          name: (r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur')),
+          avatar: r.user?.avatar || r.user?.photo || profileImage,
+          memberSince: (r.user?.createdAt ? new Date(r.user.createdAt).toLocaleDateString('fr-FR') : '—')
+        },
+        booking: {
+          boat: (r.boat?.name || r.reservation?.boat?.name || 'Bateau'),
+          location: (r.boat?.port || r.reservation?.boat?.port || '—'),
+          dates: ''
+        },
+        response: r.ownerResponse ? { text: r.ownerResponse.text, date: r.ownerResponse.createdAt || r.ownerResponse.date } : null,
+        helpful: Number(r.helpful || 0)
+      });
+      const refreshed = (Array.isArray(givenRaw) ? givenRaw : []).map(simpleMap);
+      setReviewsGiven(refreshed);
+      // Recompute simple stats
+      const total = refreshed.length;
+      const sum = refreshed.reduce((acc, r) => acc + (r.rating || 0), 0);
+      const average = total > 0 ? +(sum / total).toFixed(1) : 0;
+      const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      refreshed.forEach(r => { const k = Math.round(r.rating || 0); if (distribution[k] !== undefined) distribution[k] += 1; });
+      setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
+      closeEdit();
+    } catch (err) {
+      console.error('[TenantReviews] updateReview error', err);
+      alert(err?.message || 'Erreur lors de la mise à jour de votre avis');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const renderStars = (rating) => {
     const stars = [];
