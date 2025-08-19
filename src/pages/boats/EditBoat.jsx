@@ -35,6 +35,8 @@ const EditBoat = () => {
     "GPS", "Radio", "Glacière", "Douche", "Plateforme de baignade", "Bain de soleil", "Cuisine équipée", "Toilettes marines", "Table pique-nique"
   ];
   const [features, setFeatures] = useState([]);
+  const [customFeatures, setCustomFeatures] = useState([]);
+  const [newFeature, setNewFeature] = useState('');
   // Caractéristiques techniques dynamiques
   const [technicalSpecs, setTechnicalSpecs] = useState({
     year: '',
@@ -68,7 +70,10 @@ const EditBoat = () => {
           cabins: data.cabins || '',
           skipper: !!data.skipper,
         });
-        setFeatures(Array.isArray(data.features) ? data.features : []);
+        const initialFeatures = Array.isArray(data.features) ? data.features : [];
+        setFeatures(initialFeatures);
+        // Initialize custom features as those not in the predefined list
+        setCustomFeatures(initialFeatures.filter(f => !ALL_FEATURES.includes(f)));
         setTechnicalSpecs(data.technicalSpecs || { year: '', engine: '', fuelCapacity: '', maxSpeed: '', weight: '' });
         if (Array.isArray(data.photos) && data.photos.length > 0) {
           setImagePreview(data.photos[0]);
@@ -81,6 +86,25 @@ const EditBoat = () => {
     };
     fetchBoat();
   }, [id]);
+
+  const handleAddFeature = () => {
+    const feat = newFeature.trim();
+    if (!feat) return;
+    // Prevent duplicates across predefined/custom and current selections
+    const alreadyExists = ALL_FEATURES.includes(feat) || customFeatures.includes(feat);
+    if (!alreadyExists) {
+      setCustomFeatures(prev => [...prev, feat]);
+    }
+    if (!features.includes(feat)) {
+      setFeatures(prev => [...prev, feat]); // auto-select on add
+    }
+    setNewFeature('');
+  };
+
+  const removeCustomFeature = (feat) => {
+    setCustomFeatures(prev => prev.filter(f => f !== feat));
+    setFeatures(prev => prev.filter(f => f !== feat));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -316,21 +340,44 @@ const EditBoat = () => {
                 />
               </div>
             </div>
-            {/* Équipements (cases à cocher) */}
+            {/* Équipements (prédef + personnalisés) */}
             <div>
               <label className="block text-sm text-gray-700 mb-1 font-semibold">Équipements</label>
+              {/* Barre d'ajout d'un équipement personnalisé */}
+              <div className="flex items-center gap-2 mb-3">
+                <input
+                  type="text"
+                  value={newFeature}
+                  onChange={(e) => setNewFeature(e.target.value)}
+                  placeholder="Ajouter un équipement (ex: Dessalinisateur)"
+                  className="flex-1 input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+                <button type="button" onClick={handleAddFeature} className="btn-secondary">+ Ajouter</button>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {ALL_FEATURES.map((feat) => (
+                {[...ALL_FEATURES, ...customFeatures].map((feat) => (
                   <label key={feat} className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       checked={features.includes(feat)}
                       onChange={e => {
-                        if (e.target.checked) setFeatures([...features, feat]);
-                        else setFeatures(features.filter(f => f !== feat));
+                        if (e.target.checked) setFeatures(prev => [...prev, feat]);
+                        else setFeatures(prev => prev.filter(f => f !== feat));
                       }}
                     />
-                    {feat}
+                    <span className="flex items-center gap-2">
+                      {feat}
+                      {customFeatures.includes(feat) && (
+                        <button
+                          type="button"
+                          onClick={(ev) => { ev.preventDefault(); ev.stopPropagation(); removeCustomFeature(feat); }}
+                          className="ml-1 text-xs text-red-600 hover:text-red-800"
+                          title="Supprimer cet équipement personnalisé"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
                   </label>
                 ))}
               </div>
