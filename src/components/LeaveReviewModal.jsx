@@ -30,13 +30,16 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
     setError('');
     // Envoi direct en BDD
     try {
-      if (!boat?.boatId || !boat?.locationId) {
-        setError('Impossible de trouver l\'identifiant du bateau ou de la réservation.');
+      console.log('[DEBUG] boat prop dans LeaveReviewModal', boat);
+      const boatId = boat?.boatId || boat?.id;
+      const locationId = boat?.locationId || boat?.reservationId || boat?.resId;
+      if (!boatId || !locationId) {
+        setError("Impossible de trouver l'identifiant du bateau ou de la réservation.");
         return;
       }
       const result = await import('../services/review.service.js').then(m => m.default.createReview({
-        boat: boat.boatId,
-        reservation: boat.locationId,
+        boat: boatId,
+        reservation: locationId,
         rating,
         comment
       }));
