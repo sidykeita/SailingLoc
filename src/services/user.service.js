@@ -28,6 +28,18 @@ const getAllUsers = async () => {
   return res.data;
 };
 
+const getUserById = async (userId) => {
+  const token = localStorage.getItem('token');
+  const res = await axios.get(`${API_URL}/auth/users/${userId}`,
+    {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined,
+      },
+    }
+  );
+  return res.data;
+};
+
 const deleteUser = async (userId) => {
   const token = localStorage.getItem('token');
   const res = await axios.delete(`${API_URL}/auth/users/${userId}`, {
@@ -41,5 +53,6 @@ const deleteUser = async (userId) => {
 export default {
   updateProfile,
   getAllUsers,
+  getUserById,
   deleteUser,
 };

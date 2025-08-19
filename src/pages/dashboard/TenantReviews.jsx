@@ -27,6 +27,7 @@ import '../../assets/css/SimpleDashboard.css';
 import '../../assets/css/TenantLocations.css';
 import '../../assets/css/TenantReviews.css';
 import reviewService from '../../services/review.service';
+import userService from '../../services/user.service';
 
 const TenantReviews = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -73,9 +74,10 @@ const TenantReviews = () => {
             comment: r.comment || r.text || '',
             date: createdAt,
             reviewer: {
+              id: reviewer._id || reviewer.id || r.user || r.author || null,
               name: reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName || ''}`.trim() : (reviewer.name || 'Utilisateur'),
               avatar: reviewer.avatar || reviewer.photo || profileImage,
-              memberSince: (reviewer.createdAt ? new Date(reviewer.createdAt).getFullYear() : '—')
+              memberSince: (reviewer.createdAt ? new Date(reviewer.createdAt).toLocaleDateString('fr-FR') : '—')
             },
             owner: {
               name: owner.firstName ? `${owner.firstName} ${owner.lastName || ''}`.trim() : (owner.name || 'Propriétaire'),
@@ -99,7 +101,41 @@ const TenantReviews = () => {
           };
         };
 
-        const givenCards = givenList.map(r => mapToCard(r, 'given'));
+        let givenCards = givenList.map(r => mapToCard(r, 'given'));
+        // Récupérer les infos locataire (reviewer) via leur ID si disponible
+        const reviewerIds = Array.from(new Set(givenCards
+          .map(c => c.reviewer?.id)
+          .filter(Boolean)));
+        if (reviewerIds.length > 0) {
+          try {
+            const users = await Promise.all(
+              reviewerIds.map(id => userService.getUserById(id).catch(() => null))
+            );
+            const usersMap = users.filter(Boolean).reduce((acc, u) => {
+              const uid = u._id || u.id;
+              if (uid) acc[uid] = u;
+              return acc;
+            }, {});
+            // Remplacer nom et date d'inscription du locataire
+            givenCards = givenCards.map(c => {
+              const uid = c.reviewer?.id;
+              const u = uid ? usersMap[uid] : null;
+              if (!u) return c;
+              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Utilisateur';
+              const signupDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('fr-FR') : '—';
+              return {
+                ...c,
+                reviewer: {
+                  ...c.reviewer,
+                  name: fullName,
+                  memberSince: signupDate,
+                }
+              };
+            });
+          } catch (_) {
+            // ignore fetch errors silently
+          }
+        }
         // Avis reçus = réponses à mes avis
         const receivedCards = givenList
           .filter(r => r.ownerResponse && r.ownerResponse.text)
