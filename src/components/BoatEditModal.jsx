@@ -10,6 +10,7 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
     features: Array.isArray(boat?.features) ? boat.features : [],
   });
   const [newFeature, setNewFeature] = useState('');
+  const [customFeatures, setCustomFeatures] = useState([]);
 
   // Liste d'équipements suggérés (pré-définie)
   const suggestedFeatures = [
@@ -61,6 +62,13 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
   const addCustomFeature = () => {
     const value = (newFeature || '').trim();
     if (!value) return;
+    // Ajoute dans la liste custom si pas déjà dans suggérées ni custom
+    const existsInSuggested = suggestedFeatures.some(f => f.toLowerCase() === value.toLowerCase());
+    const existsInCustom = customFeatures.some(f => f.toLowerCase() === value.toLowerCase());
+    if (!existsInSuggested && !existsInCustom) {
+      setCustomFeatures(prev => [...prev, value]);
+    }
+    // coche automatiquement
     setForm((prev) => {
       if ((prev.features || []).some(f => f.toLowerCase() === value.toLowerCase())) return prev;
       return { ...prev, features: [...(prev.features || []), value] };
@@ -99,11 +107,11 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
             <input name="status" value={form.status} onChange={handleChange} style={{width:'100%',padding:'10px',borderRadius:'7px',border:'1px solid #ddd',marginBottom:8,fontSize:'1rem'}} />
           </div>
 
-          {/* Equipements */}
+          {/* Équipements */}
           <div style={{marginBottom:'18px'}}>
             <label style={{display:'block',fontWeight:600,color:'#333',marginBottom:8}}>Équipements</label>
             <div style={{display:'grid',gridTemplateColumns:'repeat(2, minmax(0,1fr))',gap:'10px 16px',marginBottom:10}}>
-              {suggestedFeatures.map((feat) => (
+              {[...suggestedFeatures, ...customFeatures].map((feat) => (
                 <label key={feat} style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',color:'#444'}}>
                   <input
                     type="checkbox"
@@ -125,16 +133,7 @@ const BoatEditModal = ({ boat, open, onClose, onSave }) => {
               <button type="button" onClick={addCustomFeature} title="Ajouter" style={{padding:'10px 12px',border:'1px solid #e0e0e0',borderRadius:'8px',background:'#fff'}}>+
               </button>
             </div>
-            {(form.features && form.features.length > 0) && (
-              <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
-                {form.features.map((f) => (
-                  <span key={f} style={{display:'inline-flex',alignItems:'center',gap:6,background:'#f5f7ff',color:'#3b4cca',border:'1px solid #e6ebff',borderRadius:'999px',padding:'6px 10px',fontSize:'.9rem'}}>
-                    {f}
-                    <button type="button" onClick={() => removeFeature(f)} style={{background:'none',border:'none',cursor:'pointer',color:'#8a8a8a'}}>×</button>
-                  </span>
-                ))}
-              </div>
-            )}
+            {/* Les équipements personnalisés s'affichent maintenant comme cases à cocher ci-dessus */}
           </div>
           <div style={{display:'flex',justifyContent:'space-between',gap:16}}>
             <button type="button" onClick={onClose} style={{flex:1,padding:'10px',border:'1px solid #e0e0e0',borderRadius:'8px',background:'#fff',color:'#3a3a3a',fontWeight:500,fontSize:'1rem',marginRight:8}}>Annuler</button>

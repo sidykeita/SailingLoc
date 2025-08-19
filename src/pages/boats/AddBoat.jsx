@@ -17,17 +17,23 @@ const AddBoat = () => {
     // La redirection sera gérée par le ProtectedRoute
   };
 
+  const [customFeatures, setCustomFeatures] = useState([]);
+
   const addCustomFeature = () => {
     const value = (newFeature || '').trim();
     if (!value) return;
-    // Evite les doublons (insensible à la casse)
-    const exists = features.some(f => f.toLowerCase() === value.toLowerCase());
-    if (!exists) setFeatures([...features, value]);
+    // Vérifie doublons dans ALL_FEATURES, customFeatures et features (insensible à la casse)
+    const existsInPredef = ALL_FEATURES.some(f => f.toLowerCase() === value.toLowerCase());
+    const existsInCustom = customFeatures.some(f => f.toLowerCase() === value.toLowerCase());
+    if (!existsInPredef && !existsInCustom) {
+      setCustomFeatures(prev => [...prev, value]);
+    }
+    // coche automatiquement la nouvelle option
+    setFeatures(prev => {
+      const existsSelected = prev.some(f => f.toLowerCase() === value.toLowerCase());
+      return existsSelected ? prev : [...prev, value];
+    });
     setNewFeature('');
-  };
-
-  const removeFeature = (label) => {
-    setFeatures(prev => prev.filter(f => f !== label));
   };
 
   const [form, setForm] = useState({
@@ -346,7 +352,7 @@ const AddBoat = () => {
             <div>
               <label className="block text-sm text-gray-700 mb-1 font-semibold">Équipements</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {ALL_FEATURES.map((feat) => (
+                {[...ALL_FEATURES, ...customFeatures].map((feat) => (
                   <label key={feat} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -378,16 +384,6 @@ const AddBoat = () => {
                   +
                 </button>
               </div>
-              {features.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {features.map(f => (
-                    <span key={f} className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full px-3 py-1 text-sm">
-                      {f}
-                      <button type="button" onClick={() => removeFeature(f)} className="text-gray-500 hover:text-gray-700">×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
             {/* Longueur / Capacité / Cabines / Prix */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
