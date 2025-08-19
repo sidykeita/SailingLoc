@@ -20,8 +20,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
 
   const handlePhotoChange = (e) => setPhotos([...e.target.files]);
 
-  const handleSubmit = (e) => {
-    console.log('[DEBUG] onSubmit prop', onSubmit);
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const isInvalid = rating === 0 || comment.trim().length < 10;
     if (isInvalid) {
@@ -29,11 +28,24 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
       return;
     }
     setError('');
-    if (typeof onSubmit !== 'function') {
-      console.error('[DEBUG] onSubmit n\'est pas une fonction !', onSubmit);
-      return;
+    // Envoi direct en BDD
+    try {
+      if (!boat?.boatId || !boat?.locationId) {
+        setError('Impossible de trouver l\'identifiant du bateau ou de la réservation.');
+        return;
+      }
+      const result = await import('../services/review.service.js').then(m => m.default.createReview({
+        boat: boat.boatId,
+        reservation: boat.locationId,
+        rating,
+        comment
+      }));
+      alert('Avis envoyé avec succès !');
+      if (typeof onClose === 'function') onClose();
+    } catch (error) {
+      setError('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+      console.error('[DEBUG] Erreur envoi avis direct', error);
     }
-    onSubmit({ rating, comment, photos });
   };
 
   const isInvalid = rating === 0 || comment.trim().length < 10;
