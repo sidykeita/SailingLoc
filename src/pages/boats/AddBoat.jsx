@@ -17,6 +17,19 @@ const AddBoat = () => {
     // La redirection sera gérée par le ProtectedRoute
   };
 
+  const addCustomFeature = () => {
+    const value = (newFeature || '').trim();
+    if (!value) return;
+    // Evite les doublons (insensible à la casse)
+    const exists = features.some(f => f.toLowerCase() === value.toLowerCase());
+    if (!exists) setFeatures([...features, value]);
+    setNewFeature('');
+  };
+
+  const removeFeature = (label) => {
+    setFeatures(prev => prev.filter(f => f !== label));
+  };
+
   const [form, setForm] = useState({
     name: '',
     model: '',
@@ -48,6 +61,7 @@ const AddBoat = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
+  const [newFeature, setNewFeature] = useState('');
 
   const validate = () => {
     const newErrors = {};
@@ -328,7 +342,7 @@ const AddBoat = () => {
                 />
               </div>
             </div>
-            {/* Équipements (cases à cocher) */}
+            {/* Équipements (pré-définis + ajout personnalisé) */}
             <div>
               <label className="block text-sm text-gray-700 mb-1 font-semibold">Équipements</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -346,6 +360,34 @@ const AddBoat = () => {
                   </label>
                 ))}
               </div>
+              {/* Ajout custom */}
+              <div className="mt-3 flex gap-2">
+                <input
+                  value={newFeature}
+                  onChange={(e) => setNewFeature(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomFeature(); } }}
+                  placeholder="Ajouter un équipement (ex: Sondeur)"
+                  className="flex-1 input border border-gray-300 rounded-lg bg-gray-50 shadow-sm placeholder-gray-400 text-base py-2 px-3"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomFeature}
+                  className="px-3 py-2 rounded-md text-sm border bg-white text-gray-700 border-gray-300 hover:border-primary"
+                  title="Ajouter"
+                >
+                  +
+                </button>
+              </div>
+              {features.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {features.map(f => (
+                    <span key={f} className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full px-3 py-1 text-sm">
+                      {f}
+                      <button type="button" onClick={() => removeFeature(f)} className="text-gray-500 hover:text-gray-700">×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             {/* Longueur / Capacité / Cabines / Prix */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
