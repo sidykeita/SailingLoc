@@ -46,6 +46,9 @@ const TenantReviews = () => {
     totalReviews: 0,
     ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
   });
+  const [editModal, setEditModal] = useState({ open: false, review: null });
+  const [editForm, setEditForm] = useState({ rating: 5, comment: '' });
+  const [saving, setSaving] = useState(false);
 
   // Chargement des reviews depuis le backend
   useEffect(() => {
@@ -99,6 +102,65 @@ const TenantReviews = () => {
               : null,
             helpful: Number(r.helpful || 0)
           };
+
+  const openEdit = (review) => {
+    setEditForm({ rating: review.rating || 5, comment: review.comment || '' });
+    setEditModal({ open: true, review });
+  };
+
+  const closeEdit = () => {
+    setEditModal({ open: false, review: null });
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    if (!editModal.review?.id) return;
+    try {
+      setSaving(true);
+      await reviewService.updateReview(editModal.review.id, {
+        rating: Number(editForm.rating) || 5,
+        comment: editForm.comment || ''
+      });
+      // refresh my reviews
+      const given = await reviewService.getMyReviews().catch(() => []);
+      const givenList = Array.isArray(given?.data) ? given.data : (Array.isArray(given) ? given : []);
+      // reuse minimal mapping to keep UI in sync without re-fetching users
+      const remap = (r) => ({
+        id: r._id || r.id,
+        rating: Number(r.rating || 0),
+        comment: r.comment || r.text || '',
+        date: r.createdAt || r.date || new Date().toISOString(),
+        reviewer: {
+          id: r.user?._id || r.user || null,
+          name: (r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur')),
+          avatar: r.user?.avatar || r.user?.photo || profileImage,
+          memberSince: (r.user?.createdAt ? new Date(r.user.createdAt).toLocaleDateString('fr-FR') : '—')
+        },
+        booking: {
+          boat: (r.boat?.name || 'Bateau'),
+          location: (r.boat?.port || '—'),
+          dates: ''
+        },
+        response: r.ownerResponse ? { text: r.ownerResponse.text, date: r.ownerResponse.createdAt || r.ownerResponse.date } : null,
+        helpful: Number(r.helpful || 0)
+      });
+      const refreshed = givenList.map(remap);
+      setReviewsGiven(refreshed);
+      // recalculer stats simples
+      const total = refreshed.length;
+      const sum = refreshed.reduce((acc, r) => acc + (r.rating || 0), 0);
+      const average = total > 0 ? +(sum / total).toFixed(1) : 0;
+      const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      refreshed.forEach(r => { const k = Math.round(r.rating || 0); if (distribution[k] !== undefined) distribution[k] += 1; });
+      setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
+      closeEdit();
+    } catch (err) {
+      console.error('[TenantReviews] updateReview error', err);
+      alert(err?.message || 'Erreur lors de la mise à jour de votre avis');
+    } finally {
+      setSaving(false);
+    }
+  };
         };
 
         let givenCards = givenList.map(r => mapToCard(r, 'given'));
@@ -420,7 +482,7 @@ const TenantReviews = () => {
                       <FontAwesomeIcon icon={faEye} />
                       Voir la réservation
                     </button>
-                    <button className="action-btn">
+                    <button className="action-btn" onClick={() => openEdit(review)}>
                       <FontAwesomeIcon icon={faEdit} />
                       Modifier l'avis
                     </button>
@@ -485,6 +547,36 @@ const TenantReviews = () => {
           </div>
         </div>
       </footer>
+
+      {editModal.open && (
+        <div role="dialog" aria-modal="true" className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.2)', display: 'grid', placeItems: 'center', zIndex: 3000 }}>
+          <div className="modal-card" style={{ width: 520, maxWidth: '96vw', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>Modifier mon avis</h3>
+              <button onClick={closeEdit} style={{ border: 'none', background: 'transparent', fontSize: 18, cursor: 'pointer' }}>✖️</button>
+            </div>
+            <form onSubmit={submitEdit} style={{ padding: 20 }}>
+              <div className="mb-4">
+                <label className="font-medium">Note</label>
+                <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                  {[1,2,3,4,5].map(v => (
+                    <span key={v} style={{ fontSize: 28, cursor: 'pointer', color: v <= (Number(editForm.rating)||0) ? '#FFD600' : '#E0E0E0' }} onClick={() => setEditForm(f => ({ ...f, rating: v }))}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="font-medium">Commentaire</label>
+                <textarea value={editForm.comment} onChange={(e) => setEditForm(f => ({ ...f, comment: e.target.value }))} className="w-full border rounded p-2 mt-1" rows={4} maxLength={1000} required />
+                <div className="text-xs text-gray-400">{editForm.comment.length}/1000 caractères</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button type="button" onClick={closeEdit} style={{ padding: '10px 16px', background: '#fff', border: '1px solid #ddd', borderRadius: 8 }}>Annuler</button>
+                <button type="submit" disabled={saving} style={{ padding: '10px 16px', background: 'linear-gradient(90deg,#5a84f7,#8e5bf7)', color: '#fff', border: 'none', borderRadius: 8, opacity: saving?0.7:1, cursor: saving?'not-allowed':'pointer' }}>{saving ? 'Enregistrement...' : 'Enregistrer'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

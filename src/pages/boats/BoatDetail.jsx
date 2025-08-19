@@ -83,6 +83,15 @@ const BoatDetail = () => {
     if (id) fetchReservations();
   }, [id]);
 
+  const renderStars = (rating) => {
+    const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    return (
+      <span className="text-yellow-500" style={{ letterSpacing: 2 }}>
+        {'★'.repeat(r)}{'☆'.repeat(5 - r)}
+      </span>
+    );
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -434,20 +443,36 @@ const BoatDetail = () => {
             <div>
               {(() => {
                 const count = reviews.length;
-                const avg = count ? (reviews.reduce((a, r) => a + (Number(r.rating) || 0), 0) / count).toFixed(1) : '0.0';
-                return <span className="text-gray-700">Note moyenne: <strong>{avg}</strong> ({count} avis)</span>;
+                const avgNum = count ? (reviews.reduce((a, r) => a + (Number(r.rating) || 0), 0) / count) : 0;
+                const avg = avgNum.toFixed(1);
+                return (
+                  <div className="flex items-center gap-3 text-gray-700">
+                    {renderStars(Math.round(avgNum))}
+                    <span>
+                      <strong>{avg}</strong> ({count} avis)
+                    </span>
+                  </div>
+                );
               })()}
             </div>
             <div>
               {(() => {
-                const myRes = reservations.find(r => (r.user?._id || r.user) === (currentUser?._id));
-                const canLeave = Boolean(currentUser && myRes);
+                const myPastConfirmed = reservations.find(r => (
+                  (r.user?._id || r.user) === (currentUser?._id) &&
+                  r.status === 'confirmed' &&
+                  new Date(r.endDate) < new Date()
+                ));
+                const alreadyLeft = myPastConfirmed && reviews.some(rv => (
+                  (rv.user?._id || rv.user) === (currentUser?._id) &&
+                  (rv.reservation?._id || rv.reservation) === (myPastConfirmed?._id)
+                ));
+                const canLeave = Boolean(currentUser && myPastConfirmed && !alreadyLeft);
                 return (
                   <button
                     className="booking-button booking-button-available"
                     onClick={() => setIsReviewModalOpen(true)}
                     disabled={!canLeave}
-                    title={canLeave ? 'Laisser un avis' : 'Réservations requises pour laisser un avis'}
+                    title={canLeave ? 'Laisser un avis' : (alreadyLeft ? 'Avis déjà laissé pour cette réservation' : 'Une réservation passée est requise pour laisser un avis')}
                   >
                     Laisser un avis
                   </button>
@@ -478,10 +503,16 @@ const BoatDetail = () => {
                       {new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR')}
                     </div>
                   </div>
-                  <div className="text-yellow-500" style={{ letterSpacing: 2 }}>
-                    {'★'.repeat(Number(r.rating) || 0)}{'☆'.repeat(Math.max(0, 5 - (Number(r.rating) || 0)))}
-                  </div>
+                  <div>{renderStars(Number(r.rating) || 0)}</div>
                   <div className="mt-2 text-gray-700">{r.comment || r.text}</div>
+                  {r.ownerResponse && (r.ownerResponse.text || r.ownerResponse.comment) && (
+                    <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded">
+                      <div className="text-sm text-gray-600 mb-1">
+                        Réponse du propriétaire • {new Date(r.ownerResponse.createdAt || r.ownerResponse.date || Date.now()).toLocaleDateString('fr-FR')}
+                      </div>
+                      <div className="text-gray-700">{r.ownerResponse.text || r.ownerResponse.comment}</div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
