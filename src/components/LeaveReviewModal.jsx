@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
+const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [photos, setPhotos] = useState([]);
@@ -33,6 +33,10 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
       console.log('[DEBUG] boat prop dans LeaveReviewModal', boat);
       const boatId = boat?.boatId || boat?.id;
       const locationId = boat?.locationId || boat?.reservationId || boat?.resId;
+      if (!userId) {
+        setError("Impossible d'identifier l'utilisateur (userId manquant).");
+        return;
+      }
       if (!boatId || !locationId) {
         setError("Impossible de trouver l'identifiant du bateau ou de la réservation.");
         return;
@@ -40,6 +44,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit }) => {
       const result = await import('../services/review.service.js').then(m => m.default.createReview({
         boat: boatId,
         reservation: locationId,
+        user: userId,
         rating,
         comment
       }));

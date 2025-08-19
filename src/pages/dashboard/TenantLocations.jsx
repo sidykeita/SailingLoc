@@ -455,6 +455,7 @@ const TenantLocations = () => {
               setReviewBoat(null);
             }}
             boat={reviewBoat}
+            userId={currentUser?._id || currentUser?.id}
             onSubmit={async (reviewData) => {
   if (!reviewBoat?.locationId) return;
   try {
