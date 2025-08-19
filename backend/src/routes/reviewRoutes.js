@@ -12,5 +12,7 @@ router.get('/user/my-reviews', authMiddleware, reviewController.getMyReviews);
 router.get('/:id', reviewController.getReviewById);
 router.put('/:id', reviewController.updateReview);
 router.delete('/:id', reviewController.deleteReview);
+// Répondre à une review (propriétaire)
+router.post('/:id/response', authMiddleware, reviewController.addOwnerResponse);
 
 module.exports = router;

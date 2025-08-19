@@ -24,9 +24,9 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const isInvalid = rating === 0 || comment.trim().length < 10;
+    const isInvalid = rating === 0;
     if (isInvalid) {
-      setError('Votre avis doit contenir au moins 10 caractères.');
+      setError('Veuillez choisir une note.');
       return;
     }
     setError('');
@@ -69,7 +69,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
     }
   };
 
-  const isInvalid = rating === 0 || comment.trim().length < 10;
+  const isInvalid = rating === 0;
 
   return (
     <div
@@ -163,7 +163,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Partagez votre expérience avec ce bateau... (minimum 10 caractères)"
+                placeholder="Partagez votre expérience avec ce bateau..."
                 rows={4}
                 maxLength={1000}
                 className="w-full border rounded p-2 mt-1"
@@ -218,7 +218,7 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
                 console.log('[DEBUG] Bouton Envoyer cliqué');
                 if (isInvalid) {
                   e.preventDefault();
-                  setError('Votre avis doit contenir au moins 10 caractères.');
+                  setError('Veuillez choisir une note.');
                 }
               }}
               style={{

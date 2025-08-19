@@ -52,14 +52,11 @@ const TenantReviews = () => {
     async function load() {
       try {
         setLoading(true);
-        // Avis donnés par l'utilisateur
+        // Avis donnés par l'utilisateur (reviews que j'ai postées)
         const given = await reviewService.getMyReviews().catch(() => []);
-        // Avis reçus par l'utilisateur (en tant que locataire)
-        const received = await reviewService.getAllReviews({ tenant: currentUser?._id || currentUser?.id }).catch(() => []);
 
         // Normaliser en tableaux
         const givenList = Array.isArray(given?.data) ? given.data : (Array.isArray(given) ? given : []);
-        const receivedList = Array.isArray(received?.data) ? received.data : (Array.isArray(received) ? received : []);
 
         // Mapper pour l'UI
         const mapToCard = (r, direction = 'received') => {
@@ -69,6 +66,7 @@ const TenantReviews = () => {
           const boat = r.boat || reservation?.boat || {};
           const createdAt = r.createdAt || r.date || new Date().toISOString();
           const port = boat?.port || reservation?.port || reservation?.location || '';
+          const response = r.ownerResponse || r.response || null;
           return {
             id: r._id || r.id,
             rating: Number(r.rating || 0),
@@ -91,28 +89,36 @@ const TenantReviews = () => {
                 ? `${new Date(reservation.startDate).toLocaleDateString('fr-FR')} - ${new Date(reservation.endDate).toLocaleDateString('fr-FR')}`
                 : ''
             },
-            response: r.response || r.ownerResponse || null,
+            response: response
+              ? {
+                  text: response.text,
+                  date: response.createdAt || response.date
+                }
+              : null,
             helpful: Number(r.helpful || 0)
           };
         };
 
-        const receivedCards = receivedList.map(r => mapToCard(r, 'received'));
         const givenCards = givenList.map(r => mapToCard(r, 'given'));
+        // Avis reçus = réponses à mes avis
+        const receivedCards = givenList
+          .filter(r => r.ownerResponse && r.ownerResponse.text)
+          .map(r => mapToCard(r, 'received'));
 
-        // Calcul des stats à partir des avis reçus
-        const total = receivedCards.length;
-        const sum = receivedCards.reduce((acc, r) => acc + (r.rating || 0), 0);
+        // Calcul des stats à partir de mes avis donnés
+        const total = givenCards.length;
+        const sum = givenCards.reduce((acc, r) => acc + (r.rating || 0), 0);
         const average = total > 0 ? +(sum / total).toFixed(1) : 0;
         const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-        receivedCards.forEach(r => {
+        givenCards.forEach(r => {
           const key = Math.round(r.rating || 0);
           if (distribution[key] !== undefined) distribution[key] += 1;
         });
 
         if (!mounted) return;
-        // Avis donnés = mes avis (getMyReviews)
+        // Avis donnés = mes avis
         setReviewsGiven(givenCards);
-        // Avis reçus = avis sur moi (placeholder via filtre tenant)
+        // Avis reçus = réponses à mes avis
         setReviewsReceived(receivedCards);
         setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
       } catch (e) {
@@ -204,7 +210,7 @@ const TenantReviews = () => {
               <div className="stat-label">Note moyenne</div>
             </div>
             <div className="stats-card">
-              <div className="stat-number">{stats.totalReviews}</div>
+              <div className="stat-number">{reviewsReceived.length}</div>
               <div className="stat-label">Avis reçus</div>
             </div>
             <div className="stats-card">
@@ -316,7 +322,7 @@ const TenantReviews = () => {
                     <div className="review-response">
                       <div className="response-header">
                         <FontAwesomeIcon icon={faReply} />
-                        <span>Votre réponse • {formatDate(review.response.date)}</span>
+                        <span>Réponse du propriétaire • {formatDate(review.response.date)}</span>
                       </div>
                       <p>{review.response.text}</p>
                     </div>

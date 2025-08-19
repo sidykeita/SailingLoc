@@ -103,3 +103,39 @@ exports.deleteReview = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Répondre à une review (par le propriétaire)
+exports.addOwnerResponse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+    const authorId = req.user && (req.user.id || req.user._id);
+    if (!authorId) return res.status(401).json({ message: 'Non authentifié' });
+    if (!text || !text.trim()) return res.status(400).json({ message: 'Texte de réponse manquant' });
+
+    const review = await Review.findById(id);
+    if (!review) return res.status(404).json({ message: 'Review non trouvée' });
+
+    review.ownerResponse = {
+      text: text.trim(),
+      author: authorId,
+      createdAt: new Date()
+    };
+    await review.save();
+
+    // Retourner la review mise à jour (optionnellement peuplée)
+    const populated = await Review.findById(id)
+      .populate({
+        path: 'reservation',
+        populate: [
+          { path: 'boat' },
+          { path: 'user' }
+        ]
+      })
+      .exec();
+
+    res.json(populated || review);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
