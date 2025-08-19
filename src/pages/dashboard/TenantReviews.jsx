@@ -110,7 +110,9 @@ const TenantReviews = () => {
         });
 
         if (!mounted) return;
+        // Avis donnés = mes avis (getMyReviews)
         setReviewsGiven(givenCards);
+        // Avis reçus = avis sur moi (placeholder via filtre tenant)
         setReviewsReceived(receivedCards);
         setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
       } catch (e) {
