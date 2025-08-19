@@ -17,7 +17,8 @@ import {
   faSort,
   faEye,
   faReply,
-  faFlag
+  faFlag,
+  faEdit
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
 import logoBlc from '../../assets/images/logo-blc.png';
@@ -25,6 +26,7 @@ import profileImage from '../../assets/images/profil.jpg';
 import '../../assets/css/SimpleDashboard.css';
 import '../../assets/css/TenantLocations.css';
 import '../../assets/css/TenantReviews.css';
+import reviewService from '../../services/review.service';
 
 const TenantReviews = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -44,13 +46,82 @@ const TenantReviews = () => {
     ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
   });
 
-  // Chargement des reviews depuis le backend à faire dans useEffect (à compléter)
-
+  // Chargement des reviews depuis le backend
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+    let mounted = true;
+    async function load() {
+      try {
+        setLoading(true);
+        // Avis donnés par l'utilisateur
+        const given = await reviewService.getMyReviews().catch(() => []);
+        // Avis reçus par l'utilisateur (en tant que locataire)
+        const received = await reviewService.getAllReviews({ tenant: currentUser?._id || currentUser?.id }).catch(() => []);
+
+        // Normaliser en tableaux
+        const givenList = Array.isArray(given?.data) ? given.data : (Array.isArray(given) ? given : []);
+        const receivedList = Array.isArray(received?.data) ? received.data : (Array.isArray(received) ? received : []);
+
+        // Mapper pour l'UI
+        const mapToCard = (r, direction = 'received') => {
+          const reviewer = r.user || r.author || r.reviewer || {};
+          const owner = (r.owner && typeof r.owner === 'object') ? r.owner : (r.boat?.owner || {});
+          const reservation = r.reservation || r.booking || {};
+          const boat = r.boat || reservation?.boat || {};
+          const createdAt = r.createdAt || r.date || new Date().toISOString();
+          const port = boat?.port || reservation?.port || reservation?.location || '';
+          return {
+            id: r._id || r.id,
+            rating: Number(r.rating || 0),
+            comment: r.comment || r.text || '',
+            date: createdAt,
+            reviewer: {
+              name: reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName || ''}`.trim() : (reviewer.name || 'Utilisateur'),
+              avatar: reviewer.avatar || reviewer.photo || profileImage,
+              memberSince: (reviewer.createdAt ? new Date(reviewer.createdAt).getFullYear() : '—')
+            },
+            owner: {
+              name: owner.firstName ? `${owner.firstName} ${owner.lastName || ''}`.trim() : (owner.name || 'Propriétaire'),
+              avatar: owner.avatar || owner.photo || profileImage,
+              memberSince: (owner.createdAt ? new Date(owner.createdAt).getFullYear() : '—')
+            },
+            booking: {
+              boat: boat?.name || 'Bateau',
+              location: port || '—',
+              dates: reservation?.startDate && reservation?.endDate
+                ? `${new Date(reservation.startDate).toLocaleDateString('fr-FR')} - ${new Date(reservation.endDate).toLocaleDateString('fr-FR')}`
+                : ''
+            },
+            response: r.response || r.ownerResponse || null,
+            helpful: Number(r.helpful || 0)
+          };
+        };
+
+        const receivedCards = receivedList.map(r => mapToCard(r, 'received'));
+        const givenCards = givenList.map(r => mapToCard(r, 'given'));
+
+        // Calcul des stats à partir des avis reçus
+        const total = receivedCards.length;
+        const sum = receivedCards.reduce((acc, r) => acc + (r.rating || 0), 0);
+        const average = total > 0 ? +(sum / total).toFixed(1) : 0;
+        const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        receivedCards.forEach(r => {
+          const key = Math.round(r.rating || 0);
+          if (distribution[key] !== undefined) distribution[key] += 1;
+        });
+
+        if (!mounted) return;
+        setReviewsGiven(givenCards);
+        setReviewsReceived(receivedCards);
+        setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
+      } catch (e) {
+        console.error('[TenantReviews] load error', e);
+      } finally {
+        mounted && setLoading(false);
+      }
+    }
+    load();
+    return () => { mounted = false; };
+  }, [currentUser]);
 
   const renderStars = (rating) => {
     const stars = [];
@@ -151,7 +222,7 @@ const TenantReviews = () => {
                     <div 
                       className="progress-fill"
                       style={{ 
-                        width: `${(stats.ratingDistribution[rating] / stats.totalReviews) * 100}%` 
+                        width: stats.totalReviews ? `${(stats.ratingDistribution[rating] / stats.totalReviews) * 100}%` : '0%'
                       }}
                     ></div>
                   </div>
