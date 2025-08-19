@@ -139,8 +139,10 @@ const AdminDashboard = () => {
         const arr = Array.isArray(all?.data) ? all.data : (Array.isArray(all) ? all : []);
         const mapped = arr.map(r => ({
           id: r._id || r.id,
-          boat: r.boat?.name || r.boat || 'Bateau',
-          reviewer: r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur'),
+          boat: r?.reservation?.boat?.name || '—',
+          reviewer: (r?.reservation?.user?.firstName || r?.reservation?.user?.lastName)
+            ? `${r.reservation.user.firstName || ''} ${r.reservation.user.lastName || ''}`.trim()
+            : (r?.reservation?.user?.name || '—'),
           rating: Number(r.rating || 0),
           comment: r.comment || r.text || '',
           date: r.createdAt || r.date
