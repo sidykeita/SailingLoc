@@ -69,7 +69,7 @@ const TenantLocations = () => {
         else boatImage = '/api/placeholder/300/200';
 
         return {
-          id: res.id,
+          id: res._id || res.id || res.reservationId,
           boatId: res.boat?._id || res.boat?.id || '',
           boatName: res.boat?.name || 'Bateau',
           boatType: res.boat?.type || '',
