@@ -107,7 +107,16 @@ const TenantFavorites = () => {
     }
 
     if (filterLocation !== 'all') {
-      filtered = filtered.filter(fav => fav.location.includes(filterLocation));
+      filtered = filtered.filter(fav => {
+        const loc = (
+          fav.location ||
+          fav.port ||
+          fav.city ||
+          (fav.boat && (fav.boat.location || fav.boat.port)) ||
+          ''
+        ).toString().toLowerCase();
+        return loc.includes(filterLocation.toLowerCase());
+      });
     }
 
     if (sortBy === 'recent') {
@@ -265,7 +274,13 @@ const TenantFavorites = () => {
 
                   <div className="location">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
-                    <span>{favorite.location}</span>
+                    <span>
+                      {favorite.location ||
+                      favorite.port ||
+                      favorite.city ||
+                      (favorite.boat && (favorite.boat.location || favorite.boat.port)) ||
+                      '—'}
+                    </span>
                   </div>
 
                   <div className="owner">
