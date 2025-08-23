@@ -264,8 +264,8 @@ const BoatDetail = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="feature-card">
             <FontAwesomeIcon icon={faTachometerAlt} className="feature-icon" />
-            <span className="feature-label">Puissance</span>
-            <span className="feature-value">{boat.power || boat.technicalSpecs?.engine || '-'}</span>
+            <span className="feature-label">Type</span>
+            <span className="feature-value">{boat.type || '-'}</span>
           </div>
           <div className="feature-card">
             <FontAwesomeIcon icon={faUsers} className="feature-icon" />

@@ -200,8 +200,8 @@ const SailingBoats = () => {
                       <div className="boat-specs">
                         <div className="boat-spec">
                            <FontAwesomeIcon icon={faTachometerAlt} className="boat-spec-icon" />
-                              <span className="boat-spec-label">Puissance</span>
-                              <span className="boat-spec-value">{boat.power}</span>
+                              <span className="boat-spec-label">Type</span>
+                              <span className="boat-spec-value">{boat.type}</span>
                         </div>
                         <div className="boat-spec">
                           <FontAwesomeIcon icon={faUsers} className="boat-spec-icon" />

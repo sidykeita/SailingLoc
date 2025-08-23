@@ -312,7 +312,7 @@ const Home = () => {
 
         <section className="community-favorites">
           <div className="section-container">
-            <h2 className="section-title">Les coup de coeur de la communauté</h2>
+            <h2 className="section-title">Les coups de coeur de la communauté</h2>
             <div className="boat-cards">
               {boatsLoading ? (
                 <div className="boat-card loading">Chargement des bateaux...</div>
@@ -334,7 +334,7 @@ const Home = () => {
                           {/* Note : rating mocké, à remplacer si besoin plus tard */}
                           <div className="boat-rating">★★★★★</div>
                         </div>
-                        <p className="boat-description">{boat.name} • {boat.length || '?'}m • {boat.capacity || '?'} pers{boat.power ? ` • ${boat.power}` : ''}</p>
+                        <p className="boat-description">{boat.name} • {boat.length || '?'}m • {boat.capacity || '?'} pers{boat.type ? ` • ${boat.type}` : ''}</p>
                         <p className="boat-owner">Proposé par <span>{boat.owner && (boat.owner.firstName || boat.owner.lastName) ? `${boat.owner.firstName || ''} ${boat.owner.lastName || ''}`.trim() : 'Propriétaire'}</span></p>
                         <div className="boat-price">
                           <span className="price-label">à partir de</span>
