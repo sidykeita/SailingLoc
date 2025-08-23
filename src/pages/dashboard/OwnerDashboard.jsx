@@ -131,6 +131,40 @@ const [deleteDone, setDeleteDone] = useState(false);
       <main className="container mx-auto px-4 py-8">
         <h1 className="font-pacifico text-primary text-3xl mb-8">Tableau de bord propriétaire</h1>
         
+        {/* Actions rapides */}
+        <div className="mb-8">
+          <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Actions rapides</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <Link to="/add-boat" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span className="font-medium">Ajouter un bateau</span>
+            </Link>
+            
+            <Link to="/owner/dashboard/calendrier" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span className="font-medium">Calendrier</span>
+            </Link>
+            
+            <Link to="/owner/dashboard/reservations" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span className="font-medium">Réservations</span>
+            </Link>
+            
+            <Link to="/owner/dashboard/revenus" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium">Revenus</span>
+            </Link>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Profil propriétaire */}
           <div className="card p-6 md:col-span-1">
@@ -153,21 +187,21 @@ const [deleteDone, setDeleteDone] = useState(false);
                 <p className="font-medium">Propriétaire</p>
               </div>
               <button className="btn-secondary mt-4" onClick={() => setEditModalOpen(true)}>Modifier mon profil</button>
-<EditProfileModal
-  isOpen={editModalOpen}
-  onClose={() => setEditModalOpen(false)}
-  currentEmail={currentUser?.email}
-  currentPhone={currentUser?.phone}
-  onSave={async ({ email, phone }) => {
-    await userService.updateProfile(currentUser._id, { email, phone });
-    // Met à jour currentUser côté front (contexte Auth)
-    if (currentUser) {
-      currentUser.email = email;
-      currentUser.phone = phone;
-    }
-    setSuccessMessage('Profil mis à jour !');
-  }}
-/>
+              <EditProfileModal
+                isOpen={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                currentEmail={currentUser?.email}
+                currentPhone={currentUser?.phone}
+                onSave={async ({ email, phone }) => {
+                  await userService.updateProfile(currentUser._id, { email, phone });
+                  // Met à jour currentUser côté front (contexte Auth)
+                  if (currentUser) {
+                    currentUser.email = email;
+                    currentUser.phone = phone;
+                  }
+                  setSuccessMessage('Profil mis à jour !');
+                }}
+              />
             </div>
             
             {/* Résumé */}
@@ -205,15 +239,15 @@ const [deleteDone, setDeleteDone] = useState(false);
             </div>
             
             {deleteDone && (
-  <div className="mb-4 text-red-700 bg-red-100 border border-red-400 rounded p-2 text-center animate-fade-in">
-    Le bateau a bien été supprimé.
-  </div>
-)}
-{successMessage && (
-  <div className="mb-4 text-green-700 bg-green-100 border border-green-300 rounded p-2 text-center animate-fade-in">
-    {successMessage}
-  </div>
-)}
+              <div className="mb-4 text-red-700 bg-red-100 border border-red-400 rounded p-2 text-center animate-fade-in">
+                Le bateau a bien été supprimé.
+              </div>
+            )}
+            {successMessage && (
+              <div className="mb-4 text-green-700 bg-green-100 border border-green-300 rounded p-2 text-center animate-fade-in">
+                {successMessage}
+              </div>
+            )}
             
             {loading ? (
               <p className="text-center py-4">Chargement des bateaux...</p>
@@ -262,37 +296,37 @@ const [deleteDone, setDeleteDone] = useState(false);
                           <p>{boat.dailyPrice} €</p>
                           <div className="mt-4 flex gap-2 flex-wrap">
                             <button
-  className="btn-secondary py-2 px-4"
-  onClick={() => navigate(`/boats/${boat._id || boat.id}/edit`)}
->
-  Modifier
-</button>
+                              className="btn-secondary py-2 px-4"
+                              onClick={() => navigate(`/boats/${boat._id || boat.id}/edit`)}
+                            >
+                              Modifier
+                            </button>
                             {deleteConfirmId === (boat._id || boat.id) ? (
-  <div className="bg-white border border-red-400 rounded p-3 flex flex-col md:flex-row items-center gap-2 shadow-md">
-    <span className="text-red-600 font-semibold mr-2">Confirmer la suppression de ce bateau ?</span>
-    <div className="flex gap-2 mt-2 md:mt-0">
-      <button
-        className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
-        onClick={() => handleDeleteBoat(boat._id || boat.id)}
-      >
-        Oui, supprimer
-      </button>
-      <button
-        className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
-        onClick={() => setDeleteConfirmId(null)}
-      >
-        Annuler
-      </button>
-    </div>
-  </div>
-) : (
-  <button
-    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
-    onClick={() => setDeleteConfirmId(boat._id || boat.id)}
-  >
-    Supprimer
-  </button>
-) }
+                              <div className="bg-white border border-red-400 rounded p-3 flex flex-col md:flex-row items-center gap-2 shadow-md">
+                                <span className="text-red-600 font-semibold mr-2">Confirmer la suppression de ce bateau ?</span>
+                                <div className="flex gap-2 mt-2 md:mt-0">
+                                  <button
+                                    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
+                                    onClick={() => handleDeleteBoat(boat._id || boat.id)}
+                                  >
+                                    Oui, supprimer
+                                  </button>
+                                  <button
+                                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md"
+                                    onClick={() => setDeleteConfirmId(null)}
+                                  >
+                                    Annuler
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
+                                onClick={() => setDeleteConfirmId(boat._id || boat.id)}
+                              >
+                                Supprimer
+                              </button>
+                            ) }
                             <button
                               className="btn-primary py-2 px-4 text-sm font-semibold rounded shadow hover:bg-primary-dark transition"
                               onClick={() => navigate(`/boats/${boat._id || boat.id}`)}
@@ -386,11 +420,11 @@ const [deleteDone, setDeleteDone] = useState(false);
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button
-  className="text-blue-600 hover:text-blue-800 mr-2"
-  onClick={() => setSelectedReservation(reservation)}
->
-  Détails
-</button>
+                            className="text-blue-600 hover:text-blue-800 mr-2"
+                            onClick={() => setSelectedReservation(reservation)}
+                          >
+                            Détails
+                          </button>
                           {reservation.status === 'pending' && (
                             <>
                               <button
@@ -431,42 +465,8 @@ const [deleteDone, setDeleteDone] = useState(false);
           )}
         </div>
         
-        {/* Actions rapides */}
-        <div className="mt-8">
-          <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Actions rapides</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <Link to="/add-boat" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              <span className="font-medium">Ajouter un bateau</span>
-            </Link>
-            
-            <Link to="/owner/dashboard/calendrier" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-  </svg>
-  <span className="font-medium">Calendrier</span>
-</Link>
-            
-            
-            <Link to="/owner/dashboard/reservations" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-  </svg>
-  <span className="font-medium">Réservations</span>
-</Link>
-            
-            <Link to="/owner/dashboard/revenus" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-  <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-  <span className="font-medium">Revenus</span>
-</Link>
-          </div>
-        </div>
+        <ReservationDetailModal reservation={selectedReservation} onClose={() => setSelectedReservation(null)} />
       </main>
-      <ReservationDetailModal reservation={selectedReservation} onClose={() => setSelectedReservation(null)} />
       
       {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">
