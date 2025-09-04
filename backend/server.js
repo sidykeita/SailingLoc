@@ -10,6 +10,7 @@ app.use(cors({
   origin: [
     'https://dsp-dev023-g5.vercel.app',
     'https://sailing-loc.vercel.app',
+    'https://sailingloc-git-sidy-v2-sidykeitas-projects.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
   ],
