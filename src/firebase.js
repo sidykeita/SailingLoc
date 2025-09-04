@@ -29,3 +29,4 @@ signInAnonymously(auth).catch((err) => {
   console.warn('Firebase anonymous sign-in failed:', err?.message || err);
 });
 export { auth };
+console.log("API Key utilisée:", import.meta.env.VITE_FIREBASE_API_KEY);
