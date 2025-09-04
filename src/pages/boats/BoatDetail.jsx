@@ -259,7 +259,14 @@ const BoatDetail = () => {
         {/* Galerie d'images */}
         <div className="boat-gallery">
           {boat.photos && boat.photos.length > 0 ? (
-            <img src={normalizeStorageUrl(Array.isArray(boat.photos) && boat.photos.length > 0 ? boat.photos[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop')} alt={boat.name} className="boat-main-image" />
+            <img
+              src={normalizeStorageUrl(Array.isArray(boat.photos) && boat.photos.length > 0 ? boat.photos[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop')}
+              alt={boat.name}
+              className="boat-main-image"
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop';
+              }}
+            />
           ) : (
             <div className="boat-main-image-placeholder">Aucune image</div>
           )}

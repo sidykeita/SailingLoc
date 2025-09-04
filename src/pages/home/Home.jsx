@@ -33,10 +33,10 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 
 const Home = () => {
-  // Normalise d'anciens liens Firebase mal configurés
+  // Normalise d'anciens liens Firebase mal configurés vers le bucket effectif
   const normalizeStorageUrl = (u) => {
     if (!u || typeof u !== 'string') return u;
-    return u.replace('sailingloc-photo.firebasestorage.app', 'sailingloc-photo.appspot.com');
+    return u.replace('sailingloc-photo.appspot.com', 'sailingloc-photo.firebasestorage.app');
   };
   const [selectedBoatType, setSelectedBoatType] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -330,7 +330,14 @@ const Home = () => {
                   <Link to={`/boats/${boat._id}`} className="boat-card-link" key={boat._id}>
                     <div className="boat-card">
                       <div className="boat-card-header">
-                        <img src={normalizeStorageUrl(Array.isArray(boat.photos) ? boat.photos[0] : boat.photos)} alt={boat.name} className="boat-image" />
+                        <img
+                          src={normalizeStorageUrl(Array.isArray(boat.photos) ? boat.photos[0] : boat.photos)}
+                          alt={boat.name}
+                          className="boat-image"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=1200&auto=format&fit=crop';
+                          }}
+                        />
                         <button className="favorite-btn" onClick={e => e.preventDefault()}><FontAwesomeIcon icon={faHeart} /></button>
                       </div>
                       <div className="boat-info">
