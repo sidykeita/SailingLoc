@@ -1,6 +1,7 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAweKIX8uGuGkK6N0zxeGGtIgszYgsAceY",
@@ -13,4 +14,14 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const storage = getStorage(app);
+
+// Cible explicitement le bucket custom
+export const storage = getStorage(app, 'gs://sailingloc-photo.firebasestorage.app');
+
+// Auth anonyme pour que request.auth soit présent côté Storage (évite 412 si règles l'exigent)
+const auth = getAuth(app);
+signInAnonymously(auth).catch((err) => {
+  // Évite de bloquer l'app si l'auth anonyme échoue (ex: désactivée côté console)
+  console.warn('Firebase anonymous sign-in failed:', err?.message || err);
+});
+export { auth };

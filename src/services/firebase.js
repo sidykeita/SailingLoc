@@ -1,6 +1,7 @@
 // Ce fichier configure Firebase Storage pour upload de fichiers
 import { initializeApp, getApps } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAweKIX8uGuGkK6N0zxeGGtIgszYgsAceY",
@@ -15,6 +16,10 @@ const firebaseConfig = {
 
 // Empêche l'erreur duplicate-app
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const storage = getStorage(app);
+const storage = getStorage(app, 'gs://sailingloc-photo.firebasestorage.app');
+const auth = getAuth(app);
+signInAnonymously(auth).catch((err) => {
+  console.warn('Firebase anonymous sign-in failed (services):', err?.message || err);
+});
 
-export { storage };
+export { storage, auth };
