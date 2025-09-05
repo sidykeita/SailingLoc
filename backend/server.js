@@ -6,16 +6,29 @@ const connectDB = require('./src/models/db');
 
 
 const app = express();
+// CORS dynamique pour autoriser les domaines fixes et toutes les previews Vercel (*.vercel.app)
+const allowedOrigins = [
+  'https://dsp-dev023-g5.vercel.app',
+  'https://sailing-loc.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  /\.vercel\.app$/
+];
+
 app.use(cors({
-  origin: [
-    'https://dsp-dev023-g5.vercel.app',
-    'https://sailing-loc.vercel.app',
-    'https://sailingloc-git-sidy-v2-sidykeitas-projects.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000'
-  ],
-  credentials: true
+  origin(origin, callback) {
+    // Autoriser les requêtes sans en-tête Origin (ex: Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    const ok = allowedOrigins.some((o) => (o instanceof RegExp ? o.test(origin) : o === origin));
+    return ok ? callback(null, true) : callback(new Error('CORS blocked: origin not allowed'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Gère proprement les prévols OPTIONS
+app.options('*', cors());
 app.use(express.json());
 
 // Connexion à MongoDB
