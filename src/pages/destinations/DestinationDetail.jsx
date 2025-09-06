@@ -74,13 +74,29 @@ const DestinationDetail = () => {
     let mounted = true;
     setLoading(true);
     setError('');
-    setDynamicCount(null);
 
     if (!destination) {
       setLoading(false);
       return;
     }
 
+    // 1) Essaye d'afficher immédiatement un compteur depuis le cache local
+    try {
+      const raw = localStorage.getItem('boatsCache');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const boats = Array.isArray(parsed?.boats) ? parsed.boats : [];
+        const cachedCount = boats.filter((boat) => {
+          const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
+            .filter(Boolean)
+            .map((v) => String(v).toLowerCase());
+          return fields.some((v) => v.includes(searchToken));
+        }).length;
+        if (mounted) setDynamicCount(cachedCount);
+      }
+    } catch (_) { /* ignore parse errors */ }
+
+    // 2) Rafraîchir depuis l'API pour avoir la valeur la plus à jour
     boatService
       .getAllBoats()
       .then((boats) => {
@@ -125,11 +141,11 @@ const DestinationDetail = () => {
         <div className="hero-overlay">
           <h1>{destination.name}</h1>
           <p>
-            {loading
-              ? 'Chargement des bateaux…'
-              : error
-                ? destination.boatCount + ' bateaux disponibles'
-                : `${dynamicCount} bateaux disponibles`}
+            {dynamicCount !== null
+              ? `${dynamicCount} bateaux disponibles`
+              : (loading
+                  ? 'Chargement des bateaux…'
+                  : (error ? destination.boatCount + ' bateaux disponibles' : `${destination.boatCount} bateaux disponibles`))}
           </p>
         </div>
       </div>

@@ -74,7 +74,14 @@ const Home = () => {
   useEffect(() => {
     setBoatsLoading(true);
     boatService.getAllBoats()
-      .then(data => setBoatsDynamiques(data))
+      .then(data => {
+        setBoatsDynamiques(data);
+        try {
+          if (Array.isArray(data)) {
+            localStorage.setItem('boatsCache', JSON.stringify({ ts: Date.now(), boats: data }));
+          }
+        } catch (_) { /* ignore quota errors */ }
+      })
       .catch(() => setBoatsError('Erreur lors du chargement des bateaux'))
       .finally(() => setBoatsLoading(false));
   }, []);

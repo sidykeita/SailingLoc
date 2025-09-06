@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Configuration de base d'axios
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  // Utilise VITE_API_URL si défini, sinon fallback Render (pas localhost)
+  baseURL: import.meta.env.VITE_API_URL || 'https://sailingloc-0ufn.onrender.com/api',
   headers: {
     'Content-Type': 'application/json'
   }
