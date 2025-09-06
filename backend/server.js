@@ -1,34 +1,43 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+
+const app = express();
 const connectDB = require('./src/models/db');
 
 
 
-const app = express();
-// CORS dynamique pour autoriser les domaines fixes et toutes les previews Vercel (*.vercel.app)
+// ✅ Domaines autorisés (fixes) + toutes les previews Vercel via RegExp
 const allowedOrigins = [
-  'https://dsp-dev023-g5.vercel.app',
-  'https://sailing-loc.vercel.app',
+  'https://dsp-dev023-g5.vercel.app',   // prod (si utilisé)
+  'https://sailing-loc.vercel.app',     // autre domaine (si utilisé)
   'http://localhost:5173',
   'http://localhost:3000',
-  /\.vercel\.app$/
+  /\.vercel\.app$/                      // ✅ toutes les previews *.vercel.app
 ];
 
+app.use((req, res, next) => {
+  // Utile pour debug:
+  // console.log('Origin:', req.headers.origin, '→', req.method, req.originalUrl);
+  next();
+});
+
+// ✅ CORS dynamique + cookies
 app.use(cors({
   origin(origin, callback) {
-    // Autoriser les requêtes sans en-tête Origin (ex: Postman, server-to-server)
+    // autorise requêtes sans Origin (ex: curl/Postman, cron)
     if (!origin) return callback(null, true);
-    const ok = allowedOrigins.some((o) => (o instanceof RegExp ? o.test(origin) : o === origin));
-    return ok ? callback(null, true) : callback(new Error('CORS blocked: origin not allowed'));
+    const ok = allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin);
+    return ok ? callback(null, true) : callback(new Error('CORS blocked'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Gère proprement les prévols OPTIONS
+// ✅ Réponse aux prévols OPTIONS partout
 app.options('*', cors());
+
 app.use(express.json());
 
 // Connexion à MongoDB
