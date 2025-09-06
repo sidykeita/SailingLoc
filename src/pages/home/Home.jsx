@@ -50,9 +50,10 @@ const Home = () => {
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  // Liste unique des destinations (ville/port/destination/location) à partir des bateaux chargés
+  // Liste complète des destinations: catalogue des ports + enrichissement depuis les bateaux chargés
   const destinationOptions = useMemo(() => {
-    const set = new Set();
+    const allPorts = (portService.getAllPorts?.() || []).map((p) => String(p.name).trim()).filter(Boolean);
+    const set = new Set(allPorts);
     (boatsDynamiques || []).forEach((boat) => {
       [boat?.location, boat?.city, boat?.port, boat?.destination]
         .filter(Boolean)
