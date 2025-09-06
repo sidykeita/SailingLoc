@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMapMarkerAlt, faCalendarAlt, faChevronRight, faHeart, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -49,6 +49,18 @@ const Home = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Liste unique des destinations (ville/port/destination/location) à partir des bateaux chargés
+  const destinationOptions = useMemo(() => {
+    const set = new Set();
+    (boatsDynamiques || []).forEach((boat) => {
+      [boat?.location, boat?.city, boat?.port, boat?.destination]
+        .filter(Boolean)
+        .map((v) => String(v).trim())
+        .forEach((v) => v && set.add(v));
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'));
+  }, [boatsDynamiques]);
 
   useEffect(() => {
     setBoatsLoading(true);
@@ -176,41 +188,26 @@ const Home = () => {
               <div className="search-box">
                 <div className="search-input-group location-group" ref={searchRef}>
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="search-icon" />
-                  <input 
-                    type="text" 
-                    placeholder="Où souhaitez-vous louer un bateau ?" 
-                    className="search-input" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => {
-                      if (searchResults.length > 0) {
-                        setShowResults(true);
+                  <select
+                    className="search-input"
+                    value={selectedPort?.name || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (!value) {
+                        setSelectedPort(null);
+                        setSearchQuery('');
+                        return;
                       }
+                      setSelectedPort({ name: value });
+                      setSearchQuery(value);
                     }}
-                  />
-                  {searchQuery && (
-                    <button 
-                      type="button" 
-                      className="clear-search-btn" 
-                      onClick={clearSearch}
-                    >
-                      <FontAwesomeIcon icon={faTimes} />
-                    </button>
-                  )}
-
-                  {showResults && searchResults.length > 0 && (
-                    <div className="search-results">
-                      {searchResults.map((port) => (
-                        <div 
-                          key={port.id} 
-                          className="search-result-item"
-                          onClick={() => handleSelectPort(port)}
-                        >
-                          {port.name} - {port.country}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    aria-label="Choisir une destination"
+                  >
+                    <option value="">Choisissez votre destination</option>
+                    {destinationOptions.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="search-input-group date-group" style={{ position: 'relative' }}>
