@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import '../../assets/css/DestinationDetail.css';
+import boatService from '../../services/boat.service';
 
 // Importation des images depuis le dossier destinations
 import marseilleHero from '../../assets/images/destinations/marseille.jpeg';
@@ -62,6 +63,51 @@ const destinationsData = {
 const DestinationDetail = () => {
   const { destinationId } = useParams();
   const destination = destinationsData[destinationId];
+  const [dynamicCount, setDynamicCount] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Normalise le nom à rechercher dans les champs des bateaux
+  const searchToken = useMemo(() => (destination?.name || '').trim().toLowerCase(), [destination]);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError('');
+    setDynamicCount(null);
+
+    if (!destination) {
+      setLoading(false);
+      return;
+    }
+
+    boatService
+      .getAllBoats()
+      .then((boats) => {
+        if (!mounted) return;
+        const count = Array.isArray(boats)
+          ? boats.filter((boat) => {
+              const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
+                .filter(Boolean)
+                .map((v) => String(v).toLowerCase());
+              return fields.some((v) => v.includes(searchToken));
+            }).length
+          : 0;
+        setDynamicCount(count);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setError("Erreur lors du chargement des bateaux");
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [searchToken, destination]);
 
   if (!destination) {
     return (
@@ -78,7 +124,13 @@ const DestinationDetail = () => {
       <div className="hero-section" style={{ backgroundImage: `url(${destination.heroImage})` }}>
         <div className="hero-overlay">
           <h1>{destination.name}</h1>
-          <p>{destination.boatCount} bateaux disponibles</p>
+          <p>
+            {loading
+              ? 'Chargement des bateaux…'
+              : error
+                ? destination.boatCount + ' bateaux disponibles'
+                : `${dynamicCount} bateaux disponibles`}
+          </p>
         </div>
       </div>
 
@@ -110,7 +162,7 @@ const DestinationDetail = () => {
           <div className="available-boats">
             <h2>Bateaux disponibles à {destination.name}</h2>
             <div className="cta-buttons">
-              <Link to={`/boats?location=${destinationId}`} className="primary-button">Voir tous les bateaux</Link>
+              <Link to={`/boats?location=${encodeURIComponent(destination.name)}`} className="primary-button">Voir tous les bateaux</Link>
               <Link to="/contact" className="secondary-button">Demander des informations</Link>
             </div>
           </div>
