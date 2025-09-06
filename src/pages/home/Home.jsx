@@ -56,7 +56,6 @@ const Home = () => {
       'Marseille',
       'Porto Cristo',
       'Bastia',
-      'Villeneuve-Loubet',
       'Corfou',
       'Alicante',
       'La Rochelle',
