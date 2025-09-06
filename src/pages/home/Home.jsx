@@ -50,10 +50,19 @@ const Home = () => {
   const navigate = useNavigate();
   const todayStr = new Date().toISOString().slice(0, 10);
 
-  // Liste complète des destinations: catalogue des ports + enrichissement depuis les bateaux chargés
+  // Liste CURÉE des destinations (pages existantes) + enrichissement depuis les bateaux chargés
   const destinationOptions = useMemo(() => {
-    const allPorts = (portService.getAllPorts?.() || []).map((p) => String(p.name).trim()).filter(Boolean);
-    const set = new Set(allPorts);
+    const curated = [
+      'Marseille',
+      'Porto Cristo',
+      'Bastia',
+      'Villeneuve-Loubet',
+      'Corfou',
+      'Alicante',
+      'La Rochelle',
+      'La Ciotat'
+    ];
+    const set = new Set(curated);
     (boatsDynamiques || []).forEach((boat) => {
       [boat?.location, boat?.city, boat?.port, boat?.destination]
         .filter(Boolean)
