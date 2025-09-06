@@ -5,22 +5,17 @@ require('dotenv').config();
 const app = express();
 const connectDB = require('./src/models/db');
 
-
-
 // ✅ Domaines autorisés (fixes) + toutes les previews Vercel via RegExp
 const allowedOrigins = [
-  'https://dsp-dev023-g5.vercel.app',   // prod (si utilisé)
-  'https://sailing-loc.vercel.app',     // autre domaine (si utilisé)
+  'https://dsp-dev023-g5.vercel.app',
+  'https://sailing-loc.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
-  /\.vercel\.app$/                      // ✅ toutes les previews *.vercel.app
+  /\.vercel\.app$/
 ];
 
-app.use((req, res, next) => {
-  // Utile pour debug:
-  // console.log('Origin:', req.headers.origin, '→', req.method, req.originalUrl);
-  next();
-});
+// En prod derrière proxy (Render), nécessaire pour les cookies "secure"
+app.set('trust proxy', 1);
 
 // ✅ CORS dynamique + cookies
 app.use(cors({
@@ -35,8 +30,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ Réponse aux prévols OPTIONS partout
+// ✅ Réponse aux prévols OPTIONS partout (avant les routes)
 app.options('*', cors());
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 app.use(express.json());
 
@@ -70,6 +69,10 @@ app.use('/api/owner-docs', ownerDocsRoutes);
 
 const favoriteRoutes = require('./src/routes/favoriteRoutes');
 app.use('/api/favorites', favoriteRoutes);
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, ts: Date.now() });
+});
 
 
 app.get('/', (req, res) => {

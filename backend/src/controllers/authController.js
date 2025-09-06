@@ -101,6 +101,21 @@ exports.login = async (req, res) => {
     const userData = { ...user.toObject() };
     delete userData.password;
 
+    // Déposer un cookie de session compatible cross-site (vercel.app -> onrender.com)
+    // Nécessite app.set('trust proxy', 1) côté serveur et HTTPS
+    try {
+      res.cookie('sid', token, {
+        httpOnly: true,
+        secure: true,        // HTTPS obligatoire
+        sameSite: 'none',    // autorise cross-site
+        maxAge: 8 * 60 * 60 * 1000 // 8h en ms
+        // partitioned: true // Optionnel (CHIPS) pour Chrome récent
+      });
+    } catch (e) {
+      // Ne pas bloquer la réponse si set-cookie échoue
+      console.warn('[LOGIN] set-cookie failed:', e?.message || e);
+    }
+
     res.status(200).json({
       token,
       user: userData
