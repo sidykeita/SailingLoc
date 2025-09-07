@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import '../../assets/css/Destinations.css';
+import boatService from '../../services/boat.service';
 
 // Import des images de destinations
 import marseilleImage from '../../assets/images/destinations/marseille.jpeg';
@@ -12,51 +13,89 @@ import alicanteImage from '../../assets/images/destinations/alicante.jpg';
 import corfouImage from '../../assets/images/destinations/port-de-corfou-grece.jpg';
 
 const Destinations = () => {
-  // Liste des destinations avec leurs informations et images placeholder
-  const destinations = [
+  const [boats, setBoats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Liste des destinations avec leurs informations et images (sans boatCount statique)
+  const destinationsBase = [
     {
       id: 'marseille',
       name: 'Marseille',
       image: marseilleImage,
-      boatCount: 120,
     },
     {
       id: 'porto-cristo',
       name: 'Porto Cristo',
       image: portoCristoImage,
-      boatCount: 85,
     },
     {
       id: 'bastia',
       name: 'Bastia',
       image: bastiaImage,
-      boatCount: 65,
     },
     {
       id: 'la-rochelle',
       name: 'La Rochelle',
       image: laRochelleImage,
-      boatCount: 95,
     },
     {
       id: 'la-ciotat',
       name: 'La Ciotat',
       image: laCiotatImage,
-      boatCount: 70,
     },
     {
       id: 'alicante',
       name: 'Alicante',
       image: alicanteImage,
-      boatCount: 110,
     },
     {
       id: 'corfou',
       name: 'Corfou',
       image: corfouImage,
-      boatCount: 80,
     }
   ];
+
+  // Calcul dynamique des compteurs par destination
+  const destinations = useMemo(() => {
+    return destinationsBase.map((dest) => {
+      const token = dest.name.toLowerCase();
+      const count = boats.filter((boat) => {
+        const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
+          .filter(Boolean)
+          .map((v) => String(v).toLowerCase());
+        return fields.some((v) => v.includes(token));
+      }).length;
+      return { ...dest, boatCount: count };
+    });
+  }, [boats]);
+
+  useEffect(() => {
+    // Charger les bateaux depuis l'API ou le cache
+    const loadBoats = async () => {
+      try {
+        // Essayer le cache d'abord
+        const cached = localStorage.getItem('boatsCache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed?.boats)) {
+            setBoats(parsed.boats);
+          }
+        }
+
+        // Rafraîchir depuis l'API
+        const data = await boatService.getAllBoats();
+        if (Array.isArray(data)) {
+          setBoats(data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des bateaux:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBoats();
+  }, []);
 
   return (
     <div className="destinations-page">
@@ -84,7 +123,11 @@ const Destinations = () => {
                 <div className="destination-name">{destination.name}</div>
                 <div className="destination-overlay">
                   <h3>{destination.name}</h3>
-                  <p>{destination.boatCount} bateaux disponibles</p>
+                  <p>
+                    {loading 
+                      ? 'Chargement...' 
+                      : `${destination.boatCount} bateaux disponibles`}
+                  </p>
                   <span className="destination-link">Explorer</span>
                 </div>
               </div>
