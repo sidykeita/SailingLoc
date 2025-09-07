@@ -8,6 +8,10 @@ import boatService from '../../services/boat.service';
 import marseilleHero from '../../assets/images/destinations/marseille.jpeg';
 import portoCristoHero from '../../assets/images/destinations/porto-cristo.jpeg';
 import bastiaHero from '../../assets/images/destinations/bastia.jpeg';
+import laRochelleHero from '../../assets/images/destinations/la-rochelle.jpeg';
+import laCiotatHero from '../../assets/images/destinations/la-ciotat.jpeg';
+import alicanteHero from '../../assets/images/destinations/alicante.jpg';
+import corfouHero from '../../assets/images/destinations/port-de-corfou-grece.jpg';
 
 const destinationsData = {
   marseille: {
@@ -57,6 +61,70 @@ const destinationsData = {
     bestSeasons: 'Mai à Octobre',
     averageTemperature: '15°C - 29°C',
     windConditions: 'Vents variables, généralement modérés avec quelques jours de Libeccio'
+  },
+  'la-rochelle': {
+    name: 'La Rochelle',
+    heroImage: laRochelleHero,
+    description: 'La Rochelle, port historique de la côte atlantique française, est une destination prisée des navigateurs. Avec ses tours médiévales gardant l\'entrée du port et ses îles environnantes, elle offre un cadre exceptionnel pour la navigation. Explorez l\'île de Ré, l\'île d\'Oléron ou naviguez vers les côtes vendéennes.',
+    boatCount: 95,
+    attractions: [
+      'Vieux-Port',
+      'Tours de La Rochelle',
+      'Île de Ré',
+      'Île d\'Oléron',
+      'Aquarium de La Rochelle'
+    ],
+    bestSeasons: 'Avril à Octobre',
+    averageTemperature: '12°C - 25°C',
+    windConditions: 'Vents d\'ouest dominants, idéal pour la navigation hauturière'
+  },
+  'la-ciotat': {
+    name: 'La Ciotat',
+    heroImage: laCiotatHero,
+    description: 'La Ciotat, charmante ville portuaire des Bouches-du-Rhône, est réputée pour ses calanques spectaculaires et son patrimoine maritime. Entre Marseille et Toulon, elle offre un accès privilégié aux plus belles criques de la Méditerranée. Découvrez les calanques de Figuerolles et du Mugel.',
+    boatCount: 70,
+    attractions: [
+      'Calanques de Figuerolles',
+      'Parc du Mugel',
+      'Vieux-Port',
+      'Île Verte',
+      'Eden Théâtre'
+    ],
+    bestSeasons: 'Mai à Septembre',
+    averageTemperature: '16°C - 28°C',
+    windConditions: 'Mistral modéré, conditions idéales pour la navigation côtière'
+  },
+  alicante: {
+    name: 'Alicante',
+    heroImage: alicanteHero,
+    description: 'Alicante, joyau de la Costa Blanca en Espagne, est une destination idéale pour les amateurs de navigation. Avec son climat méditerranéen ensoleillé presque toute l\'année, ses plages de sable fin et ses eaux cristallines, elle offre des conditions parfaites pour la navigation de plaisance.',
+    boatCount: 110,
+    attractions: [
+      'Château de Santa Bárbara',
+      'Plage de San Juan',
+      'Île de Tabarca',
+      'Port d\'Alicante',
+      'Explanada de España'
+    ],
+    bestSeasons: 'Mars à Novembre',
+    averageTemperature: '18°C - 32°C',
+    windConditions: 'Brises thermiques régulières, parfait pour tous niveaux'
+  },
+  corfou: {
+    name: 'Corfou',
+    heroImage: corfouHero,
+    description: 'Corfou, perle des îles Ioniennes en Grèce, est un paradis pour les navigateurs. Avec ses eaux turquoise, ses baies protégées et son riche patrimoine vénitien, elle offre une expérience de navigation unique en Méditerranée orientale. Explorez les côtes albanaises ou naviguez vers les autres îles Ioniennes.',
+    boatCount: 80,
+    attractions: [
+      'Vieille ville de Corfou',
+      'Palais d\'Achilleion',
+      'Canal d\'Amour',
+      'Baie de Paleokastritsa',
+      'Île de Paxos'
+    ],
+    bestSeasons: 'Avril à Octobre',
+    averageTemperature: '16°C - 30°C',
+    windConditions: 'Vents étésiens en été, conditions clémentes au printemps et automne'
   }
 };
 
