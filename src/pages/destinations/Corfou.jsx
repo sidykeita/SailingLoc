@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useBoatCount } from '../../hooks/useBoatCount';
 import '../../assets/css/DestinationDetail.css';
 
 // Importation des images depuis le dossier destinations
 import corfouHero from '../../assets/images/destinations/port-de-corfou-grece.jpg';
 
 const Corfou = () => {
+  const { boatCount, isLoading, error } = useBoatCount('Corfou');
   return (
     <div className="destination-detail-page">
       <div className="hero-section" style={{ backgroundImage: `url(${corfouHero})` }}>
         <div className="hero-overlay">
           <h1>Corfou</h1>
-          <p>75 bateaux disponibles</p>
+          <p>{isLoading ? 'Chargement...' : error ? 'Erreur de chargement' : `${boatCount} bateaux disponibles`}</p>
         </div>
       </div>
 
