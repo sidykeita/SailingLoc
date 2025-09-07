@@ -22,7 +22,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import '../../assets/css/BoatDetail.css';
@@ -100,8 +99,6 @@ const BoatDetail = () => {
   }
 
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
