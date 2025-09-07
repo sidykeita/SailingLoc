@@ -37,7 +37,6 @@ import LaCiotat from './pages/destinations/LaCiotat';
 import Alicante from './pages/destinations/Alicante';
 import Corfou from './pages/destinations/Corfou';
 import Destinations from './pages/destinations/Destinations';
-import VilleneuveLoubet from './pages/destinations/VilleneuveLoubet';
 
 // Page d'accueil
 import Home from './pages/home/Home';
