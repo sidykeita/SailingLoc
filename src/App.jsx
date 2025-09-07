@@ -130,7 +130,6 @@ function App() {
           <Route path="/destinations/la-ciotat" element={<Layout><LaCiotat /></Layout>} />
           <Route path="/destinations/alicante" element={<Layout><Alicante /></Layout>} />
           <Route path="/destinations/corfou" element={<Layout><Corfou /></Layout>} />
-          <Route path="/destinations/villeneuve-loubet" element={<Layout><VilleneuveLoubet /></Layout>} />
           
           {/* Routes d'inscription */}
           <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
