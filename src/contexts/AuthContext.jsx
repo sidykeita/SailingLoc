@@ -63,10 +63,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Fonction de connexion
-  const login = async (email, password) => {
+  const login = async (email, password, recaptchaToken) => {
     try {
       setError('');
-      const data = await authService.login(email, password);
+      const data = await authService.login(email, password, recaptchaToken);
       
       // Mise à jour de l'état utilisateur
       setCurrentUser(data.user);
@@ -81,10 +81,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Fonction d'inscription
-  const register = async (userData) => {
+  const register = async (userData, recaptchaToken) => {
     try {
       setError('');
-      const data = await authService.register(userData);
+      const data = await authService.register(userData, recaptchaToken);
       // Ne pas connecter automatiquement l'utilisateur après inscription
       return data.user;
     } catch (err) {

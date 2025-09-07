@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -14,6 +16,8 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [recaptchaError, setRecaptchaError] = useState('');
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -67,6 +71,11 @@ const Register = () => {
       setError('');
       setLoading(true);
       setNetworkError(false);
+      setRecaptchaError('');
+      if (isRecaptchaEnabled && !recaptchaToken) {
+        setRecaptchaError('Veuillez valider le CAPTCHA');
+        return;
+      }
       
       // Préparation des données utilisateur pour l'inscription
       // Adapter la valeur du rôle pour respecter l'énum backend
@@ -82,7 +91,7 @@ const Register = () => {
       };
       
       // Appel de la fonction register du contexte d'authentification
-      const user = await register(userData);
+      const user = await register(userData, recaptchaToken);
       
       // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
       if (user.role === 'owner') {
@@ -202,10 +211,28 @@ const Register = () => {
               </div>
             </div>
             
+            {isRecaptchaEnabled && (
+              <div className="mb-4" style={{ display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => {
+                    setRecaptchaToken(token || '');
+                    setRecaptchaError('');
+                  }}
+                  onExpired={() => setRecaptchaToken('')}
+                />
+              </div>
+            )}
+            {recaptchaError && (
+              <div className="error-alert" role="alert">
+                <span>{recaptchaError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               className="submit-button"
-              disabled={loading}
+              disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}
             >
               {loading ? 'Inscription en cours...' : 'S\'inscrire'}
             </button>

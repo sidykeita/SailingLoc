@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 // L'image de fond est maintenant gérée directement par le CSS
 import '../../assets/css/Login.css';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const Login = () => {
   const [email, setEmail] = useState('c.line2110@hotmail.com');
@@ -12,6 +14,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [recaptchaError, setRecaptchaError] = useState('');
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -54,9 +58,14 @@ const Login = () => {
       setError('');
       setLoading(true);
       setNetworkError(false);
+      setRecaptchaError('');
+      if (isRecaptchaEnabled && !recaptchaToken) {
+        setRecaptchaError('Veuillez valider le CAPTCHA');
+        return;
+      }
       
       // Appel de la fonction login du contexte d'authentification
-      const user = await login(email, password);
+      const user = await login(email, password, recaptchaToken);
       
       // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
       if (user.role === 'admin') {
@@ -125,10 +134,28 @@ const Login = () => {
               />
             </div>
             
+            {isRecaptchaEnabled && (
+              <div className="mb-4" style={{ display: 'flex', justifyContent: 'center' }}>
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => {
+                    setRecaptchaToken(token || '');
+                    setRecaptchaError('');
+                  }}
+                  onExpired={() => setRecaptchaToken('')}
+                />
+              </div>
+            )}
+            {recaptchaError && (
+              <div className="error-alert" role="alert">
+                <span>{recaptchaError}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               className="submit-button"
-              disabled={loading}
+              disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}
             >
               {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>

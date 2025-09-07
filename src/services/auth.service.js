@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { API_URL } from '../lib/api';
 
-const login = async (email, password) => {
+const login = async (email, password, recaptchaToken) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+    const payload = { email, password };
+    if (recaptchaToken) payload.recaptchaToken = recaptchaToken;
+    const response = await axios.post(`${API_URL}/auth/login`, payload);
     console.log('[DEBUG][auth.service.js] Réponse login backend:', response.data);
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
@@ -18,9 +20,11 @@ const login = async (email, password) => {
   }
 };
 
-const register = async (userData) => {
+const register = async (userData, recaptchaToken) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    const payload = { ...userData };
+    if (recaptchaToken) payload.recaptchaToken = recaptchaToken;
+    const response = await axios.post(`${API_URL}/auth/register`, payload);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Erreur d'inscription" };
