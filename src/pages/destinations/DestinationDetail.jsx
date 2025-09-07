@@ -67,8 +67,8 @@ const DestinationDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Normalise le nom à rechercher dans les champs des bateaux
-  const searchToken = useMemo(() => (destination?.name || '').trim().toLowerCase(), [destination]);
+  // Nom lisible de la destination
+  const destinationName = useMemo(() => (destination?.name || '').trim(), [destination]);
 
   useEffect(() => {
     let mounted = true;
@@ -86,34 +86,30 @@ const DestinationDetail = () => {
       if (raw) {
         const parsed = JSON.parse(raw);
         const boats = Array.isArray(parsed?.boats) ? parsed.boats : [];
+        const token = destinationName.toLowerCase();
         const cachedCount = boats.filter((boat) => {
           const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
             .filter(Boolean)
             .map((v) => String(v).toLowerCase());
-          return fields.some((v) => v.includes(searchToken));
+          return fields.some((v) => v.includes(token));
         }).length;
         if (mounted) setDynamicCount(cachedCount);
       }
     } catch (_) { /* ignore parse errors */ }
 
-    // 2) Rafraîchir depuis l'API pour avoir la valeur la plus à jour
+    // 2) Rafraîchir depuis l'API pour avoir la valeur la plus à jour (filtré côté backend si possible)
     boatService
-      .getAllBoats()
+      .getAllBoats({ location: destinationName })
       .then((boats) => {
         if (!mounted) return;
-        const count = Array.isArray(boats)
-          ? boats.filter((boat) => {
-              const fields = [boat?.location, boat?.city, boat?.port, boat?.destination]
-                .filter(Boolean)
-                .map((v) => String(v).toLowerCase());
-              return fields.some((v) => v.includes(searchToken));
-            }).length
-          : 0;
+        const count = Array.isArray(boats) ? boats.length : (Array.isArray(boats?.data) ? boats.data.length : 0);
         setDynamicCount(count);
       })
       .catch(() => {
         if (!mounted) return;
         setError("Erreur lors du chargement des bateaux");
+        // Si pas de cache précédent, on force un 0 plutôt qu'une valeur statique trompeuse
+        setDynamicCount((prev) => (prev === null ? 0 : prev));
       })
       .finally(() => {
         if (!mounted) return;
@@ -123,7 +119,7 @@ const DestinationDetail = () => {
     return () => {
       mounted = false;
     };
-  }, [searchToken, destination]);
+  }, [destinationName, destination]);
 
   if (!destination) {
     return (
@@ -141,11 +137,7 @@ const DestinationDetail = () => {
         <div className="hero-overlay">
           <h1>{destination.name}</h1>
           <p>
-            {dynamicCount !== null
-              ? `${dynamicCount} bateaux disponibles`
-              : (loading
-                  ? 'Chargement des bateaux…'
-                  : (error ? destination.boatCount + ' bateaux disponibles' : `${destination.boatCount} bateaux disponibles`))}
+            {dynamicCount !== null ? `${dynamicCount} bateaux disponibles` : 'Chargement des bateaux…'}
           </p>
         </div>
       </div>
