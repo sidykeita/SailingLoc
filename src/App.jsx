@@ -3,6 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BackgroundImage from './components/BackgroundImage';
 import Layout from './Layout';
+import CookieConsentBanner from './components/common/CookieConsentBanner';
 
 // Pages d'authentification
 import Login from './pages/auth/Login';
@@ -44,6 +45,10 @@ import Home from './pages/home/Home';
 // Pages légales
 import LegalNotices from './pages/legal/LegalNotices';
 import CGUCGV from './pages/legal/CGUCGV';
+import CookiePolicy from './pages/legal/CookiePolicy';
+
+// Pages de paiement
+import PaymentPage from './pages/payment/PaymentPage';
 
 // Pages à propos
 import About from './pages/about/About';
@@ -86,10 +91,11 @@ function App() {
   return (
     <div className="app-container">
       <BackgroundImage />
+      <CookieConsentBanner />
       <main>
         <Routes>
           {/* Routes publiques */}
-          <Route path="/" element={<Home />} />  {/* Home contient déjà Layout */}
+          <Route path="/" element={<Layout><Home /></Layout>} />  
           <Route path="/login" element={!currentUser ? <Login /> : <Navigate to={userRole === 'admin' ? '/admin/dashboard' : userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           
           {/* Routes des bateaux - avec Layout */}
@@ -104,6 +110,14 @@ function App() {
           {/* Pages légales - avec Layout */}
           <Route path="/legal-notices" element={<Layout><LegalNotices /></Layout>} />
           <Route path="/cgu-cgv" element={<Layout><CGUCGV /></Layout>} />
+          <Route path="/politique-cookies" element={<Layout><CookiePolicy /></Layout>} />
+          
+          {/* Page de paiement - sans Layout pour un affichage personnalisé */}
+          <Route path="/paiement" element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          } />
           
           {/* Pages d'aide - avec Layout */}
           <Route path="/help" element={<Layout><Help /></Layout>} />

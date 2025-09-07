@@ -22,6 +22,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import '../../assets/css/BoatDetail.css';
 
 // Importation des images
@@ -36,7 +39,55 @@ import visaIcon from '../../assets/images/visa.png';
 import applepayIcon from '../../assets/images/applepay.png';
 
 const BoatDetail = () => {
-  // ...
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  
+  // État pour les dates sélectionnées
+  const [selectedDates, setSelectedDates] = useState({
+    startDate: null,
+    endDate: null
+  });
+  
+  // Fonction pour gérer la réservation
+  const handleBookNow = () => {
+    if (!currentUser) {
+      // Rediriger vers la page de connexion avec un état pour revenir à la page actuelle
+      navigate('/login', { state: { from: window.location.pathname } });
+      return;
+    }
+    
+    if (!selectedDates.startDate || !selectedDates.endDate) {
+      alert('Veuillez sélectionner des dates de réservation');
+      return;
+    }
+    
+    // Calculer le nombre de nuits
+    const start = new Date(selectedDates.startDate);
+    const end = new Date(selectedDates.endDate);
+    const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    
+    // Calculer le montant total (exemple avec un prix de base de 150€/nuit)
+    const basePrice = boat?.pricePerDay || 150;
+    const total = basePrice * nights;
+    
+    // Préparer les données de réservation pour la page de paiement
+    const bookingData = {
+      boatId: boat?._id,
+      boatName: boat?.name,
+      boatImage: boat?.images?.[0] || '',
+      startDate: format(selectedDates.startDate, 'dd/MM/yyyy', { locale: fr }),
+      endDate: format(selectedDates.endDate, 'dd/MM/yyyy', { locale: fr }),
+      nights,
+      basePrice,
+      fees: total * 0.1, // 10% de frais de service
+      amount: total * 1.1, // Prix total avec frais
+      currency: 'EUR'
+    };
+    
+    // Rediriger vers la page de paiement avec les données de réservation
+    navigate('/paiement', { state: { bookingData } });
+  };
+  
   // Fonction utilitaire pour savoir si une date est réservée
   function isDateReserved(dateStr) {
     if (!dateStr) return false;
@@ -429,7 +480,39 @@ const BoatDetail = () => {
                 )}
               </div>
               <button
-                type="submit"
+                type="button"
+                onClick={() => {
+                  if (!currentUser) {
+                    navigate('/login', { state: { from: window.location.pathname } });
+                    return;
+                  }
+                  
+                  if (!startDate || !endDate) {
+                    alert('Veuillez sélectionner des dates de réservation');
+                    return;
+                  }
+                  
+                  // Calculer le nombre de nuits
+                  const start = new Date(startDate);
+                  const end = new Date(endDate);
+                  const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                  
+                  // Préparer les données de réservation pour la page de paiement
+                  const bookingData = {
+                    boatId: boat?._id,
+                    boatName: boat?.name,
+                    boatImage: boat?.images?.[0] || '',
+                    startDate: format(new Date(startDate), 'dd/MM/yyyy', { locale: fr }),
+                    endDate: format(new Date(endDate), 'dd/MM/yyyy', { locale: fr }),
+                    nights,
+                    basePrice: boat?.pricePerDay || 150,
+                    amount: (boat?.pricePerDay || 150) * nights,
+                    currency: 'EUR'
+                  };
+                  
+                  // Rediriger vers la page de paiement avec les données de réservation
+                  navigate('/paiement', { state: { bookingData } });
+                }}
                 className={`booking-button ${
                   canBook
                     ? 'booking-button-available'

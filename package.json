@@ -20,6 +20,8 @@
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
     "@react-google-maps/api": "^2.20.7",
+    "@stripe/react-stripe-js": "^4.0.0",
+    "@stripe/stripe-js": "^7.9.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.7",
     "date-fns": "^4.1.0",
@@ -27,8 +29,10 @@
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
+    "react-cookie-consent": "^9.0.0",
     "react-date-range": "^2.0.1",
     "react-dom": "^19.1.0",
+    "react-google-recaptcha": "^3.1.0",
     "react-router-dom": "^7.6.1"
   },
   "devDependencies": {
