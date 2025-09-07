@@ -125,6 +125,8 @@ function App() {
           <Route path="/destinations/marseille" element={<Layout><DestinationDetail /></Layout>} />
           <Route path="/destinations/porto-cristo" element={<Layout><DestinationDetail /></Layout>} />
           <Route path="/destinations/bastia" element={<Layout><DestinationDetail /></Layout>} />
+          <Route path="/destinations/la-rochelle" element={<Layout><DestinationDetail /></Layout>} />
+          <Route path="/destinations/la-ciotat" element={<Layout><DestinationDetail /></Layout>} />
           <Route path="/destinations/alicante" element={<Layout><DestinationDetail /></Layout>} />
           <Route path="/destinations/corfou" element={<Layout><DestinationDetail /></Layout>} />
           <Route path="/destinations/villeneuve-loubet" element={<Layout><DestinationDetail /></Layout>} />
