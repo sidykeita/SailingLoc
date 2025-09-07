@@ -12,23 +12,36 @@ export function useBoatCount(destinationName) {
     const fetchBoatCount = async () => {
       try {
         // 1) Vérifier le cache d'abord pour une expérience plus rapide
-        const cachedBoats = localStorage.getItem('boatsCache');
-        if (cachedBoats) {
-          const boats = JSON.parse(cachedBoats);
-          const filteredBoats = boats.filter(boat => 
-            boat.location?.toLowerCase() === destinationName.toLowerCase() ||
-            boat.city?.toLowerCase() === destinationName.toLowerCase() ||
-            boat.port?.toLowerCase() === destinationName.toLowerCase() ||
-            boat.destination?.toLowerCase() === destinationName.toLowerCase()
-          );
-          
-          if (mounted) {
-            setBoatCount(filteredBoats.length);
+        const readCache = (key) => {
+          try {
+            const str = localStorage.getItem(key);
+            if (!str) return [];
+            const json = JSON.parse(str);
+            if (Array.isArray(json)) return json;
+            if (json && Array.isArray(json.data)) return json.data; // fallback si réponse de type {data: [...]} 
+            return [];
+          } catch (_) {
+            return [];
           }
+        };
+
+        const cachedV1 = readCache('boatsCache:v1');
+        const legacy = cachedV1.length ? [] : readCache('boatsCache');
+        const cacheToUse = cachedV1.length ? cachedV1 : legacy;
+
+        if (cacheToUse.length) {
+          const filteredBoats = cacheToUse.filter(boat => 
+            boat?.location?.toLowerCase() === destinationName.toLowerCase() ||
+            boat?.city?.toLowerCase() === destinationName.toLowerCase() ||
+            boat?.port?.toLowerCase() === destinationName.toLowerCase() ||
+            boat?.destination?.toLowerCase() === destinationName.toLowerCase()
+          );
+          if (mounted) setBoatCount(filteredBoats.length);
         }
 
         // 2) Rafraîchir depuis l'API pour avoir la valeur la plus à jour
-        const data = await boatService.getAllBoats({ location: destinationName });
+        const apiResp = await boatService.getAllBoats({ location: destinationName });
+        const data = Array.isArray(apiResp) ? apiResp : (apiResp && Array.isArray(apiResp.data) ? apiResp.data : []);
         if (mounted && Array.isArray(data)) {
           // Si l'API a déjà filtré, on prend directement la longueur. Sinon, on filtre côté client.
           const looksFiltered = data.every(boat =>
@@ -49,7 +62,7 @@ export function useBoatCount(destinationName) {
           // Met à jour le cache avec la dernière liste complète si elle est fournie
           try {
             if (!looksFiltered) {
-              localStorage.setItem('boatsCache', JSON.stringify(data));
+              localStorage.setItem('boatsCache:v1', JSON.stringify(data));
             }
           } catch (_) {
             // ignore quota/storage errors
