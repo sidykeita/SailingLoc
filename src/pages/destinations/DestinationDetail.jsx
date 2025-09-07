@@ -8,7 +8,7 @@ import boatService from '../../services/boat.service';
 import marseilleHero from '../../assets/images/destinations/marseille.jpeg';
 import portoCristoHero from '../../assets/images/destinations/porto-cristo.jpeg';
 import bastiaHero from '../../assets/images/destinations/bastia.jpeg';
-import laRochelleHero from '../../assets/images/destinations/la-rochelle.jpeg';
+import laRochelleHero from '../../assets/images/la-rochelle.jpeg';
 import laCiotatHero from '../../assets/images/destinations/la-ciotat.jpeg';
 import alicanteHero from '../../assets/images/destinations/alicante.jpg';
 import corfouHero from '../../assets/images/destinations/port-de-corfou-grece.jpg';
