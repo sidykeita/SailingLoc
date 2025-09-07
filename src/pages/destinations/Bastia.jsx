@@ -53,7 +53,7 @@ const Bastia = () => {
           <div className="available-boats">
             <h2>Bateaux disponibles à Bastia</h2>
             <div className="cta-buttons">
-              <Link to="/boats/bastia" className="primary-button">Voir tous les bateaux</Link>
+              <Link to="/boats?location=bastia" className="primary-button">Voir tous les bateaux</Link>
               <Link to="/contact" className="secondary-button">Demander des informations</Link>
             </div>
           </div>
