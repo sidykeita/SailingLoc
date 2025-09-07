@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 import '../../assets/css/Register.css';
 
 const Register = () => {
@@ -16,9 +14,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
-  const [recaptchaError, setRecaptchaError] = useState('');
-  const recaptchaRef = useRef(null);
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -52,11 +47,6 @@ const Register = () => {
       return;
     }
     
-    if (isRecaptchaEnabled && !recaptchaToken) {
-      setRecaptchaError('Veuillez valider le CAPTCHA');
-      return;
-    }
-    
     // Validation des champs
     if (!name || !email || !password || !confirmPassword) {
       setError('Veuillez remplir tous les champs');
@@ -75,16 +65,31 @@ const Register = () => {
     
     try {
       setError('');
-      setRecaptchaError('');
       setLoading(true);
+      setNetworkError(false);
       
-      const userData = { name, email, password, confirmPassword, role };
-      if (isRecaptchaEnabled) {
-        userData.recaptchaToken = recaptchaToken;
+      // Préparation des données utilisateur pour l'inscription
+      // Adapter la valeur du rôle pour respecter l'énum backend
+      let roleToSend = role;
+      if (role === 'tenant') roleToSend = 'locataire';
+      if (role === 'owner') roleToSend = 'propriétaire';
+      const userData = {
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ').slice(1).join(' '),
+        email,
+        password,
+        role: roleToSend
+      };
+      
+      // Appel de la fonction register du contexte d'authentification
+      const user = await register(userData);
+      
+      // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
+      if (user.role === 'owner') {
+        navigate('/owner/dashboard');
+      } else {
+        navigate('/dashboard');
       }
-      
-      await register(userData);
-      navigate('/dashboard');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
       if (!navigator.onLine) {
@@ -197,29 +202,12 @@ const Register = () => {
               </div>
             </div>
             
-            {isRecaptchaEnabled && (
-              <div className="mb-4">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  onChange={(token) => {
-                    setRecaptchaToken(token);
-                    setRecaptchaError('');
-                  }}
-                  onExpired={() => setRecaptchaToken('')}
-                  onErrored={() => setError('Erreur lors de la vérification du CAPTCHA')}
-                  className="w-full flex justify-center"
-                />
-                {recaptchaError && <p className="text-red-500 text-sm mt-1">{recaptchaError}</p>}
-              </div>
-            )}
-            
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
-              disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}
+              disabled={loading}
             >
-              {loading ? 'Inscription en cours...' : "S'inscrire"}
+              {loading ? 'Inscription en cours...' : 'S\'inscrire'}
             </button>
             
             <div className="login-link">

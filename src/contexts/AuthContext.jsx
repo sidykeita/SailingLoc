@@ -63,16 +63,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Fonction de connexion
-  const login = async (loginData) => {
+  const login = async (email, password) => {
     try {
       setError('');
-      const userData = await authService.login(loginData);
-      setCurrentUser(userData.user);
-      setUserRole(userData.user.role || 'tenant');
-      return userData;
+      const data = await authService.login(email, password);
+      
+      // Mise à jour de l'état utilisateur
+      setCurrentUser(data.user);
+      setUserRole(data.user.role);
+      
+      return data.user;
     } catch (err) {
       console.error('Erreur de connexion:', err);
-      setError(err.message || 'Échec de la connexion');
+      setError(err.message || 'Erreur lors de la connexion');
       throw err;
     }
   };

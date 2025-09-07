@@ -1,19 +1,10 @@
 import axios from 'axios';
 import { API_URL } from '../lib/api';
 
-const login = async (loginData) => {
+const login = async (email, password) => {
   try {
-    const { email, password, recaptchaToken } = loginData;
-    const payload = { email, password };
-    
-    // Ajouter le token reCAPTCHA si fourni
-    if (recaptchaToken) {
-      payload.recaptchaToken = recaptchaToken;
-    }
-
-    const response = await axios.post(`${API_URL}/auth/login`, payload);
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
     console.log('[DEBUG][auth.service.js] Réponse login backend:', response.data);
-    
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
     }
@@ -29,18 +20,9 @@ const login = async (loginData) => {
 
 const register = async (userData) => {
   try {
-    const { recaptchaToken, ...userPayload } = userData;
-    const payload = { ...userPayload };
-    
-    // Ajouter le token reCAPTCHA si fourni
-    if (recaptchaToken) {
-      payload.recaptchaToken = recaptchaToken;
-    }
-    
-    const response = await axios.post(`${API_URL}/auth/register`, payload);
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
     return response.data;
   } catch (error) {
-    console.error('[DEBUG][auth.service.js] Erreur inscription:', error.response?.data || error);
     throw error.response?.data || { message: "Erreur d'inscription" };
   }
 };

@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
+// L'image de fond est maintenant gérée directement par le CSS
 import '../../assets/css/Login.css';
 
 const Login = () => {
@@ -13,9 +12,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
-  const [recaptchaError, setRecaptchaError] = useState('');
-  const recaptchaRef = useRef(null);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -54,23 +50,22 @@ const Login = () => {
       return;
     }
     
-    if (isRecaptchaEnabled && !recaptchaToken) {
-      setRecaptchaError('Veuillez valider le CAPTCHA');
-      return;
-    }
-    
     try {
       setError('');
-      setRecaptchaError('');
       setLoading(true);
+      setNetworkError(false);
       
-      const loginData = { email, password };
-      if (isRecaptchaEnabled) {
-        loginData.recaptchaToken = recaptchaToken;
+      // Appel de la fonction login du contexte d'authentification
+      const user = await login(email, password);
+      
+      // Redirection vers le dashboard approprié selon le rôle de l'utilisateur
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (user.role === 'propriétaire') {
+        navigate('/owner/dashboard');
+      } else {
+        navigate('/dashboard');
       }
-      
-      await login(loginData);
-      navigate('/dashboard');
     } catch (err) {
       console.error('Erreur de connexion:', err);
       if (!navigator.onLine) {
@@ -130,27 +125,10 @@ const Login = () => {
               />
             </div>
             
-            {isRecaptchaEnabled && (
-              <div className="mb-4">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  onChange={(token) => {
-                    setRecaptchaToken(token);
-                    setRecaptchaError('');
-                  }}
-                  onExpired={() => setRecaptchaToken('')}
-                  onErrored={() => setError('Erreur lors de la vérification du CAPTCHA')}
-                  className="w-full flex justify-center"
-                />
-                {recaptchaError && <p className="text-red-500 text-sm mt-1">{recaptchaError}</p>}
-              </div>
-            )}
-            
             <button
               type="submit"
-              className="login-button"
-              disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}
+              className="submit-button"
+              disabled={loading}
             >
               {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
