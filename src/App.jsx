@@ -32,11 +32,12 @@ import AllBoats from './pages/boats/AllBoats';
 import Marseille from './pages/destinations/Marseille';
 import PortoCristo from './pages/destinations/PortoCristo';
 import Bastia from './pages/destinations/Bastia';
+import LaRochelle from './pages/destinations/LaRochelle';
+import LaCiotat from './pages/destinations/LaCiotat';
 import Alicante from './pages/destinations/Alicante';
 import Corfou from './pages/destinations/Corfou';
 import Destinations from './pages/destinations/Destinations';
 import VilleneuveLoubet from './pages/destinations/VilleneuveLoubet';
-import DestinationDetail from './pages/destinations/DestinationDetail';
 
 // Page d'accueil
 import Home from './pages/home/Home';
@@ -122,15 +123,14 @@ function App() {
           
           {/* Routes des destinations - avec Layout */}
           <Route path="/destinations" element={<Layout><Destinations /></Layout>} />
-          <Route path="/destinations/marseille" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/porto-cristo" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/bastia" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/la-rochelle" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/la-ciotat" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/alicante" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/corfou" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/villeneuve-loubet" element={<Layout><DestinationDetail /></Layout>} />
-          <Route path="/destinations/:destinationId" element={<Layout><DestinationDetail /></Layout>} />
+          <Route path="/destinations/marseille" element={<Layout><Marseille /></Layout>} />
+          <Route path="/destinations/porto-cristo" element={<Layout><PortoCristo /></Layout>} />
+          <Route path="/destinations/bastia" element={<Layout><Bastia /></Layout>} />
+          <Route path="/destinations/la-rochelle" element={<Layout><LaRochelle /></Layout>} />
+          <Route path="/destinations/la-ciotat" element={<Layout><LaCiotat /></Layout>} />
+          <Route path="/destinations/alicante" element={<Layout><Alicante /></Layout>} />
+          <Route path="/destinations/corfou" element={<Layout><Corfou /></Layout>} />
+          <Route path="/destinations/villeneuve-loubet" element={<Layout><VilleneuveLoubet /></Layout>} />
           
           {/* Routes d'inscription */}
           <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
