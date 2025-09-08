@@ -18,6 +18,7 @@ const Register = () => {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState(null);
   const recaptchaRef = useRef(null);
   
   const { register } = useAuth();
@@ -65,16 +66,23 @@ const Register = () => {
     const initializeRecaptcha = () => {
       try {
         console.log('Initializing reCAPTCHA...');
-        const container = document.getElementById('recaptcha-container');
+        const container = recaptchaRef.current || document.getElementById('recaptcha-container');
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
         }
+
+        // Avoid double render
+        if (recaptchaWidgetId !== null) {
+          console.log('reCAPTCHA already initialized, skipping render. widgetId=', recaptchaWidgetId);
+          setIsRecaptchaReady(true);
+          return;
+        }
         
-        // Clear any existing reCAPTCHA
+        // Clear any existing children just in case
         container.innerHTML = '';
         
-        window.grecaptcha.render('recaptcha-container', {
+        const widgetId = window.grecaptcha.render(container, {
           sitekey: RECAPTCHA_SITE_KEY,
           callback: (token) => {
             console.log('reCAPTCHA token generated:', token);
@@ -91,8 +99,8 @@ const Register = () => {
             setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
           }
         });
-        
-        console.log('reCAPTCHA initialized successfully');
+        console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
+        setRecaptchaWidgetId(widgetId);
         setIsRecaptchaReady(true);
       } catch (error) {
         console.error('Error initializing reCAPTCHA:', error);
