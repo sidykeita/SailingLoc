@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
+import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const RegisterOwner = () => {
   const [name, setName] = useState('');
@@ -15,37 +16,129 @@ const RegisterOwner = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [networkError, setNetworkError] = useState(false);
+  const [networkConnected, setNetworkConnected] = useState(true);
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+  const [recaptchaError, setRecaptchaError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState(null);
+  const recaptchaRef = useRef(null);
   
   const { register } = useAuth();
   const navigate = useNavigate();
   
   // Vérifier la connexion réseau au chargement
   useEffect(() => {
-    const checkNetwork = () => {
-      if (!navigator.onLine) {
-        setNetworkError(true);
-      } else {
-        setNetworkError(false);
-      }
-    };
+    setNetworkConnected(navigator.onLine);
     
-    checkNetwork();
-    window.addEventListener('online', checkNetwork);
-    window.addEventListener('offline', checkNetwork);
+    const handleOnline = () => setNetworkConnected(true);
+    const handleOffline = () => setNetworkConnected(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
     
     return () => {
-      window.removeEventListener('online', checkNetwork);
-      window.removeEventListener('offline', checkNetwork);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Initialize reCAPTCHA
+  useEffect(() => {
+    if (!isRecaptchaEnabled) return;
+
+    const loadRecaptcha = () => {
+      if (window.grecaptcha) {
+        console.log('reCAPTCHA API loaded, initializing...');
+        initializeRecaptcha();
+      } else {
+        console.log('reCAPTCHA API not loaded yet, waiting...');
+        const timer = setTimeout(() => {
+          if (window.grecaptcha) {
+            initializeRecaptcha();
+          } else {
+            console.error('reCAPTCHA API failed to load');
+            setRecaptchaError('Impossible de charger le CAPTCHA. Veuillez recharger la page.');
+          }
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    const initializeRecaptcha = () => {
+      try {
+        console.log('Initializing reCAPTCHA...');
+        const container = recaptchaRef.current || document.getElementById('recaptcha-container-owner');
+        if (!container) {
+          console.error('reCAPTCHA container not found');
+          return;
+        }
+
+        if (recaptchaWidgetId !== null) {
+          console.log('reCAPTCHA already initialized, skipping render. widgetId=', recaptchaWidgetId);
+          setIsRecaptchaReady(true);
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        const widgetId = window.grecaptcha.render(container, {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: (token) => {
+            console.log('reCAPTCHA token generated:', token);
+            setRecaptchaToken(token);
+            setRecaptchaError('');
+          },
+          'expired-callback': () => {
+            console.log('reCAPTCHA expired');
+            setRecaptchaToken('');
+          },
+          'error-callback': (error) => {
+            console.error('reCAPTCHA error:', error);
+            setRecaptchaToken('');
+            setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
+          }
+        });
+        
+        console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
+        setRecaptchaWidgetId(widgetId);
+        setIsRecaptchaReady(true);
+      } catch (error) {
+        console.error('Error initializing reCAPTCHA:', error);
+        setRecaptchaError('Erreur lors du chargement du CAPTCHA. Veuillez recharger la page.');
+      }
+    };
+
+    const handleRecaptchaReady = () => {
+      console.log('recaptchaReady event received');
+      loadRecaptcha();
+    };
+
+    document.addEventListener('recaptchaReady', handleRecaptchaReady);
+    
+    if (window.recaptchaLoaded) {
+      loadRecaptcha();
+    }
+
+    return () => {
+      document.removeEventListener('recaptchaReady', handleRecaptchaReady);
+    };
+  }, [isRecaptchaEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!navigator.onLine) {
-      setNetworkError(true);
+    if (!networkConnected) {
       setError('Vérifiez votre connexion internet et réessayez.');
+      return;
+    }
+    
+    if (!acceptTerms) {
+      setError('Veuvez accepter les conditions d\'utilisation pour continuer.');
+      return;
+    }
+    
+    if (isRecaptchaEnabled && !recaptchaToken) {
+      setRecaptchaError('Veuillez valider le CAPTCHA');
       return;
     }
     
@@ -65,15 +158,10 @@ const RegisterOwner = () => {
       return;
     }
     
-    if (!acceptTerms) {
-      setError('Vous devez accepter les conditions spécifiques aux propriétaires');
-      return;
-    }
-    
     try {
       setError('');
       setLoading(true);
-      setNetworkError(false);
+      setNetworkConnected(true);
       
       // Préparation des données utilisateur pour l'inscription
       const userData = {
@@ -95,8 +183,8 @@ const RegisterOwner = () => {
       navigate('/owner/dashboard');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
-      if (!navigator.onLine) {
-        setNetworkError(true);
+      if (!networkConnected) {
+        setNetworkConnected(true);
         setError('Vérifiez votre connexion internet et réessayez.');
       } else {
         setError(err.message || 'Erreur lors de l\'inscription. Veuillez réessayer.');
@@ -116,13 +204,7 @@ const RegisterOwner = () => {
           <div className="register-title">Inscription Propriétaire</div>
           <div className="register-subtitle">Mettez votre bateau en location et générez des revenus</div>
           
-          {networkError && (
-            <div className="error-alert" role="alert">
-              <span>Network Error</span>
-            </div>
-          )}
-          
-          {error && !networkError && (
+          {error && (
             <div className="error-alert" role="alert">
               <span>{error}</span>
             </div>
@@ -202,7 +284,7 @@ const RegisterOwner = () => {
               />
             </div>
             
-            <div className="form-group checkbox-group">
+            <div className="form-group">
               <div className="checkbox-container">
                 <input
                   type="checkbox"
@@ -212,17 +294,48 @@ const RegisterOwner = () => {
                   required
                 />
                 <label htmlFor="acceptTerms">
-                  J'accepte les conditions spécifiques aux propriétaires et la commission de 15% sur les locations
+                  J'accepte les <a href="/terms" target="_blank" rel="noopener noreferrer">conditions d'utilisation</a> et la <a href="/privacy" target="_blank" rel="noopener noreferrer">politique de confidentialité</a>
                 </label>
               </div>
             </div>
             
+            {isRecaptchaEnabled ? (
+              <div className="mb-4">
+                <div 
+                  id="recaptcha-container-owner" 
+                  ref={recaptchaRef}
+                  style={{
+                    minHeight: '78px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    backgroundColor: '#f9f9f9',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd'
+                  }}
+                >
+                  {!isRecaptchaReady && (
+                    <div style={{ color: '#666', padding: '10px' }}>
+                      Chargement du CAPTCHA...
+                    </div>
+                  )}
+                </div>
+                {recaptchaError && (
+                  <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
+                )}
+              </div>
+            ) : (
+              <div className="text-yellow-600 text-sm mb-4">
+                reCAPTCHA non activé. Vérifiez votre configuration.
+              </div>
+            )}
+            
             <button
               type="submit"
-              className="submit-button"
-              disabled={loading}
+              className="submit-button owner-button"
+              disabled={loading || (isRecaptchaEnabled && !recaptchaToken)}
             >
-              {loading ? 'Inscription en cours...' : 'S\'inscrire comme propriétaire'}
+              {loading ? 'Inscription en cours...' : 'Créer mon compte propriétaire'}
             </button>
             
             <div className="login-link">
