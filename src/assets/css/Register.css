@@ -200,9 +200,9 @@
 
 /* Styles spécifiques pour les formulaires propriétaire/locataire */
 .submit-button.owner-button {
-  background-color: var(--secondary-blue);
+  background-color: var(--turquoise);
 }
 
 .submit-button.owner-button:hover {
-  background-color: var(--primary-blue);
+  background-color: #55b7b5;
 }

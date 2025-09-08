@@ -66,6 +66,7 @@ import Revenus from './pages/dashboard/Revenus';
 import TenantLocations from './pages/dashboard/TenantLocations';
 import TenantReviews from './pages/dashboard/TenantReviews';
 import TenantFavorites from './pages/dashboard/TenantFavorites';
+import CookieConsent from './components/common/CookieConsent';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -86,6 +87,7 @@ function App() {
   return (
     <div className="app-container">
       <BackgroundImage />
+      <CookieConsent />
       <main>
         <Routes>
           {/* Routes publiques */}
