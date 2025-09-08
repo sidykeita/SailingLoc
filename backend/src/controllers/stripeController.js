@@ -9,6 +9,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Expects: { amount, currency, description, metadata }
 exports.createCheckoutSession = async (req, res) => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('[Stripe] STRIPE_SECRET_KEY manquante');
+      return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
+    }
+    if (!process.env.FRONTEND_URL) {
+      console.warn('[Stripe] FRONTEND_URL manquante - utilisation de http://localhost:5173 par défaut');
+    }
     const { amount, currency = 'eur', description = 'Paiement', metadata = {} } = req.body || {};
 
     if (!amount || amount <= 0) {
@@ -35,8 +42,8 @@ exports.createCheckoutSession = async (req, res) => {
 
     return res.json({ id: session.id, url: session.url });
   } catch (err) {
-    console.error('Stripe createCheckoutSession error:', err);
-    return res.status(500).json({ message: 'Erreur de création de session de paiement' });
+    console.error('Stripe createCheckoutSession error:', err?.message || err);
+    return res.status(500).json({ message: `Erreur de création de session de paiement` });
   }
 };
 
@@ -44,6 +51,13 @@ exports.createCheckoutSession = async (req, res) => {
 // Route: POST /api/stripe/reservations/:id/checkout
 exports.createReservationCheckoutSession = async (req, res) => {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('[Stripe] STRIPE_SECRET_KEY manquante');
+      return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
+    }
+    if (!process.env.FRONTEND_URL) {
+      console.warn('[Stripe] FRONTEND_URL manquante - utilisation de http://localhost:5173 par défaut');
+    }
     const { id } = req.params;
     const reservation = await Reservation.findById(id).populate('boat user');
     if (!reservation) {
@@ -82,8 +96,8 @@ exports.createReservationCheckoutSession = async (req, res) => {
 
     return res.json({ id: session.id, url: session.url });
   } catch (err) {
-    console.error('Stripe createReservationCheckoutSession error:', err);
-    return res.status(500).json({ message: 'Erreur de création de session de paiement' });
+    console.error('Stripe createReservationCheckoutSession error:', err?.type || err?.code || err?.message || err);
+    return res.status(500).json({ message: 'Erreur de création de session de paiement (Stripe)' });
   }
 };
 
