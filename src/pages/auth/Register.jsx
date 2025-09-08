@@ -42,6 +42,9 @@ const Register = () => {
     };
   }, []);
 
+  console.log('Register - isRecaptchaEnabled:', isRecaptchaEnabled);
+  console.log('Register - RECAPTCHA_SITE_KEY:', RECAPTCHA_SITE_KEY);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -211,16 +214,27 @@ const Register = () => {
               </div>
             </div>
             
-            {isRecaptchaEnabled && (
+            {isRecaptchaEnabled ? (
               <div className="mb-4" style={{ display: 'flex', justifyContent: 'center' }}>
-                <ReCAPTCHA
-                  sitekey={RECAPTCHA_SITE_KEY}
-                  onChange={(token) => {
-                    setRecaptchaToken(token || '');
-                    setRecaptchaError('');
-                  }}
-                  onExpired={() => setRecaptchaToken('')}
-                />
+                <div style={{ border: '1px solid red', padding: '10px' }}>
+                  <div>DEBUG: Affichage du reCAPTCHA</div>
+                  <ReCAPTCHA
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    onChange={(token) => {
+                      console.log('reCAPTCHA token:', token);
+                      setRecaptchaToken(token || '');
+                      setRecaptchaError('');
+                    }}
+                    onExpired={() => {
+                      console.log('reCAPTCHA expired');
+                      setRecaptchaToken('');
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div style={{ color: 'red', border: '1px solid red', padding: '10px' }}>
+                DEBUG: reCAPTCHA non activé ou clé manquante
               </div>
             )}
             {recaptchaError && (
