@@ -203,31 +203,6 @@ const RegisterLocataire = () => {
             </div>
           )}
 
-          {isRecaptchaEnabled ? (
-            <div className="mb-4">
-              {/* Empty container owned by reCAPTCHA only */}
-              <div
-                ref={recaptchaContainerRef}
-                style={{
-                  minHeight: '78px',
-                  backgroundColor: '#f9f9f9',
-                  padding: '10px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd'
-                }}
-              />
-              {/* Loader as a sibling, not a child of the reCAPTCHA container */}
-              {!isRecaptchaReady && (
-                <div style={{ color: '#666', paddingTop: '8px', textAlign: 'center' }}>
-                  Chargement du CAPTCHA...
-                </div>
-              )}
-              {recaptchaError && (
-                <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
-              )}
-            </div>
-          ) : null}
-          
           {error && !networkError && (
             <div className="error-alert" role="alert">
               <span>{error}</span>
@@ -296,6 +271,30 @@ const RegisterLocataire = () => {
                 required
               />
             </div>
+            {isRecaptchaEnabled ? (
+              <div className="mb-4">
+                {/* Empty container owned by reCAPTCHA only */}
+                <div
+                  ref={recaptchaContainerRef}
+                  style={{
+                    minHeight: '78px',
+                    backgroundColor: '#f9f9f9',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd'
+                  }}
+                />
+                {/* Loader as a sibling, not a child of the reCAPTCHA container */}
+                {!isRecaptchaReady && (
+                  <div style={{ color: '#666', paddingTop: '8px', textAlign: 'center' }}>
+                    Chargement du CAPTCHA...
+                  </div>
+                )}
+                {recaptchaError && (
+                  <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
+                )}
+              </div>
+            ) : null}
             
             <button
               type="submit"
