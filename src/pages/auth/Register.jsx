@@ -18,7 +18,7 @@ const Register = () => {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const recaptchaRef = useRef(null);
+  const recaptchaRef = useRef({ widgetId: null, initialized: false });
   const recaptchaContainerRef = useRef(null);
   
   const { register } = useAuth();
@@ -44,7 +44,6 @@ const Register = () => {
   useEffect(() => {
     if (!isRecaptchaEnabled) return;
     
-    let widgetId = null;
     let timer;
 
     const loadRecaptcha = () => {
@@ -66,22 +65,22 @@ const Register = () => {
 
     const initializeRecaptcha = () => {
       try {
+        if (recaptchaRef.current.initialized) {
+          console.log('reCAPTCHA already initialized, skipping.');
+          setIsRecaptchaReady(true);
+          return;
+        }
+
         console.log('Initializing reCAPTCHA...');
         const container = recaptchaContainerRef.current;
-        
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
         }
 
-        // Clear any existing reCAPTCHA widgets
         if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
-          // Create a new container for reCAPTCHA
-          container.innerHTML = '';
-          const newContainer = document.createElement('div');
-          container.appendChild(newContainer);
-          
-          widgetId = window.grecaptcha.render(newContainer, {
+          // IMPORTANT: Do not modify container innerHTML nor append/remove children.
+          const widgetId = window.grecaptcha.render(container, {
             sitekey: RECAPTCHA_SITE_KEY,
             callback: (token) => {
               console.log('reCAPTCHA token generated:', token);
@@ -98,9 +97,9 @@ const Register = () => {
               setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
             }
           });
-          
+
           console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
-          recaptchaRef.current = { widgetId, container: newContainer };
+          recaptchaRef.current = { widgetId, initialized: true };
           setIsRecaptchaReady(true);
         }
       } catch (error) {
@@ -124,22 +123,16 @@ const Register = () => {
     return () => {
       document.removeEventListener('recaptchaReady', handleRecaptchaReady);
       if (timer) clearTimeout(timer);
-      
-      // Cleanup reCAPTCHA widget if it exists
-      if (recaptchaRef.current && window.grecaptcha) {
+
+      // Only reset widget; do not remove DOM nodes. React owns the container.
+      if (recaptchaRef.current && window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
         try {
-          const { widgetId: currentWidgetId, container } = recaptchaRef.current;
-          if (typeof window.grecaptcha.reset === 'function') {
-            window.grecaptcha.reset(currentWidgetId);
-          }
-          if (container && container.parentNode) {
-            container.parentNode.removeChild(container);
-          }
+          window.grecaptcha.reset(recaptchaRef.current.widgetId);
         } catch (e) {
-          console.warn('Error cleaning up reCAPTCHA:', e);
+          console.warn('Error resetting reCAPTCHA:', e);
         }
-        recaptchaRef.current = null;
       }
+      recaptchaRef.current = { widgetId: null, initialized: false };
     };
   }, [isRecaptchaEnabled]);
 
@@ -312,6 +305,7 @@ const Register = () => {
                   style={{
                     minHeight: '78px',
                     display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: '#f9f9f9',
                     padding: '10px',

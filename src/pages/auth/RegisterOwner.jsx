@@ -20,7 +20,7 @@ const RegisterOwner = () => {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const recaptchaRef = useRef(null);
+  const recaptchaRef = useRef({ widgetId: null, initialized: false });
   const recaptchaContainerRef = useRef(null);
 
   const { register } = useAuth();
@@ -46,7 +46,6 @@ const RegisterOwner = () => {
   useEffect(() => {
     if (!isRecaptchaEnabled) return;
 
-    let widgetId = null;
     let timer;
 
     const loadRecaptcha = () => {
@@ -68,22 +67,21 @@ const RegisterOwner = () => {
 
     const initializeRecaptcha = () => {
       try {
+        if (recaptchaRef.current.initialized) {
+          console.log('reCAPTCHA already initialized, skipping.');
+          setIsRecaptchaReady(true);
+          return;
+        }
+
         console.log('Initializing reCAPTCHA...');
         const container = recaptchaContainerRef.current;
-
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
         }
 
-        // Clear any existing reCAPTCHA widgets
         if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
-          // Create a new container for reCAPTCHA
-          container.innerHTML = '';
-          const newContainer = document.createElement('div');
-          container.appendChild(newContainer);
-
-          widgetId = window.grecaptcha.render(newContainer, {
+          const widgetId = window.grecaptcha.render(container, {
             sitekey: RECAPTCHA_SITE_KEY,
             callback: (token) => {
               console.log('reCAPTCHA token generated:', token);
@@ -102,7 +100,7 @@ const RegisterOwner = () => {
           });
 
           console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
-          recaptchaRef.current = { widgetId, container: newContainer };
+          recaptchaRef.current = { widgetId, initialized: true };
           setIsRecaptchaReady(true);
         }
       } catch (error) {
@@ -127,21 +125,14 @@ const RegisterOwner = () => {
       document.removeEventListener('recaptchaReady', handleRecaptchaReady);
       if (timer) clearTimeout(timer);
 
-      // Cleanup reCAPTCHA widget if it exists
-      if (recaptchaRef.current && window.grecaptcha) {
+      if (recaptchaRef.current && window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
         try {
-          const { widgetId: currentWidgetId, container } = recaptchaRef.current;
-          if (typeof window.grecaptcha.reset === 'function') {
-            window.grecaptcha.reset(currentWidgetId);
-          }
-          if (container && container.parentNode) {
-            container.parentNode.removeChild(container);
-          }
+          window.grecaptcha.reset(recaptchaRef.current.widgetId);
         } catch (e) {
-          console.warn('Error cleaning up reCAPTCHA:', e);
+          console.warn('Error resetting reCAPTCHA:', e);
         }
-        recaptchaRef.current = null;
       }
+      recaptchaRef.current = { widgetId: null, initialized: false };
     };
   }, [isRecaptchaEnabled]);
 
@@ -326,20 +317,17 @@ const RegisterOwner = () => {
                   ref={recaptchaContainerRef}
                   style={{
                     minHeight: '78px',
-                    display: 'flex',
-                    justifyContent: 'center',
                     backgroundColor: '#f9f9f9',
                     padding: '10px',
                     borderRadius: '4px',
                     border: '1px solid #ddd'
                   }}
-                >
-                  {!isRecaptchaReady && (
-                    <div style={{ color: '#666', padding: '10px' }}>
-                      Chargement du CAPTCHA...
-                    </div>
-                  )}
-                </div>
+                />
+                {!isRecaptchaReady && (
+                  <div style={{ color: '#666', paddingTop: '8px', textAlign: 'center' }}>
+                    Chargement du CAPTCHA...
+                  </div>
+                )}
                 {recaptchaError && (
                   <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
                 )}
