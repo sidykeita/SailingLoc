@@ -45,6 +45,9 @@ const RegisterOwner = () => {
   // Initialize reCAPTCHA
   useEffect(() => {
     if (!isRecaptchaEnabled) return;
+    
+    let cleanup = () => {};
+    let timer;
 
     const loadRecaptcha = () => {
       if (window.grecaptcha) {
@@ -52,7 +55,7 @@ const RegisterOwner = () => {
         initializeRecaptcha();
       } else {
         console.log('reCAPTCHA API not loaded yet, waiting...');
-        const timer = setTimeout(() => {
+        timer = setTimeout(() => {
           if (window.grecaptcha) {
             initializeRecaptcha();
           } else {
@@ -60,14 +63,13 @@ const RegisterOwner = () => {
             setRecaptchaError('Impossible de charger le CAPTCHA. Veuillez recharger la page.');
           }
         }, 2000);
-        return () => clearTimeout(timer);
       }
     };
 
     const initializeRecaptcha = () => {
       try {
         console.log('Initializing reCAPTCHA...');
-        const container = recaptchaRef.current || document.getElementById('recaptcha-container-owner');
+        const container = recaptchaRef.current;
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
@@ -79,29 +81,44 @@ const RegisterOwner = () => {
           return;
         }
         
-        container.innerHTML = '';
-        
-        const widgetId = window.grecaptcha.render(container, {
-          sitekey: RECAPTCHA_SITE_KEY,
-          callback: (token) => {
-            console.log('reCAPTCHA token generated:', token);
-            setRecaptchaToken(token);
-            setRecaptchaError('');
-          },
-          'expired-callback': () => {
-            console.log('reCAPTCHA expired');
-            setRecaptchaToken('');
-          },
-          'error-callback': (error) => {
-            console.error('reCAPTCHA error:', error);
-            setRecaptchaToken('');
-            setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
-          }
-        });
-        
-        console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
-        setRecaptchaWidgetId(widgetId);
-        setIsRecaptchaReady(true);
+        // Clear any existing reCAPTCHA widgets
+        if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
+          // Reset the container
+          container.innerHTML = '';
+          
+          const widgetId = window.grecaptcha.render(container, {
+            sitekey: RECAPTCHA_SITE_KEY,
+            callback: (token) => {
+              console.log('reCAPTCHA token generated:', token);
+              setRecaptchaToken(token);
+              setRecaptchaError('');
+            },
+            'expired-callback': () => {
+              console.log('reCAPTCHA expired');
+              setRecaptchaToken('');
+            },
+            'error-callback': (error) => {
+              console.error('reCAPTCHA error:', error);
+              setRecaptchaToken('');
+              setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
+            }
+          });
+          
+          console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
+          setRecaptchaWidgetId(widgetId);
+          setIsRecaptchaReady(true);
+          
+          // Store cleanup function
+          cleanup = () => {
+            if (window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
+              try {
+                window.grecaptcha.reset(widgetId);
+              } catch (e) {
+                console.warn('Error resetting reCAPTCHA:', e);
+              }
+            }
+          };
+        }
       } catch (error) {
         console.error('Error initializing reCAPTCHA:', error);
         setRecaptchaError('Erreur lors du chargement du CAPTCHA. Veuillez recharger la page.');
@@ -121,6 +138,8 @@ const RegisterOwner = () => {
 
     return () => {
       document.removeEventListener('recaptchaReady', handleRecaptchaReady);
+      if (timer) clearTimeout(timer);
+      cleanup();
     };
   }, [isRecaptchaEnabled]);
 
