@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./src/models/db');
+const stripeController = require('./src/controllers/stripeController');
 
 
 
@@ -15,6 +16,10 @@ app.use(cors({
   ],
   credentials: true
 }));
+// Stripe webhook must use raw body parser ONLY on this route
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeController.webhook);
+
+// JSON parser for all other routes
 app.use(express.json());
 
 // Connexion à MongoDB
@@ -38,6 +43,9 @@ app.use('/api/photos', photoRoutes);
 
 const paymentRoutes = require('./src/routes/paymentRoutes');
 app.use('/api/payments', paymentRoutes);
+
+const stripeRoutes = require('./src/routes/stripeRoutes');
+app.use('/api/stripe', stripeRoutes);
 
 const userRoutes = require('./src/routes/userRoutes');
 app.use('/api/users', userRoutes);
