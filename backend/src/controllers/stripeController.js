@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const Reservation = require('../models/reservation');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
@@ -39,6 +40,53 @@ exports.createCheckoutSession = async (req, res) => {
   }
 };
 
+// Create a Checkout Session for a Reservation by ID
+// Route: POST /api/stripe/reservations/:id/checkout
+exports.createReservationCheckoutSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reservation = await Reservation.findById(id).populate('boat user');
+    if (!reservation) {
+      return res.status(404).json({ message: 'Réservation introuvable' });
+    }
+
+    // Convert price (assumed EUR) to cents
+    const amountCents = Math.round(Number(reservation.price) * 100);
+    if (!amountCents || amountCents <= 0) {
+      return res.status(400).json({ message: 'Montant de réservation invalide' });
+    }
+
+    const description = `Réservation bateau ${reservation.boat?._id || ''} du ${new Date(reservation.startDate).toLocaleDateString()} au ${new Date(reservation.endDate).toLocaleDateString()}`.trim();
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: { name: description || 'Réservation bateau' },
+            unit_amount: amountCents,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/cancel`,
+      metadata: {
+        reservationId: reservation._id.toString(),
+        userId: reservation.user?._id?.toString() || '',
+        boatId: reservation.boat?._id?.toString() || '',
+      },
+    });
+
+    return res.json({ id: session.id, url: session.url });
+  } catch (err) {
+    console.error('Stripe createReservationCheckoutSession error:', err);
+    return res.status(500).json({ message: 'Erreur de création de session de paiement' });
+  }
+};
+
 // Stripe Webhook handler (must use express.raw on the route)
 exports.webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
@@ -56,7 +104,24 @@ exports.webhook = async (req, res) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        // TODO: mark reservation/payment as paid in DB using session.metadata
+        // Mark reservation as paid if metadata contains reservationId
+        const { reservationId } = session.metadata || {};
+        if (reservationId) {
+          try {
+            await Reservation.findByIdAndUpdate(
+              reservationId,
+              {
+                status: 'confirmed',
+                paymentStatus: 'paid',
+                paymentSessionId: session.id,
+                paymentIntentId: session.payment_intent || '',
+              },
+              { new: true }
+            );
+          } catch (dbErr) {
+            console.error('Failed to update reservation as paid:', dbErr);
+          }
+        }
         console.log('Checkout completed:', session.id);
         break;
       }

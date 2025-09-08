@@ -7,7 +7,12 @@ const reservationSchema = new mongoose.Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
-  price: { type: Number, required: true }
+  price: { type: Number, required: true },
+  // Stripe payment fields
+  paymentStatus: { type: String, enum: ['unpaid', 'paid', 'refunded'], default: 'unpaid' },
+  paymentSessionId: { type: String },
+  paymentIntentId: { type: String },
+  currency: { type: String, default: 'eur' }
 }, { timestamps: true });
 
 // Index pour accélérer la recherche d'overlaps lors du calcul de disponibilité

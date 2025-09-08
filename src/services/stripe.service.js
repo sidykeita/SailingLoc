@@ -28,3 +28,15 @@ export async function redirectToCheckout(params) {
     throw new Error('URL de paiement non disponible');
   }
 }
+
+/**
+ * Create checkout session for a reservation and redirect
+ */
+export async function payReservation(reservationId) {
+  const { data } = await api.post(`/stripe/reservations/${reservationId}/checkout`);
+  if (data?.url) {
+    window.location.href = data.url;
+  } else {
+    throw new Error('URL de paiement non disponible');
+  }
+}
