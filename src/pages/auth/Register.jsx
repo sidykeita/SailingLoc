@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const Register = () => {
@@ -21,6 +20,7 @@ const Register = () => {
   
   const { register } = useAuth();
   const navigate = useNavigate();
+  const recaptchaRef = useRef(null);
   
   // Vérifier la connexion réseau au chargement
   useEffect(() => {
@@ -44,6 +44,36 @@ const Register = () => {
 
   console.log('Register - isRecaptchaEnabled:', isRecaptchaEnabled);
   console.log('Register - RECAPTCHA_SITE_KEY:', RECAPTCHA_SITE_KEY);
+
+  useEffect(() => {
+    if (isRecaptchaEnabled && recaptchaRef.current) {
+      console.log('Initialisation du reCAPTCHA...');
+      // Force le rendu du widget
+      const interval = setInterval(() => {
+        if (window.grecaptcha) {
+          console.log('grecaptcha trouvé, rendu du widget...');
+          window.grecaptcha.render('recaptcha-container', {
+            sitekey: RECAPTCHA_SITE_KEY,
+            callback: (token) => {
+              console.log('reCAPTCHA token généré:', token);
+              setRecaptchaToken(token);
+              setRecaptchaError('');
+            },
+            'expired-callback': () => {
+              console.log('reCAPTCHA expiré');
+              setRecaptchaToken('');
+            },
+            'error-callback': () => {
+              console.error('Erreur reCAPTCHA');
+              setRecaptchaToken('');
+            }
+          });
+          clearInterval(interval);
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isRecaptchaEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -215,26 +245,24 @@ const Register = () => {
             </div>
             
             {isRecaptchaEnabled ? (
-              <div className="mb-4" style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ border: '1px solid red', padding: '10px' }}>
-                  <div>DEBUG: Affichage du reCAPTCHA</div>
-                  <ReCAPTCHA
-                    sitekey={RECAPTCHA_SITE_KEY}
-                    onChange={(token) => {
-                      console.log('reCAPTCHA token:', token);
-                      setRecaptchaToken(token || '');
-                      setRecaptchaError('');
-                    }}
-                    onExpired={() => {
-                      console.log('reCAPTCHA expired');
-                      setRecaptchaToken('');
-                    }}
-                  />
+              <div className="mb-4" style={{ minHeight: '78px' }}>
+                <div style={{ 
+                  border: '1px solid #ccc', 
+                  padding: '10px',
+                  borderRadius: '4px',
+                  backgroundColor: '#f9f9f9'
+                }}>
+                  <div id="recaptcha-container" ref={recaptchaRef}></div>
+                  {!recaptchaToken && (
+                    <div style={{ color: '#666', fontSize: '0.9em', marginTop: '5px' }}>
+                      Veuillez valider le CAPTCHA pour continuer
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
               <div style={{ color: 'red', border: '1px solid red', padding: '10px' }}>
-                DEBUG: reCAPTCHA non activé ou clé manquante
+                reCAPTCHA non activé. Vérifiez votre configuration.
               </div>
             )}
             {recaptchaError && (
