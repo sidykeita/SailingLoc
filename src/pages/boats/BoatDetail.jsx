@@ -23,6 +23,7 @@ import {
 // Layout est maintenant géré au niveau des routes dans App.jsx
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/BoatDetail.css';
+import { payReservation } from '../../services/stripe.service';
 
 // Importation des images
 import logoBlc from '../../assets/images/logo-blc.png';
@@ -211,12 +212,9 @@ const BoatDetail = () => {
         const data = await res.json();
         throw new Error(data.message || "Erreur lors de la réservation.");
       }
-      setSuccess("Réservation effectuée avec succès !");
-      setStartDate('');
-      setEndDate('');
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2500);
+      const created = await res.json();
+      // Redirige immédiatement vers Stripe Checkout pour paiement
+      await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
     }
