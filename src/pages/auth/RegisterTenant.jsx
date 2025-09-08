@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
+import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const RegisterLocataire = () => {
   const [name, setName] = useState('');
@@ -14,6 +15,11 @@ const RegisterLocataire = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [networkError, setNetworkError] = useState(false);
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+  const [recaptchaError, setRecaptchaError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const recaptchaRef = useRef({ widgetId: null, initialized: false });
+  const recaptchaContainerRef = useRef(null);
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +43,83 @@ const RegisterLocataire = () => {
       window.removeEventListener('offline', checkNetwork);
     };
   }, []);
+
+  // Initialize reCAPTCHA (v2 explicit)
+  useEffect(() => {
+    if (!isRecaptchaEnabled) return;
+
+    let timer;
+
+    const loadRecaptcha = () => {
+      if (window.grecaptcha) {
+        initializeRecaptcha();
+      } else {
+        timer = setTimeout(() => {
+          if (window.grecaptcha) {
+            initializeRecaptcha();
+          } else {
+            console.error('reCAPTCHA API failed to load');
+            setRecaptchaError('Impossible de charger le CAPTCHA. Veuillez recharger la page.');
+          }
+        }, 2000);
+      }
+    };
+
+    const initializeRecaptcha = () => {
+      try {
+        if (recaptchaRef.current.initialized) {
+          setIsRecaptchaReady(true);
+          return;
+        }
+        const container = recaptchaContainerRef.current;
+        if (!container) {
+          console.error('reCAPTCHA container not found');
+          return;
+        }
+        if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
+          const widgetId = window.grecaptcha.render(container, {
+            sitekey: RECAPTCHA_SITE_KEY,
+            callback: (token) => {
+              setRecaptchaToken(token);
+              setRecaptchaError('');
+            },
+            'expired-callback': () => {
+              setRecaptchaToken('');
+            },
+            'error-callback': () => {
+              setRecaptchaToken('');
+              setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
+            }
+          });
+          recaptchaRef.current = { widgetId, initialized: true };
+          setIsRecaptchaReady(true);
+        }
+      } catch (error) {
+        console.error('Error initializing reCAPTCHA:', error);
+        setRecaptchaError('Erreur lors du chargement du CAPTCHA. Veuillez recharger la page.');
+      }
+    };
+
+    const handleRecaptchaReady = () => {
+      loadRecaptcha();
+    };
+
+    document.addEventListener('recaptchaReady', handleRecaptchaReady);
+    if (window.recaptchaLoaded) loadRecaptcha();
+
+    return () => {
+      document.removeEventListener('recaptchaReady', handleRecaptchaReady);
+      if (timer) clearTimeout(timer);
+      if (recaptchaRef.current && window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
+        try {
+          window.grecaptcha.reset(recaptchaRef.current.widgetId);
+        } catch (e) {
+          console.warn('Error resetting reCAPTCHA:', e);
+        }
+      }
+      recaptchaRef.current = { widgetId: null, initialized: false };
+    };
+  }, [isRecaptchaEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,6 +150,11 @@ const RegisterLocataire = () => {
       setError('');
       setLoading(true);
       setNetworkError(false);
+      setRecaptchaError('');
+      if (isRecaptchaEnabled && !recaptchaToken) {
+        setRecaptchaError('Veuillez valider le CAPTCHA');
+        return;
+      }
       
       // Préparation des données utilisateur pour l'inscription
       const userData = {
@@ -82,7 +170,7 @@ const RegisterLocataire = () => {
       delete userData.phoneNumber;
       
       // Appel de la fonction register du contexte d'authentification
-      const user = await register(userData);
+      const user = await register(userData, recaptchaToken);
       
       // Redirection vers la page de connexion après inscription
       navigate('/login');
@@ -114,6 +202,31 @@ const RegisterLocataire = () => {
               <span>Network Error</span>
             </div>
           )}
+
+          {isRecaptchaEnabled ? (
+            <div className="mb-4">
+              {/* Empty container owned by reCAPTCHA only */}
+              <div
+                ref={recaptchaContainerRef}
+                style={{
+                  minHeight: '78px',
+                  backgroundColor: '#f9f9f9',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd'
+                }}
+              />
+              {/* Loader as a sibling, not a child of the reCAPTCHA container */}
+              {!isRecaptchaReady && (
+                <div style={{ color: '#666', paddingTop: '8px', textAlign: 'center' }}>
+                  Chargement du CAPTCHA...
+                </div>
+              )}
+              {recaptchaError && (
+                <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
+              )}
+            </div>
+          ) : null}
           
           {error && !networkError && (
             <div className="error-alert" role="alert">

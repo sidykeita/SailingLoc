@@ -50,10 +50,8 @@ const RegisterOwner = () => {
 
     const loadRecaptcha = () => {
       if (window.grecaptcha) {
-        console.log('reCAPTCHA API loaded, initializing...');
         initializeRecaptcha();
       } else {
-        console.log('reCAPTCHA API not loaded yet, waiting...');
         timer = setTimeout(() => {
           if (window.grecaptcha) {
             initializeRecaptcha();
@@ -68,12 +66,9 @@ const RegisterOwner = () => {
     const initializeRecaptcha = () => {
       try {
         if (recaptchaRef.current.initialized) {
-          console.log('reCAPTCHA already initialized, skipping.');
           setIsRecaptchaReady(true);
           return;
         }
-
-        console.log('Initializing reCAPTCHA...');
         const container = recaptchaContainerRef.current;
         if (!container) {
           console.error('reCAPTCHA container not found');
@@ -84,22 +79,17 @@ const RegisterOwner = () => {
           const widgetId = window.grecaptcha.render(container, {
             sitekey: RECAPTCHA_SITE_KEY,
             callback: (token) => {
-              console.log('reCAPTCHA token generated:', token);
               setRecaptchaToken(token);
               setRecaptchaError('');
             },
             'expired-callback': () => {
-              console.log('reCAPTCHA expired');
               setRecaptchaToken('');
             },
             'error-callback': (error) => {
-              console.error('reCAPTCHA error:', error);
               setRecaptchaToken('');
               setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
             }
           });
-
-          console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
           recaptchaRef.current = { widgetId, initialized: true };
           setIsRecaptchaReady(true);
         }
@@ -110,7 +100,6 @@ const RegisterOwner = () => {
     };
 
     const handleRecaptchaReady = () => {
-      console.log('recaptchaReady event received');
       loadRecaptcha();
     };
 
@@ -188,8 +177,8 @@ const RegisterOwner = () => {
       userData.phone = userData.phoneNumber;
       delete userData.phoneNumber;
 
-      // Appel de la fonction register du contexte d'authentification
-      const user = await register(userData);
+      // Appel de la fonction register du contexte d'authentification avec le token reCAPTCHA
+      const user = await register(userData, recaptchaToken);
 
       // Redirection vers le dashboard propriétaire
       navigate('/owner/dashboard');
