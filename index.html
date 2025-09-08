@@ -7,19 +7,27 @@
     <title>SailingLoc - Location de bateaux</title>
     
     <!-- Google reCAPTCHA -->
-    <script 
-      src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit"
-      async 
-      defer>
-    </script>
     <script>
-      // Fonction de rappel appelée quand reCAPTCHA est prêt
+      // Global callback for reCAPTCHA
       window.onRecaptchaLoad = function() {
         console.log('reCAPTCHA prêt');
         window.recaptchaLoaded = true;
-        // Déclenche un événement personnalisé pour informer React
+        // Trigger custom event to notify React components
         document.dispatchEvent(new Event('recaptchaReady'));
       };
+
+      // Load reCAPTCHA script
+      (function() {
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit`;
+        script.async = true;
+        script.defer = true;
+        script.onerror = function() {
+          console.error('Failed to load reCAPTCHA script');
+          document.dispatchEvent(new Event('recaptchaError'));
+        };
+        document.head.appendChild(script);
+      })();
     </script>
     
   </head>

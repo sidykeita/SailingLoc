@@ -14,72 +14,114 @@ const Register = () => {
   const [role, setRole] = useState('locataire');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [networkError, setNetworkError] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [networkConnected, setNetworkConnected] = useState(true);
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const recaptchaRef = useRef(null);
   
   const { register } = useAuth();
   const navigate = useNavigate();
-  const recaptchaRef = useRef(null);
   
   // Vérifier la connexion réseau au chargement
   useEffect(() => {
-    const checkNetwork = () => {
-      if (!navigator.onLine) {
-        setNetworkError(true);
-      } else {
-        setNetworkError(false);
-      }
-    };
+    setNetworkConnected(navigator.onLine);
     
-    checkNetwork();
-    window.addEventListener('online', checkNetwork);
-    window.addEventListener('offline', checkNetwork);
+    const handleOnline = () => setNetworkConnected(true);
+    const handleOffline = () => setNetworkConnected(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
     
     return () => {
-      window.removeEventListener('online', checkNetwork);
-      window.removeEventListener('offline', checkNetwork);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
-  console.log('Register - isRecaptchaEnabled:', isRecaptchaEnabled);
-  console.log('Register - RECAPTCHA_SITE_KEY:', RECAPTCHA_SITE_KEY);
-
+  // Initialize reCAPTCHA
   useEffect(() => {
-    if (isRecaptchaEnabled && recaptchaRef.current) {
-      console.log('Initialisation du reCAPTCHA...');
-      // Force le rendu du widget
-      const interval = setInterval(() => {
-        if (window.grecaptcha) {
-          console.log('grecaptcha trouvé, rendu du widget...');
-          window.grecaptcha.render('recaptcha-container', {
-            sitekey: RECAPTCHA_SITE_KEY,
-            callback: (token) => {
-              console.log('reCAPTCHA token généré:', token);
-              setRecaptchaToken(token);
-              setRecaptchaError('');
-            },
-            'expired-callback': () => {
-              console.log('reCAPTCHA expiré');
-              setRecaptchaToken('');
-            },
-            'error-callback': () => {
-              console.error('Erreur reCAPTCHA');
-              setRecaptchaToken('');
-            }
-          });
-          clearInterval(interval);
+    if (!isRecaptchaEnabled) return;
+
+    const loadRecaptcha = () => {
+      if (window.grecaptcha) {
+        console.log('reCAPTCHA API loaded, initializing...');
+        initializeRecaptcha();
+      } else {
+        console.log('reCAPTCHA API not loaded yet, waiting...');
+        // Fallback: Try again after a delay
+        const timer = setTimeout(() => {
+          if (window.grecaptcha) {
+            initializeRecaptcha();
+          } else {
+            console.error('reCAPTCHA API failed to load');
+            setRecaptchaError('Impossible de charger le CAPTCHA. Veuillez recharger la page.');
+          }
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    const initializeRecaptcha = () => {
+      try {
+        console.log('Initializing reCAPTCHA...');
+        const container = document.getElementById('recaptcha-container');
+        if (!container) {
+          console.error('reCAPTCHA container not found');
+          return;
         }
-      }, 500);
-      return () => clearInterval(interval);
+        
+        // Clear any existing reCAPTCHA
+        container.innerHTML = '';
+        
+        window.grecaptcha.render('recaptcha-container', {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: (token) => {
+            console.log('reCAPTCHA token generated:', token);
+            setRecaptchaToken(token);
+            setRecaptchaError('');
+          },
+          'expired-callback': () => {
+            console.log('reCAPTCHA expired');
+            setRecaptchaToken('');
+          },
+          'error-callback': (error) => {
+            console.error('reCAPTCHA error:', error);
+            setRecaptchaToken('');
+            setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
+          }
+        });
+        
+        console.log('reCAPTCHA initialized successfully');
+        setIsRecaptchaReady(true);
+      } catch (error) {
+        console.error('Error initializing reCAPTCHA:', error);
+        setRecaptchaError('Erreur lors du chargement du CAPTCHA. Veuillez recharger la page.');
+      }
+    };
+
+    // Listen for the recaptchaReady event
+    const handleRecaptchaReady = () => {
+      console.log('recaptchaReady event received');
+      loadRecaptcha();
+    };
+
+    document.addEventListener('recaptchaReady', handleRecaptchaReady);
+    
+    // Initial load check
+    if (window.recaptchaLoaded) {
+      loadRecaptcha();
     }
+
+    return () => {
+      document.removeEventListener('recaptchaReady', handleRecaptchaReady);
+    };
   }, [isRecaptchaEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!navigator.onLine) {
-      setNetworkError(true);
+    if (!networkConnected) {
       setError('Vérifiez votre connexion internet et réessayez.');
       return;
     }
@@ -103,7 +145,6 @@ const Register = () => {
     try {
       setError('');
       setLoading(true);
-      setNetworkError(false);
       setRecaptchaError('');
       if (isRecaptchaEnabled && !recaptchaToken) {
         setRecaptchaError('Veuillez valider le CAPTCHA');
@@ -134,12 +175,7 @@ const Register = () => {
       }
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
-      if (!navigator.onLine) {
-        setNetworkError(true);
-        setError('Vérifiez votre connexion internet et réessayez.');
-      } else {
-        setError(err.message || 'Erreur lors de l\'inscription. Veuillez réessayer.');
-      }
+      setError(err.message || 'Erreur lors de l\'inscription. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -154,13 +190,13 @@ const Register = () => {
         <div className="register-form-container">
           <div className="register-title">Inscription</div>
           
-          {networkError && (
+          {!networkConnected && (
             <div className="error-alert" role="alert">
               <span>Network Error</span>
             </div>
           )}
           
-          {error && !networkError && (
+          {error && networkConnected && (
             <div className="error-alert" role="alert">
               <span>{error}</span>
             </div>
@@ -245,32 +281,36 @@ const Register = () => {
             </div>
             
             {isRecaptchaEnabled ? (
-              <div className="mb-4" style={{ minHeight: '78px' }}>
-                <div style={{ 
-                  border: '1px solid #ccc', 
-                  padding: '10px',
-                  borderRadius: '4px',
-                  backgroundColor: '#f9f9f9'
-                }}>
-                  <div id="recaptcha-container" ref={recaptchaRef}></div>
-                  {!recaptchaToken && (
-                    <div style={{ color: '#666', fontSize: '0.9em', marginTop: '5px' }}>
-                      Veuillez valider le CAPTCHA pour continuer
+              <div className="mb-4">
+                <div 
+                  id="recaptcha-container" 
+                  ref={recaptchaRef}
+                  style={{
+                    minHeight: '78px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    backgroundColor: '#f9f9f9',
+                    padding: '10px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd'
+                  }}
+                >
+                  {!isRecaptchaReady && (
+                    <div style={{ color: '#666', padding: '10px' }}>
+                      Chargement du CAPTCHA...
                     </div>
                   )}
                 </div>
+                {recaptchaError && (
+                  <div className="text-red-500 text-sm mt-2">{recaptchaError}</div>
+                )}
               </div>
             ) : (
-              <div style={{ color: 'red', border: '1px solid red', padding: '10px' }}>
+              <div className="text-yellow-600 text-sm mb-4">
                 reCAPTCHA non activé. Vérifiez votre configuration.
               </div>
             )}
-            {recaptchaError && (
-              <div className="error-alert" role="alert">
-                <span>{recaptchaError}</span>
-              </div>
-            )}
-
+            
             <button
               type="submit"
               className="submit-button"
