@@ -59,6 +59,9 @@ import FAQ from './pages/help/FAQ';
 
 // Page de contact
 import Contact from './pages/contact/Contact';
+import PaymentSuccess from './pages/payments/PaymentSuccess';
+import PaymentCancel from './pages/payments/PaymentCancel';
+import PaymentTest from './pages/payments/PaymentTest';
 
 import Calendrier from './pages/dashboard/Calendrier';
 import Reservations from './pages/dashboard/Reservations';
@@ -136,6 +139,11 @@ function App() {
           <Route path="/register" element={!currentUser ? <RegisterHome /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
           <Route path="/register/tenant" element={!currentUser ? <RegisterTenant /> : <Navigate to='/dashboard' />} />
           <Route path="/register/owner" element={!currentUser ? <RegisterOwner /> : <Navigate to='/owner/dashboard' />} />
+
+          {/* Paiements Stripe */}
+          <Route path="/payment/success" element={<Layout><PaymentSuccess /></Layout>} />
+          <Route path="/payment/cancel" element={<Layout><PaymentCancel /></Layout>} />
+          <Route path="/payment/test" element={<Layout><PaymentTest /></Layout>} />
           
           {/* Conserver l'ancienne route pour la compatibilité */}
           <Route path="/register/old" element={!currentUser ? <Register /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
