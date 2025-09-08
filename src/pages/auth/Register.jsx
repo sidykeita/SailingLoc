@@ -18,8 +18,8 @@ const Register = () => {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState(null);
   const recaptchaRef = useRef(null);
+  const recaptchaContainerRef = useRef(null);
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const Register = () => {
   useEffect(() => {
     if (!isRecaptchaEnabled) return;
     
-    let cleanup = () => {};
+    let widgetId = null;
     let timer;
 
     const loadRecaptcha = () => {
@@ -67,24 +67,21 @@ const Register = () => {
     const initializeRecaptcha = () => {
       try {
         console.log('Initializing reCAPTCHA...');
-        const container = recaptchaRef.current;
+        const container = recaptchaContainerRef.current;
+        
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
         }
 
-        if (recaptchaWidgetId !== null) {
-          console.log('reCAPTCHA already initialized, skipping render. widgetId=', recaptchaWidgetId);
-          setIsRecaptchaReady(true);
-          return;
-        }
-        
         // Clear any existing reCAPTCHA widgets
         if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
-          // Reset the container
+          // Create a new container for reCAPTCHA
           container.innerHTML = '';
+          const newContainer = document.createElement('div');
+          container.appendChild(newContainer);
           
-          const widgetId = window.grecaptcha.render(container, {
+          widgetId = window.grecaptcha.render(newContainer, {
             sitekey: RECAPTCHA_SITE_KEY,
             callback: (token) => {
               console.log('reCAPTCHA token generated:', token);
@@ -103,19 +100,8 @@ const Register = () => {
           });
           
           console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
-          setRecaptchaWidgetId(widgetId);
+          recaptchaRef.current = { widgetId, container: newContainer };
           setIsRecaptchaReady(true);
-          
-          // Store cleanup function
-          cleanup = () => {
-            if (window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
-              try {
-                window.grecaptcha.reset(widgetId);
-              } catch (e) {
-                console.warn('Error resetting reCAPTCHA:', e);
-              }
-            }
-          };
         }
       } catch (error) {
         console.error('Error initializing reCAPTCHA:', error);
@@ -123,7 +109,6 @@ const Register = () => {
       }
     };
 
-    // Listen for the recaptchaReady event
     const handleRecaptchaReady = () => {
       console.log('recaptchaReady event received');
       loadRecaptcha();
@@ -131,15 +116,30 @@ const Register = () => {
 
     document.addEventListener('recaptchaReady', handleRecaptchaReady);
     
-    // Initial load check
     if (window.recaptchaLoaded) {
       loadRecaptcha();
     }
 
+    // Cleanup function
     return () => {
       document.removeEventListener('recaptchaReady', handleRecaptchaReady);
       if (timer) clearTimeout(timer);
-      cleanup();
+      
+      // Cleanup reCAPTCHA widget if it exists
+      if (recaptchaRef.current && window.grecaptcha) {
+        try {
+          const { widgetId: currentWidgetId, container } = recaptchaRef.current;
+          if (typeof window.grecaptcha.reset === 'function') {
+            window.grecaptcha.reset(currentWidgetId);
+          }
+          if (container && container.parentNode) {
+            container.parentNode.removeChild(container);
+          }
+        } catch (e) {
+          console.warn('Error cleaning up reCAPTCHA:', e);
+        }
+        recaptchaRef.current = null;
+      }
     };
   }, [isRecaptchaEnabled]);
 
@@ -308,8 +308,7 @@ const Register = () => {
             {isRecaptchaEnabled ? (
               <div className="mb-4">
                 <div 
-                  id="recaptcha-container" 
-                  ref={recaptchaRef}
+                  ref={recaptchaContainerRef}
                   style={{
                     minHeight: '78px',
                     display: 'flex',

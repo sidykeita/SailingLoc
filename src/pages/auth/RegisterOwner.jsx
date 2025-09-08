@@ -20,22 +20,22 @@ const RegisterOwner = () => {
   const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState('');
-  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState(null);
   const recaptchaRef = useRef(null);
-  
+  const recaptchaContainerRef = useRef(null);
+
   const { register } = useAuth();
   const navigate = useNavigate();
-  
+
   // Vérifier la connexion réseau au chargement
   useEffect(() => {
     setNetworkConnected(navigator.onLine);
-    
+
     const handleOnline = () => setNetworkConnected(true);
     const handleOffline = () => setNetworkConnected(false);
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -45,8 +45,8 @@ const RegisterOwner = () => {
   // Initialize reCAPTCHA
   useEffect(() => {
     if (!isRecaptchaEnabled) return;
-    
-    let cleanup = () => {};
+
+    let widgetId = null;
     let timer;
 
     const loadRecaptcha = () => {
@@ -69,24 +69,21 @@ const RegisterOwner = () => {
     const initializeRecaptcha = () => {
       try {
         console.log('Initializing reCAPTCHA...');
-        const container = recaptchaRef.current;
+        const container = recaptchaContainerRef.current;
+
         if (!container) {
           console.error('reCAPTCHA container not found');
           return;
         }
 
-        if (recaptchaWidgetId !== null) {
-          console.log('reCAPTCHA already initialized, skipping render. widgetId=', recaptchaWidgetId);
-          setIsRecaptchaReady(true);
-          return;
-        }
-        
         // Clear any existing reCAPTCHA widgets
         if (window.grecaptcha && typeof window.grecaptcha.render === 'function') {
-          // Reset the container
+          // Create a new container for reCAPTCHA
           container.innerHTML = '';
-          
-          const widgetId = window.grecaptcha.render(container, {
+          const newContainer = document.createElement('div');
+          container.appendChild(newContainer);
+
+          widgetId = window.grecaptcha.render(newContainer, {
             sitekey: RECAPTCHA_SITE_KEY,
             callback: (token) => {
               console.log('reCAPTCHA token generated:', token);
@@ -103,21 +100,10 @@ const RegisterOwner = () => {
               setRecaptchaError('Erreur lors de la vérification CAPTCHA. Veuillez réessayer.');
             }
           });
-          
+
           console.log('reCAPTCHA initialized successfully with widgetId:', widgetId);
-          setRecaptchaWidgetId(widgetId);
+          recaptchaRef.current = { widgetId, container: newContainer };
           setIsRecaptchaReady(true);
-          
-          // Store cleanup function
-          cleanup = () => {
-            if (window.grecaptcha && typeof window.grecaptcha.reset === 'function') {
-              try {
-                window.grecaptcha.reset(widgetId);
-              } catch (e) {
-                console.warn('Error resetting reCAPTCHA:', e);
-              }
-            }
-          };
         }
       } catch (error) {
         console.error('Error initializing reCAPTCHA:', error);
@@ -131,57 +117,73 @@ const RegisterOwner = () => {
     };
 
     document.addEventListener('recaptchaReady', handleRecaptchaReady);
-    
+
     if (window.recaptchaLoaded) {
       loadRecaptcha();
     }
 
+    // Cleanup function
     return () => {
       document.removeEventListener('recaptchaReady', handleRecaptchaReady);
       if (timer) clearTimeout(timer);
-      cleanup();
+
+      // Cleanup reCAPTCHA widget if it exists
+      if (recaptchaRef.current && window.grecaptcha) {
+        try {
+          const { widgetId: currentWidgetId, container } = recaptchaRef.current;
+          if (typeof window.grecaptcha.reset === 'function') {
+            window.grecaptcha.reset(currentWidgetId);
+          }
+          if (container && container.parentNode) {
+            container.parentNode.removeChild(container);
+          }
+        } catch (e) {
+          console.warn('Error cleaning up reCAPTCHA:', e);
+        }
+        recaptchaRef.current = null;
+      }
     };
   }, [isRecaptchaEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!networkConnected) {
       setError('Vérifiez votre connexion internet et réessayez.');
       return;
     }
-    
+
     if (!acceptTerms) {
       setError('Veuvez accepter les conditions d\'utilisation pour continuer.');
       return;
     }
-    
+
     if (isRecaptchaEnabled && !recaptchaToken) {
       setRecaptchaError('Veuillez valider le CAPTCHA');
       return;
     }
-    
+
     // Validation des champs
     if (!name || !email || !password || !confirmPassword || !phoneNumber || !homePort) {
       setError('Veuillez remplir tous les champs obligatoires');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
       return;
     }
-    
+
     if (password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
-    
+
     try {
       setError('');
       setLoading(true);
       setNetworkConnected(true);
-      
+
       // Préparation des données utilisateur pour l'inscription
       const userData = {
         firstName: name.split(' ')[0],
@@ -194,10 +196,10 @@ const RegisterOwner = () => {
       };
       userData.phone = userData.phoneNumber;
       delete userData.phoneNumber;
-      
+
       // Appel de la fonction register du contexte d'authentification
       const user = await register(userData);
-      
+
       // Redirection vers le dashboard propriétaire
       navigate('/owner/dashboard');
     } catch (err) {
@@ -222,13 +224,13 @@ const RegisterOwner = () => {
         <div className="register-form-container">
           <div className="register-title">Inscription Propriétaire</div>
           <div className="register-subtitle">Mettez votre bateau en location et générez des revenus</div>
-          
+
           {error && (
             <div className="error-alert" role="alert">
               <span>{error}</span>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="name" className="form-label">Nom complet</label>
@@ -241,7 +243,7 @@ const RegisterOwner = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="email" className="form-label">Email</label>
               <input
@@ -253,7 +255,7 @@ const RegisterOwner = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
               <input
@@ -265,7 +267,7 @@ const RegisterOwner = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="homePort" className="form-label">Port d'attache principal</label>
               <input
@@ -277,7 +279,7 @@ const RegisterOwner = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="password" className="form-label">Mot de passe</label>
               <input
@@ -290,7 +292,7 @@ const RegisterOwner = () => {
               />
               <div className="form-hint">Au moins 6 caractères</div>
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="confirmPassword" className="form-label">Confirmer le mot de passe</label>
               <input
@@ -302,7 +304,7 @@ const RegisterOwner = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <div className="checkbox-container">
                 <input
@@ -317,12 +319,11 @@ const RegisterOwner = () => {
                 </label>
               </div>
             </div>
-            
+
             {isRecaptchaEnabled ? (
               <div className="mb-4">
-                <div 
-                  id="recaptcha-container-owner" 
-                  ref={recaptchaRef}
+                <div
+                  ref={recaptchaContainerRef}
                   style={{
                     minHeight: '78px',
                     display: 'flex',
@@ -348,7 +349,7 @@ const RegisterOwner = () => {
                 reCAPTCHA non activé. Vérifiez votre configuration.
               </div>
             )}
-            
+
             <button
               type="submit"
               className="submit-button owner-button"
@@ -356,13 +357,13 @@ const RegisterOwner = () => {
             >
               {loading ? 'Inscription en cours...' : 'Créer mon compte propriétaire'}
             </button>
-            
+
             <div className="login-link">
               <p>Déjà inscrit ? <Link to="/login">Se connecter</Link></p>
             </div>
           </form>
         </div>
-        
+
         <div className="terms">
           <p>
             En vous inscrivant, vous acceptez nos{' '}
