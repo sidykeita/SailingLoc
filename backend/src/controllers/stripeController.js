@@ -213,7 +213,44 @@ exports.webhook = async (req, res) => {
         break;
       }
       case 'payment_intent.succeeded':
-        // Optional: handle intents directly if needed
+        // Gestion directe via PaymentIntent (certaines configs Stripe envoient cet event)
+        try {
+          const intent = event.data.object;
+          const reservationId = intent.metadata?.reservationId;
+          if (reservationId) {
+            try {
+              await Reservation.findByIdAndUpdate(
+                reservationId,
+                {
+                  status: 'confirmed',
+                  paymentStatus: 'paid',
+                  paymentIntentId: intent.id,
+                },
+                { new: true }
+              );
+
+              // Créer un enregistrement de paiement
+              try {
+                await Payment.create({
+                  reservation: reservationId,
+                  amount: typeof intent.amount_received === 'number' ? intent.amount_received / 100 : (typeof intent.amount === 'number' ? intent.amount / 100 : 0),
+                  method: 'carte',
+                  status: 'effectué',
+                  paymentDate: new Date(),
+                });
+              } catch (pErr) {
+                console.error('Failed to create Payment from intent:', pErr);
+              }
+            } catch (dbErr) {
+              console.error('Failed to update reservation from intent:', dbErr);
+            }
+          } else {
+            console.warn('PaymentIntent without reservationId metadata:', intent.id);
+          }
+          console.log('PaymentIntent succeeded:', intent.id);
+        } catch (e) {
+          console.error('Error handling payment_intent.succeeded:', e);
+        }
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
