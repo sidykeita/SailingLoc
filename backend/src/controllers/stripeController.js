@@ -85,8 +85,9 @@ exports.createReservationCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/cancel`,
+      // Redirection directe vers la page du bateau avec l'état de paiement
+      success_url: `${(process.env.FRONTEND_URL || 'http://localhost:5173')}/boats/${reservation.boat?._id?.toString() || ''}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${(process.env.FRONTEND_URL || 'http://localhost:5173')}/boats/${reservation.boat?._id?.toString() || ''}?payment=cancel`,
       metadata: {
         reservationId: reservation._id.toString(),
         userId: reservation.user?._id?.toString() || '',

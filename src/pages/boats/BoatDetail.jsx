@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../../lib/api';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
 import reviewService from '../../services/review.service';
@@ -51,6 +51,7 @@ const BoatDetail = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useAuth();
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -83,6 +84,27 @@ const BoatDetail = () => {
     };
     if (id) fetchReservations();
   }, [id]);
+
+  // Affiche le résultat de paiement après retour de Stripe et nettoie l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search || '');
+    const payment = params.get('payment');
+    const sessionId = params.get('session_id');
+    if (payment === 'success') {
+      setSuccess('Paiement accepté ✔️');
+      // Optionnel: vérifier sessionId côté backend
+      // fetch(`${API_URL}/payments/confirm?session_id=${sessionId}`)
+    } else if (payment === 'cancel') {
+      setError('Paiement annulé ❌');
+    }
+    if (payment) {
+      // Nettoyer l'URL pour revenir à /boats/:id sans query
+      setTimeout(() => {
+        navigate(`/boats/${id}`, { replace: true });
+      }, 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, id]);
 
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
