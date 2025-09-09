@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 const Reservation = require('../models/reservation');
+const Payment = require('../models/payment');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
@@ -85,9 +86,8 @@ exports.createReservationCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      // Redirection directe vers la page du bateau avec l'état de paiement
-      success_url: `${(process.env.FRONTEND_URL || 'http://localhost:5173')}/boats/${reservation.boat?._id?.toString() || ''}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${(process.env.FRONTEND_URL || 'http://localhost:5173')}/boats/${reservation.boat?._id?.toString() || ''}?payment=cancel`,
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/cancel`,
       metadata: {
         reservationId: reservation._id.toString(),
         userId: reservation.user?._id?.toString() || '',
@@ -133,6 +133,18 @@ exports.webhook = async (req, res) => {
               },
               { new: true }
             );
+            // Create a Payment record for bookkeeping
+            try {
+              await Payment.create({
+                reservation: reservationId,
+                amount: typeof session.amount_total === 'number' ? session.amount_total / 100 : 0,
+                method: 'carte',
+                status: 'effectué',
+                paymentDate: new Date(),
+              });
+            } catch (pErr) {
+              console.error('Failed to create Payment record:', pErr);
+            }
           } catch (dbErr) {
             console.error('Failed to update reservation as paid:', dbErr);
           }
