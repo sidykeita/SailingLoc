@@ -39,6 +39,10 @@ exports.createCheckoutSession = async (req, res) => {
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/cancel`,
       metadata,
+      // Propager les métadonnées vers le PaymentIntent pour les événements payment_intent.*
+      payment_intent_data: {
+        metadata,
+      },
     });
 
     return res.json({ id: session.id, url: session.url });
@@ -92,6 +96,14 @@ exports.createReservationCheckoutSession = async (req, res) => {
         reservationId: reservation._id.toString(),
         userId: reservation.user?._id?.toString() || '',
         boatId: reservation.boat?._id?.toString() || '',
+      },
+      // Propager les métadonnées vers le PaymentIntent pour récupérer reservationId dans payment_intent.succeeded
+      payment_intent_data: {
+        metadata: {
+          reservationId: reservation._id.toString(),
+          userId: reservation.user?._id?.toString() || '',
+          boatId: reservation.boat?._id?.toString() || '',
+        },
       },
     });
 
@@ -213,10 +225,26 @@ exports.webhook = async (req, res) => {
         break;
       }
       case 'payment_intent.succeeded':
-        // Gestion directe via PaymentIntent (certaines configs Stripe envoient cet event)
+        // Gestion via PaymentIntent (cas où l'event checkout.session.completed n'est pas reçu)
         try {
           const intent = event.data.object;
-          const reservationId = intent.metadata?.reservationId;
+          let reservationId = intent.metadata?.reservationId;
+
+          // Fallback: si pas de reservationId dans le PaymentIntent, tenter de récupérer la Checkout Session liée
+          if (!reservationId) {
+            try {
+              const sessions = await stripe.checkout.sessions.list({ payment_intent: intent.id, limit: 1 });
+              const linkedSession = sessions?.data?.[0];
+              if (linkedSession?.metadata?.reservationId) {
+                reservationId = linkedSession.metadata.reservationId;
+                console.log('Recovered reservationId from Checkout Session:', reservationId);
+              } else {
+                console.warn('No reservationId found on linked Checkout Session for intent:', intent.id);
+              }
+            } catch (lsErr) {
+              console.error('Failed to list Checkout Sessions for intent:', intent.id, lsErr);
+            }
+          }
           if (reservationId) {
             try {
               await Reservation.findByIdAndUpdate(
