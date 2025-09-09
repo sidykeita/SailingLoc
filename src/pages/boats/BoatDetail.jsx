@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../../lib/api';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
 import reviewService from '../../services/review.service';
@@ -51,7 +51,6 @@ const BoatDetail = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { currentUser } = useAuth();
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -169,27 +168,9 @@ const BoatDetail = () => {
     fetchReviews();
   }, [id]);
 
-  useEffect(() => {
-    // Detect payment result from Stripe redirect and show a message, then clean URL
-    const params = new URLSearchParams(location.search || '');
-    const payment = params.get('payment');
-    const sessionId = params.get('session_id');
-    if (payment === 'success') {
-      setSuccess('Paiement accepté ✔️');
-      // Optionally: verify sessionId with backend here
-    } else if (payment === 'cancel') {
-      setError("Paiement annulé ❌");
-    }
-    if (payment) {
-      // Clean the URL without query params
-      const cleanPath = `/boats/${id}`;
-      // Small timeout so the user sees the message before URL is cleaned
-      setTimeout(() => {
-        navigate(cleanPath, { replace: true });
-      }, 300);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, id]);
+  if (loading) return <div>Chargement...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
+  if (!boat) return <div>Bateau introuvable</div>;
 
   const handleReservation = async (e) => {
     e.preventDefault();
@@ -238,10 +219,6 @@ const BoatDetail = () => {
       setError(err.message || "Erreur lors de la réservation.");
     }
   };
-
-  if (loading) return <div>Chargement...</div>;
-  if (error) return <div className="text-red-600">{error}</div>;
-  if (!boat) return <div>Bateau introuvable</div>;
 
   return (
     <div className="boat-detail-page boat-detail-container">
