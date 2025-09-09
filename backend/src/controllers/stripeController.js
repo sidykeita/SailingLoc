@@ -102,6 +102,66 @@ exports.createReservationCheckoutSession = async (req, res) => {
   }
 };
 
+// Confirm payment manually using session_id (alternative to webhook)
+exports.confirmPayment = async (req, res) => {
+  try {
+    const { session_id } = req.query;
+    
+    if (!session_id) {
+      return res.status(400).json({ message: 'session_id requis' });
+    }
+
+    // Retrieve session from Stripe
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    
+    if (session.payment_status !== 'paid') {
+      return res.status(400).json({ message: 'Paiement non confirmé' });
+    }
+
+    const { reservationId } = session.metadata || {};
+    
+    if (!reservationId) {
+      return res.status(400).json({ message: 'Aucune réservation associée' });
+    }
+
+    // Update reservation
+    const reservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      {
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        paymentSessionId: session.id,
+        paymentIntentId: session.payment_intent || '',
+      },
+      { new: true }
+    );
+
+    if (!reservation) {
+      return res.status(404).json({ message: 'Réservation non trouvée' });
+    }
+
+    // Create Payment record
+    const payment = await Payment.create({
+      reservation: reservationId,
+      amount: typeof session.amount_total === 'number' ? session.amount_total / 100 : 0,
+      method: 'carte',
+      status: 'effectué',
+      paymentDate: new Date(),
+    });
+
+    res.json({ 
+      message: 'Paiement confirmé', 
+      reservation, 
+      payment,
+      session_id: session.id 
+    });
+
+  } catch (error) {
+    console.error('Erreur confirmation paiement:', error);
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
+  }
+};
+
 // Stripe Webhook handler (must use express.raw on the route)
 exports.webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
