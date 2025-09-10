@@ -55,6 +55,17 @@ const BoatDetail = () => {
     });
   }
 
+  // Fonction utilitaire pour savoir si une date est bloquée
+  function isDateBlocked(dateStr) {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    return blockedDates.some(b => {
+      const bStart = new Date(b.startDate);
+      const bEnd = new Date(b.endDate);
+      return d >= bStart && d <= bEnd;
+    });
+  }
+
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -115,7 +126,11 @@ const BoatDetail = () => {
     }
     return list;
   };
-  const disabledDates = reservations.flatMap(r => enumerateDates(new Date(r.startDate), new Date(r.endDate)));
+  // Dates désactivées : réservations + blocages
+  const disabledDates = [
+    ...reservations.flatMap(r => enumerateDates(new Date(r.startDate), new Date(r.endDate))),
+    ...blockedDates.flatMap(b => enumerateDates(new Date(b.startDate), new Date(b.endDate)))
+  ];
 
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
