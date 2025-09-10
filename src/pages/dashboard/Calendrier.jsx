@@ -60,9 +60,9 @@ const Calendrier = () => {
           setEvents([]);
           return;
         }
-        // Mapper chaque réservation confirmée comme un seul objet (start/end)
+        // Mapper chaque réservation (confirmée ou en attente) comme un seul objet (start/end)
         const mapped = (reservationsData || [])
-          .filter(r => r.status === 'confirmed' && r.startDate && r.endDate)
+          .filter(r => ['confirmed','pending'].includes(r.status) && r.startDate && r.endDate)
           .map(r => ({
             id: r._id || r.id,
             reservationId: r._id || r.id,
@@ -164,6 +164,21 @@ const Calendrier = () => {
 
   const days = getDaysInMonth(currentDate);
   const today = new Date();
+
+  // Jour indisponible si une réservation (confirmed ou pending) couvre ce jour pour le bateau sélectionné
+  const isBookedDay = (day) => {
+    if (!day || !selectedBoatId) return false;
+    const dayTs = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getTime();
+    return (events || []).some((res) => {
+      if (res.boatId !== selectedBoatId) return false;
+      if (!['confirmed', 'pending'].includes(res.status)) return false;
+      const s = new Date(res.start);
+      const e = new Date(res.end);
+      const sTs = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+      const eTs = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
+      return sTs <= dayTs && dayTs <= eTs;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -276,15 +291,16 @@ const Calendrier = () => {
                   {days.map((day, index) => {
                     const isToday = day && day.toDateString() === today.toDateString();
                     const isSelected = selectedDate && day && day.toDateString() === selectedDate.toDateString();
+                    const booked = day ? isBookedDay(day) : false;
                     // Ne rien faire si la case est vide (pas de jour)
-                    const handleClick = () => { if (day) setSelectedDate(day); };
+                    const handleClick = () => { if (day && !booked) setSelectedDate(day); };
                     return (
   <div
     key={index}
-    className={`bg-white min-h-[60px] p-1 ${day ? 'cursor-pointer hover:bg-gray-50' : 'cursor-default'} transition-colors ${
+    className={`bg-white min-h-[60px] p-1 ${day ? (booked ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50') : 'cursor-default'} transition-colors ${
       isSelected ? 'ring-2 ring-primary' : ''
-    }`}
-    onClick={day ? () => setSelectedDate(day) : undefined}
+    } ${booked ? 'opacity-60' : ''}`}
+    onClick={day && !booked ? () => setSelectedDate(day) : undefined}
     style={{ position: 'relative' }}
   >
     {day && (
@@ -295,8 +311,8 @@ const Calendrier = () => {
               ? 'bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center'
               : day.getMonth() !== currentDate.getMonth()
                 ? 'text-gray-400'
-                : 'text-gray-900'
-          }`}>
+                : booked ? 'text-gray-400 line-through' : 'text-gray-900'
+          }`} title={booked ? 'Indisponible (réservé)' : ''}>
             {day.getDate()}
           </span>
         </div>
