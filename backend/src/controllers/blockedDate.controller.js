@@ -26,6 +26,17 @@ exports.listByBoat = async (req, res) => {
   }
 };
 
+// GET /api/blocks/public/boat/:boatId (public, dates uniquement)
+exports.listByBoatPublic = async (req, res) => {
+  try {
+    const { boatId } = req.params;
+    const blocks = await BlockedDate.find({ boat: boatId }).select('startDate endDate').sort({ startDate: 1 });
+    res.json(blocks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST /api/blocks
 // Body: { boatId, startDate, endDate, reason, notes, locked }
 exports.create = async (req, res) => {

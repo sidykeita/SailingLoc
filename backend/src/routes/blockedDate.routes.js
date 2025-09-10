@@ -7,6 +7,9 @@ const controller = require('../controllers/blockedDate.controller');
 // Liste des blocages pour un bateau (owner/admin)
 router.get('/boat/:boatId', protect, controller.listByBoat);
 
+// Liste publique (dates uniquement) pour un bateau
+router.get('/public/boat/:boatId', controller.listByBoatPublic);
+
 // Créer un blocage (owner/admin)
 router.post('/', protect, controller.create);
 

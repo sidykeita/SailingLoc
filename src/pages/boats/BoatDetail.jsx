@@ -132,6 +132,25 @@ const BoatDetail = () => {
     ...blockedDates.flatMap(b => enumerateDates(new Date(b.startDate), new Date(b.endDate)))
   ];
 
+  // Fonction pour désactiver un jour (utilisée par react-date-range)
+  const isDayDisabled = (date) => {
+    if (!date) return false;
+    const d0 = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const match = disabledDates.some(d => {
+      const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      return dd === d0;
+    });
+    return match;
+  };
+
+  const selectionContainsDisabled = (sel) => {
+    const s = sel?.startDate ? new Date(sel.startDate) : null;
+    const e = sel?.endDate ? new Date(sel.endDate) : null;
+    if (!s || !e) return false;
+    const days = enumerateDates(s, e);
+    return days.some(isDayDisabled);
+  };
+
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
     return (
