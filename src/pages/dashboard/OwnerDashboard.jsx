@@ -275,12 +275,13 @@ const [deleteDone, setDeleteDone] = useState(false);
                 onClose={() => setEditModalOpen(false)}
                 currentEmail={currentUser?.email}
                 currentPhone={currentUser?.phone}
-                onSave={async ({ email, phone }) => {
-                  await userService.updateProfile(currentUser._id, { email, phone });
+                onSave={async ({ email, phone, idCardUrl }) => {
+                  await userService.updateProfile(currentUser._id, { email, phone, idCardUrl });
                   // Met à jour currentUser côté front (contexte Auth)
                   if (currentUser) {
                     currentUser.email = email;
                     currentUser.phone = phone;
+                    if (idCardUrl) currentUser.idCardUrl = idCardUrl;
                   }
                   setSuccessMessage('Profil mis à jour !');
                 }}
