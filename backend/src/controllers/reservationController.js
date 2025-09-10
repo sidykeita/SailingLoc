@@ -30,6 +30,23 @@ exports.createReservation = async (req, res) => {
       return res.status(400).json({ message: 'La date de fin doit être après la date de début' });
     }
 
+    // Refuser si chevauchement avec un blocage du propriétaire
+    const BlockedDate = require('../models/blockedDate');
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    const overlappingBlock = await BlockedDate.findOne({
+      boat: boatId,
+      $expr: {
+        $and: [
+          { $lte: ['$startDate', e] },
+          { $gte: ['$endDate', s] }
+        ]
+      }
+    });
+    if (overlappingBlock) {
+      return res.status(409).json({ message: 'Ces dates sont bloquées par le propriétaire' });
+    }
+
     // Créer la réservation
     const reservation = new Reservation({
       boat: boatId,
