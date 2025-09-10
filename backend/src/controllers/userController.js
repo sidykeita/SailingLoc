@@ -131,7 +131,8 @@ exports.deleteMe = async (req, res) => {
     user.isDeleted = true;
     user.deletedAt = new Date();
     user.email = anonymizedEmail;
-    user.phone = undefined;
+    // Utiliser un placeholder unique pour éviter les conflits d'index unique sur phone
+    user.phone = `deleted_${user._id.toString()}`;
     user.firstName = 'Compte';
     user.lastName = 'supprimé';
     await user.save();
