@@ -8,12 +8,14 @@ import reservationService from '../../services/reservation.service';
 import { Link, useNavigate } from 'react-router-dom';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
 import EditProfileModal from '../../components/EditProfileModal';
+import ViewProfileModal from '../../components/ViewProfileModal';
 import OwnerDocsSection from '../../components/OwnerDocsSection';
 import userService from '../../services/user.service';
 import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
 
 const OwnerDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(() => {
     try {
@@ -265,7 +267,8 @@ const [deleteDone, setDeleteDone] = useState(false);
                 <p className="text-gray-500 text-sm">Rôle</p>
                 <p className="font-medium">Propriétaire</p>
               </div>
-              <button className="btn-secondary mt-4" onClick={() => setEditModalOpen(true)}>Modifier mon profil</button>
+              <button className="btn-secondary mt-4" onClick={() => setViewModalOpen(true)}>Voir mon profil</button>
+              <button className="btn-secondary mt-2" onClick={() => setEditModalOpen(true)}>Modifier mon profil</button>
               <button className="btn-outline mt-2" style={{ borderColor: '#dc2626', color: '#dc2626' }} onClick={() => setDeleteOpen(true)}>Supprimer mon compte</button>
               <EditProfileModal
                 isOpen={editModalOpen}
@@ -281,6 +284,11 @@ const [deleteDone, setDeleteDone] = useState(false);
                   }
                   setSuccessMessage('Profil mis à jour !');
                 }}
+              />
+              <ViewProfileModal
+                isOpen={viewModalOpen}
+                onClose={() => setViewModalOpen(false)}
+                user={currentUser}
               />
             </div>
             
