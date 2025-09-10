@@ -8,6 +8,7 @@ import { faSearch, faChevronDown, faEnvelope, faMobileAlt, faIdCard, faFileAlt, 
 import logoBlc from '../../assets/images/logo-blc.png';
 import profileImage from '../../assets/images/profil.jpg';
 import userService from '../../services/user.service';
+import EditProfileModal from '../../components/EditProfileModal';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -31,6 +32,7 @@ const SimpleDashboard = () => {
   const [showModelsSubmenu, setShowModelsSubmenu] = useState(false);
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   // Suppression de compte
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -94,7 +96,7 @@ const SimpleDashboard = () => {
           </div>
           
           <div className="profile-buttons">
-            <Link to="/account?section=modifier-informations" className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</Link>
+            <button onClick={() => setEditModalOpen(true)} className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</button>
             <Link to="/account?section=modifier-informations" className="btn btn-outline">Voir mon profil</Link>
             <button className="btn btn-outline" style={{ borderColor: '#dc2626', color: '#dc2626' }} onClick={() => setDeleteOpen(true)}>Supprimer mon compte</button>
           </div>
@@ -253,6 +255,22 @@ const SimpleDashboard = () => {
         </div>
       </footer>
       
+      {/* Modal modification profil (email/téléphone) */}
+      <EditProfileModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        currentEmail={currentUser?.email}
+        currentPhone={currentUser?.phone}
+        onSave={async ({ email, phone }) => {
+          await userService.updateProfile(currentUser._id, { email, phone });
+          // Option: mettre à jour l'affichage localement
+          if (currentUser) {
+            currentUser.email = email;
+            currentUser.phone = phone;
+          }
+        }}
+      />
+
       {/* Modal suppression de compte */}
       {deleteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
