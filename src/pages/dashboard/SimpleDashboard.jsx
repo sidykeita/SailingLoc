@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import TenantHeader from '../../components/tenant/TenantHeader';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/SimpleDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown, faEnvelope, faMobileAlt, faIdCard, faFileAlt, faQuestionCircle, faChevronRight, faSignOutAlt, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import logoBlc from '../../assets/images/logo-blc.png';
 import profileImage from '../../assets/images/profil.jpg';
+import userService from '../../services/user.service';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
+  const navigate = useNavigate();
   const today = new Date();
   const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()} ${today.getHours().toString().padStart(2, '0')}:${today.getMinutes().toString().padStart(2, '0')}`;
   
@@ -29,6 +31,11 @@ const SimpleDashboard = () => {
   const [showModelsSubmenu, setShowModelsSubmenu] = useState(false);
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  // Suppression de compte
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   
   // Fonction pour gérer la déconnexion
   const handleLogout = async () => {
@@ -37,6 +44,20 @@ const SimpleDashboard = () => {
       // La redirection sera gérée par le contexte d'authentification
     } catch (error) {
       console.error("Erreur lors de la déconnexion", error);
+    }
+  };
+  
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleteError('');
+      setDeleteLoading(true);
+      await userService.deleteMe(deletePassword);
+      await logout();
+      navigate('/');
+    } catch (e) {
+      setDeleteError(e?.message || 'Erreur lors de la suppression du compte');
+    } finally {
+      setDeleteLoading(false);
     }
   };
   
@@ -74,6 +95,7 @@ const SimpleDashboard = () => {
           <div className="profile-buttons">
             <Link to="/account?section=modifier-informations" className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</Link>
             <Link to="/account?section=modifier-informations" className="btn btn-outline">Voir mon profil</Link>
+            <button className="btn btn-outline" style={{ borderColor: '#dc2626', color: '#dc2626' }} onClick={() => setDeleteOpen(true)}>Supprimer mon compte</button>
           </div>
           
           <div className="verification-list">
@@ -229,6 +251,33 @@ const SimpleDashboard = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Modal suppression de compte */}
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold mb-2">Supprimer mon compte</h3>
+            <p className="text-sm text-gray-600 mb-4">Cette action est irréversible. Entrez votre mot de passe pour confirmer.</p>
+            <input
+              type="password"
+              className="w-full border rounded px-3 py-2 mb-2"
+              placeholder="Mot de passe actuel"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+            />
+            {deleteError && <p className="text-red-600 text-sm mb-2">{deleteError}</p>}
+            <div className="flex justify-end gap-2 mt-2">
+              <button className="px-4 py-2 rounded border" onClick={() => setDeleteOpen(false)} disabled={deleteLoading}>Annuler</button>
+              <button
+                className="px-4 py-2 rounded text-white"
+                style={{ backgroundColor: '#dc2626' }}
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading || !deletePassword}
+              >{deleteLoading ? 'Suppression...' : 'Confirmer la suppression'}</button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Help Button */}
       <div className="help-button">
