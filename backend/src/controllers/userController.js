@@ -108,7 +108,7 @@ exports.deleteMe = async (req, res) => {
 
     // Règles demandées:
     // - Locataire: supprimer le compte et TOUTES ses réservations (+ paiements liés)
-    // - Propriétaire: supprimer le compte et rendre ses bateaux indisponibles
+    // - Propriétaire: rendre ses bateaux indisponibles
     let deletedReservations = 0;
     let deletedPayments = 0;
     let updatedBoats = 0;
@@ -126,19 +126,11 @@ exports.deleteMe = async (req, res) => {
       updatedBoats = upd?.modifiedCount || 0;
     }
 
-    // Soft delete + anonymisation PII
-    const anonymizedEmail = `deleted_${user._id}@sailingloc.local`;
-    user.isDeleted = true;
-    user.deletedAt = new Date();
-    user.email = anonymizedEmail;
-    // Utiliser un placeholder unique pour éviter les conflits d'index unique sur phone
-    user.phone = `deleted_${user._id.toString()}`;
-    user.firstName = 'Compte';
-    user.lastName = 'supprimé';
-    await user.save();
+    // HARD DELETE: supprimer définitivement l'utilisateur de la BDD
+    await User.findByIdAndDelete(user._id);
 
     return res.json({ 
-      message: 'Compte supprimé avec succès',
+      message: 'Compte supprimé définitivement avec succès',
       details: {
         role: user.role,
         deletedReservations,
