@@ -22,6 +22,20 @@ export default function ViewProfileModal({ isOpen, onClose, user }) {
             <p className="text-gray-600 text-sm">Téléphone</p>
             <p className="font-medium">{user?.phone || 'Non renseigné'}</p>
           </div>
+          {user?.idCardUrl && (
+            <div>
+              <p className="text-gray-600 text-sm">Carte d'identité</p>
+              <div className="mt-2">
+                <img 
+                  src={user.idCardUrl} 
+                  alt="Carte d'identité" 
+                  className="max-w-full h-auto max-h-48 border rounded"
+                  style={{maxWidth: '200px'}}
+                />
+                <p className="text-xs text-green-600 mt-1">✓ Acceptée</p>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex justify-end mt-6">
           <button onClick={onClose} className="btn-secondary">Fermer</button>

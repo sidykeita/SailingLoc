@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { uploadIdCard } from '../services/idCardUpload';
 
 export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, onSave }) {
   const [email, setEmail] = useState(currentEmail || '');
@@ -12,7 +13,15 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
     setLoading(true);
     setError(null);
     try {
-      await onSave({ email, phone });
+      let idCardUrl = null;
+      
+      // Upload de la carte d'identité si un fichier est sélectionné
+      if (idCard) {
+        const uploadResult = await uploadIdCard(idCard, 'user_' + Date.now());
+        idCardUrl = uploadResult.url;
+      }
+      
+      await onSave({ email, phone, idCardUrl });
       onClose();
     } catch (err) {
       setError(err?.message || 'Erreur lors de la modification.');

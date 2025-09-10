@@ -98,11 +98,13 @@ const SimpleDashboard = () => {
             <div className="verification-item">
               <FontAwesomeIcon icon={faEnvelope} /> {/* Icône */}
               <span>{currentUser?.email || 'Email non renseigné'}</span>
+              <span style={{marginLeft: '10px'}}></span>
               <a href="#" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
             </div>
             <div className="verification-item">
               <FontAwesomeIcon icon={faMobileAlt} /> {/* Icône */}
               <span>{currentUser?.phone || 'Téléphone non renseigné'}</span>
+              <span style={{marginLeft: '10px'}}></span>
               <a href="#" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
             </div>
           </div>
@@ -244,12 +246,13 @@ const SimpleDashboard = () => {
         onClose={() => setEditModalOpen(false)}
         currentEmail={currentUser?.email}
         currentPhone={currentUser?.phone}
-        onSave={async ({ email, phone }) => {
-          await userService.updateProfile(currentUser._id, { email, phone });
+        onSave={async ({ email, phone, idCardUrl }) => {
+          await userService.updateProfile(currentUser._id, { email, phone, idCardUrl });
           // Option: mettre à jour l'affichage localement
           if (currentUser) {
             currentUser.email = email;
             currentUser.phone = phone;
+            if (idCardUrl) currentUser.idCardUrl = idCardUrl;
           }
         }}
       />
