@@ -6,6 +6,11 @@ class BlockedDateService {
     return res.data;
   }
 
+  async listPublicByBoat(boatId) {
+    const res = await apiClient.get(`/blocks/public/boat/${boatId}`);
+    return res.data;
+  }
+
   async create(payload) {
     const res = await apiClient.post('/blocks', payload);
     return res.data;

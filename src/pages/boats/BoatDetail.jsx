@@ -101,10 +101,11 @@ const BoatDetail = () => {
     };
     const fetchBlockedDates = async () => {
       try {
-        const blocks = await blockedDateService.listByBoat(id);
+        // Route publique: visibles pour tous afin d'indiquer les indisponibilités
+        const blocks = await blockedDateService.listPublicByBoat(id);
         setBlockedDates(blocks || []);
       } catch (err) {
-        // Ignore les erreurs (pas propriétaire ou autre)
+        // Ne bloque pas l'affichage si erreur
         setBlockedDates([]);
       }
     };
@@ -149,6 +150,39 @@ const BoatDetail = () => {
     if (!s || !e) return false;
     const days = enumerateDates(s, e);
     return days.some(isDayDisabled);
+  };
+
+  // Helpers visuels
+  const isDayBlocked = (date) => {
+    if (!date) return false;
+    const d0 = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    return blockedDates.some(b => {
+      const s = new Date(b.startDate); const e = new Date(b.endDate);
+      const ds = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+      const de = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
+      return ds <= d0 && d0 <= de;
+    });
+  };
+  const isDayReserved = (date) => {
+    if (!date) return false;
+    const d0 = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    return reservations.some(r => {
+      const s = new Date(r.startDate); const e = new Date(r.endDate);
+      const ds = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+      const de = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
+      return ds <= d0 && d0 <= de;
+    });
+  };
+
+  const handleRangeChange = (item) => {
+    const next = item.selection;
+    if (selectionContainsDisabled(next)) {
+      setError("Plage indisponible: dates réservées ou bloquées.");
+      // Ne pas mettre à jour la sélection
+      return;
+    }
+    setError('');
+    setDateRange([next]);
   };
 
   const renderStars = (rating) => {
@@ -446,7 +480,7 @@ const BoatDetail = () => {
                 {showCalendar && (
                   <div className="mt-2">
                     <DateRange
-                      onChange={(item) => setDateRange([item.selection])}
+                      onChange={handleRangeChange}
                       moveRangeOnFirstSelection={false}
                       ranges={dateRange}
                       months={1}
@@ -455,11 +489,38 @@ const BoatDetail = () => {
                       minDate={new Date()}
                       rangeColors={["#274991"]}
                       disabledDates={disabledDates}
+                      dayContentRenderer={(date) => {
+                        const label = date.getDate();
+                        const blocked = isDayBlocked(date);
+                        const reserved = isDayReserved(date);
+                        return (
+                          <div style={{ position: 'relative' }}>
+                            <span>{label}</span>
+                            {(blocked || reserved) && (
+                              <span
+                                title={blocked ? 'Bloqué' : 'Réservé'}
+                                style={{
+                                  position: 'absolute',
+                                  right: 2,
+                                  bottom: 2,
+                                  width: 6,
+                                  height: 6,
+                                  borderRadius: '50%',
+                                  backgroundColor: blocked ? '#dc2626' : '#2563eb'
+                                }}
+                              />
+                            )}
+                          </div>
+                        );
+                      }}
                     />
                   </div>
                 )}
                 {disabledDates?.length > 0 && (
                   <p className="text-sm text-gray-500 mt-2">Les dates grisées / barrées sont indisponibles.</p>
+                )}
+                {selectionContainsDisabled((dateRange && dateRange[0]) || {}) && (
+                  <p className="text-sm text-red-600 mt-1">Votre sélection inclut des jours indisponibles (réservés ou bloqués).</p>
                 )}
               </div>
               <div className="mb-6">
@@ -489,7 +550,7 @@ const BoatDetail = () => {
                     ? 'booking-button-available'
                     : 'booking-button-unavailable'
                 }`}
-                disabled={!canBook}
+                disabled={!canBook || selectionContainsDisabled((dateRange && dateRange[0]) || {})}
               >
                 {canBook ? 'Réserver maintenant' : 'Non disponible'}
               </button>
