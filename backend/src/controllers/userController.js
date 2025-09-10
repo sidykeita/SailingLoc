@@ -37,18 +37,20 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// PATCH /api/users/:id — met à jour uniquement email et téléphone
+// PATCH /api/users/:id — met à jour email, téléphone et URLs de fichiers
 exports.updateProfile = async (req, res) => {
   try {
-    const { email, phone } = req.body;
+    const { email, phone, profilePhotoUrl, idCardUrl } = req.body;
     const updates = {};
     if (email) updates.email = email;
     if (phone) updates.phone = phone;
+    if (profilePhotoUrl) updates.profilePhotoUrl = profilePhotoUrl;
+    if (idCardUrl) updates.idCardUrl = idCardUrl;
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { $set: updates },
-      { new: true, runValidators: true, select: '-password' }
-    );
+      { new: true, runValidators: true }
+    ).select('-password');
     if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
     res.json(user);
   } catch (err) {

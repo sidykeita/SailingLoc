@@ -10,6 +10,9 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   // Champ optionnel pour le téléphone (unique uniquement quand présent)
   phone: { type: String, unique: true, sparse: true },
+  // URLs des fichiers stockés (Firebase Storage)
+  profilePhotoUrl: { type: String },
+  idCardUrl: { type: String },
   role: { 
     type: String, 
     enum: ['locataire', 'propriétaire', 'admin'], 
