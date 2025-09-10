@@ -28,6 +28,12 @@ export const AuthProvider = ({ children }) => {
             console.log('[DEBUG][AuthContext] userData:', userData);
             setCurrentUser(userData);
             setUserRole(userData.role || 'tenant'); // Par défaut 'tenant' si aucun rôle n'est spécifié
+            // Persiste l'avatar pour éviter la disparition après refresh
+            if (userData?.profilePhotoUrl) {
+              localStorage.setItem('profilePhotoUrl', userData.profilePhotoUrl);
+            } else {
+              localStorage.removeItem('profilePhotoUrl');
+            }
           } catch (err) {
             console.error('[DEBUG][AuthContext] getCurrentUser error:', err);
             throw err;
@@ -97,6 +103,7 @@ export const AuthProvider = ({ children }) => {
   // Fonction de déconnexion
   const logout = () => {
     authService.logout();
+    localStorage.removeItem('profilePhotoUrl');
     setCurrentUser(null);
     setUserRole(null);
   };

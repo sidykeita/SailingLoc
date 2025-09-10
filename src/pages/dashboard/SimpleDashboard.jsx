@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TenantHeader from '../../components/tenant/TenantHeader';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -37,12 +37,20 @@ const SimpleDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState(null);
   // Suppression de compte
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   
+  // Initialiser l'URL de photo depuis l'utilisateur ou le localStorage pour persister après refresh
+  useEffect(() => {
+    const stored = localStorage.getItem('profilePhotoUrl');
+    const initial = currentUser?.profilePhotoUrl || stored || null;
+    setPhotoUrl(initial);
+  }, [currentUser?.profilePhotoUrl]);
+
   // Fonction pour gérer la déconnexion
   const handleLogout = async () => {
     try {
@@ -61,12 +69,13 @@ const SimpleDashboard = () => {
     setPhotoUploading(true);
     try {
       const uploadResult = await uploadProfilePhoto(file, currentUser._id);
+      // Sauvegarder côté backend
       await userService.updateProfile(currentUser._id, { profilePhotoUrl: uploadResult.url });
+      // Persister localement pour éviter la disparition après refresh si l'API ne renvoie pas encore le champ
+      localStorage.setItem('profilePhotoUrl', uploadResult.url);
       
-      // Mettre à jour localement
-      if (currentUser) {
-        currentUser.profilePhotoUrl = uploadResult.url;
-      }
+      // Mettre à jour localement (état réactif)
+      setPhotoUrl(uploadResult.url);
     } catch (error) {
       alert('Erreur lors de l\'upload: ' + error.message);
     } finally {
@@ -105,13 +114,13 @@ const SimpleDashboard = () => {
         {/* User Profile Section */}
         <div className="user-profile">
           <div className="profile-avatar">
-            <img src={currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
+            <img src={photoUrl || currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
               e.target.onerror = null;
               e.target.style.display = 'none';
             }} />
           </div>
           <label className="add-photo" style={{cursor: 'pointer'}}>
-            {photoUploading ? 'Upload en cours...' : '+ Ajouter une photo'}
+            {photoUploading ? 'Upload en cours...' : (photoUrl || currentUser?.profilePhotoUrl ? 'Changer la photo' : '+ Ajouter une photo')}
             <input 
               type="file" 
               accept="image/*" 
