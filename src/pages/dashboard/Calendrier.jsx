@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
 import boatService from '../../services/boat.service';
+import blockedDateService from '../../services/blockedDate.service';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { 
@@ -28,6 +29,13 @@ const Calendrier = () => {
   const [events, setEvents] = useState([]);
   const [boats, setBoats] = useState([]);
   const [selectedBoatId, setSelectedBoatId] = useState(null);
+  // Blocage formulaire
+  const [blockStart, setBlockStart] = useState('');
+  const [blockEnd, setBlockEnd] = useState('');
+  const [blockReason, setBlockReason] = useState('maintenance');
+  const [blockNotes, setBlockNotes] = useState('');
+  const [blockError, setBlockError] = useState('');
+  const [creatingBlock, setCreatingBlock] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -60,8 +68,7 @@ const Calendrier = () => {
           setEvents([]);
           return;
         }
-        // Mapper chaque réservation confirmée comme un seul objet (start/end)
-        const mapped = (reservationsData || [])
+        const mappedReservations = (reservationsData || [])
           .filter(r => r.status === 'confirmed' && r.startDate && r.endDate)
           .map(r => ({
             id: r._id || r.id,
@@ -79,14 +86,35 @@ const Calendrier = () => {
               end: new Date(r.endDate)
             }
           }));
-        setEvents(mapped);
+
+        // Charger les blocages si propriétaire et bateau sélectionné
+        let mappedBlocks = [];
+        if (currentUser.role === 'propriétaire' && selectedBoatId) {
+          try {
+            const blocks = await blockedDateService.listByBoat(selectedBoatId);
+            mappedBlocks = (blocks || []).map(b => ({
+              id: b._id,
+              title: `Bloqué: ${b.reason}`,
+              start: new Date(b.startDate),
+              end: new Date(b.endDate),
+              type: 'block',
+              reason: b.reason,
+              notes: b.notes,
+              boatId: b.boat,
+              status: 'indisponible'
+            }));
+          } catch(e) {
+            // ignorer pour ne pas casser l'affichage
+          }
+        }
+
+        setEvents([ ...mappedReservations, ...mappedBlocks ]);
       } catch (error) {
         setEvents([]);
-        // Optionnel: afficher une notification d'erreur
       }
     };
     fetchEvents();
-  }, [currentUser]);
+  }, [currentUser, selectedBoatId]);
 
   const months = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -140,6 +168,8 @@ const Calendrier = () => {
     switch (type) {
       case 'reservation':
         return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'block':
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'maintenance':
         return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'inspection':
@@ -279,47 +309,47 @@ const Calendrier = () => {
                     // Ne rien faire si la case est vide (pas de jour)
                     const handleClick = () => { if (day) setSelectedDate(day); };
                     return (
-  <div
-    key={index}
-    className={`bg-white min-h-[60px] p-1 ${day ? 'cursor-pointer hover:bg-gray-50' : 'cursor-default'} transition-colors ${
-      isSelected ? 'ring-2 ring-primary' : ''
-    }`}
-    onClick={day ? () => setSelectedDate(day) : undefined}
-    style={{ position: 'relative' }}
-  >
-    {day && (
-      <>
-        <div className="flex justify-between items-start mb-1">
-          <span className={`text-sm font-medium ${
-            isToday
-              ? 'bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center'
-              : day.getMonth() !== currentDate.getMonth()
-                ? 'text-gray-400'
-                : 'text-gray-900'
-          }`}>
-            {day.getDate()}
-          </span>
-        </div>
-        {/* Réservations couvrant ce jour, juste sous la date */}
-        {(events && selectedBoatId) && events.filter(res => {
-          if (res.boatId !== selectedBoatId) return false;
-          const dayTime = day && day instanceof Date ? new Date(day).setHours(0,0,0,0) : null;
-          const startTime = res.start && res.start instanceof Date ? new Date(res.start).setHours(0,0,0,0) : null;
-          const endTime = res.end && res.end instanceof Date ? new Date(res.end).setHours(0,0,0,0) : null;
-          return dayTime !== null && startTime !== null && endTime !== null && startTime <= dayTime && endTime >= dayTime;
-        }).map(res => (
-          <div
-            key={res.id + '-d' + day.getTime()}
-            className="h-5 bg-blue-200 border border-blue-400 rounded px-1 text-[11px] font-semibold text-blue-900 flex items-center overflow-hidden truncate cursor-pointer mt-2"
-            title={`Du ${res.start.toLocaleDateString('fr-FR')} au ${res.end.toLocaleDateString('fr-FR')}`}
-            onClick={e => { e.stopPropagation(); setSelectedReservation(res); }}
-          >
-            {res.title}
-          </div>
-        ))}
-      </>
-    )}
-  </div>
+                      <div
+                        key={index}
+                        className={`bg-white min-h-[60px] p-1 ${day ? 'cursor-pointer hover:bg-gray-50' : 'cursor-default'} transition-colors ${
+                          isSelected ? 'ring-2 ring-primary' : ''
+                        }`}
+                        onClick={day ? () => setSelectedDate(day) : undefined}
+                        style={{ position: 'relative' }}
+                      >
+                        {day && (
+                          <>
+                            <div className="flex justify-between items-start mb-1">
+                              <span className={`text-sm font-medium ${
+                                isToday
+                                  ? 'bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center'
+                                  : day.getMonth() !== currentDate.getMonth()
+                                    ? 'text-gray-400'
+                                    : 'text-gray-900'
+                              }`}>
+                                {day.getDate()}
+                              </span>
+                            </div>
+                            {/* Événements (réservations + blocages) couvrant ce jour, juste sous la date */}
+                            {(events && selectedBoatId) && events.filter(res => {
+                              if (res.boatId !== selectedBoatId) return false;
+                              const dayTime = day && day instanceof Date ? new Date(day).setHours(0,0,0,0) : null;
+                              const startTime = res.start && res.start instanceof Date ? new Date(res.start).setHours(0,0,0,0) : null;
+                              const endTime = res.end && res.end instanceof Date ? new Date(res.end).setHours(0,0,0,0) : null;
+                              return dayTime !== null && startTime !== null && endTime !== null && startTime <= dayTime && endTime >= dayTime;
+                            }).map(res => (
+                              <div
+                                key={res.id + '-d' + day.getTime()}
+                                className={`h-5 border rounded px-1 text-[11px] font-semibold flex items-center overflow-hidden truncate cursor-pointer mt-2 ${res.type==='block' ? 'bg-red-200 border-red-400 text-red-900' : 'bg-blue-200 border-blue-400 text-blue-900'}`}
+                                title={`${res.title} — Du ${res.start.toLocaleDateString('fr-FR')} au ${res.end.toLocaleDateString('fr-FR')}`}
+                                onClick={e => { e.stopPropagation(); setSelectedReservation(res); }}
+                              >
+                                {res.title}
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
                     );
                   })}
 
@@ -415,7 +445,60 @@ const Calendrier = () => {
                     ×
                   </button>
                 </div>
-                
+
+                {/* Formulaire de blocage rapide (propriétaire) */}
+                {currentUser?.role === 'propriétaire' && boats.length > 0 && selectedBoatId && (
+                  <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <h4 className="font-semibold text-gray-800 mb-3">Bloquer le calendrier</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                      <div className="flex flex-col">
+                        <label className="text-xs text-gray-600 mb-1">Du</label>
+                        <input type="date" className="border rounded px-2 py-1" value={blockStart} onChange={e=>setBlockStart(e.target.value)} />
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="text-xs text-gray-600 mb-1">Au</label>
+                        <input type="date" className="border rounded px-2 py-1" value={blockEnd} onChange={e=>setBlockEnd(e.target.value)} />
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="text-xs text-gray-600 mb-1">Raison</label>
+                        <select className="border rounded px-2 py-1" value={blockReason} onChange={e=>setBlockReason(e.target.value)}>
+                          <option value="maintenance">Maintenance</option>
+                          <option value="personnel">Personnel</option>
+                          <option value="inspection">Inspection</option>
+                          <option value="autre">Autre</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2 flex flex-col">
+                        <label className="text-xs text-gray-600 mb-1">Notes</label>
+                        <input type="text" placeholder="Notes (optionnel)" className="border rounded px-2 py-1" value={blockNotes} onChange={e=>setBlockNotes(e.target.value)} />
+                      </div>
+                    </div>
+                    {blockError && <div className="text-red-600 text-sm mt-2">{blockError}</div>}
+                    <div className="mt-3 flex justify-end">
+                      <button className="btn-primary" disabled={creatingBlock} onClick={async ()=>{
+                        try {
+                          setBlockError('');
+                          setCreatingBlock(true);
+                          if (!blockStart || !blockEnd) { setBlockError('Veuillez sélectionner une plage de dates'); return; }
+                          const payload = { boatId: selectedBoatId, startDate: blockStart, endDate: blockEnd, reason: blockReason, notes: blockNotes };
+                          await blockedDateService.create(payload);
+                          // reset
+                          setBlockNotes('');
+                          // rafraîchir les événements
+                          const blocks = await blockedDateService.listByBoat(selectedBoatId);
+                          const mappedBlocks = (blocks||[]).map(b=>({ id:b._id, title:`Bloqué: ${b.reason}`, start:new Date(b.startDate), end:new Date(b.endDate), type:'block', reason:b.reason, notes:b.notes, boatId:b.boat, status:'indisponible'}));
+                          // conserver les réservations existantes
+                          setEvents(prev => [ ...(prev.filter(e=>e.type!=='block')), ...mappedBlocks ]);
+                        } catch(e) {
+                          setBlockError(e?.response?.data?.message || e?.message || 'Erreur lors du blocage');
+                        } finally {
+                          setCreatingBlock(false);
+                        }
+                      }}>Bloquer</button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   {getEventsForDate(selectedDate).length > 0 ? (
                     getEventsForDate(selectedDate).map(event => (
@@ -435,29 +518,43 @@ const Calendrier = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                               <div className="flex items-center space-x-2">
                                 <ClockIcon className="h-4 w-4" />
-                                <span>{event.time} ({event.duration})</span>
+                                <span>{event.start?.toLocaleDateString('fr-FR')} → {event.end?.toLocaleDateString('fr-FR')}</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <UserIcon className="h-4 w-4" />
-                                <span>{event.client}</span>
+                                <span>{event.client || (event.type==='block' ? 'Propriétaire' : '')}</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <MapPinIcon className="h-4 w-4" />
                                 <span>{event.location}</span>
                               </div>
                             </div>
+                            {event.type==='block' && event.notes && (
+                              <div className="text-sm text-gray-700 mt-2">Notes: {event.notes}</div>
+                            )}
                           </div>
                           
                           <div className="flex items-center space-x-2 ml-4">
                             <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                               <EyeIcon className="h-4 w-4" />
                             </button>
-                            <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                              <PencilIcon className="h-4 w-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                              <TrashIcon className="h-4 w-4" />
-                            </button>
+                            {event.type==='reservation' && (
+                              <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                                <PencilIcon className="h-4 w-4" />
+                              </button>
+                            )}
+                            {event.type==='block' && (
+                              <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={async ()=>{
+                                try {
+                                  await blockedDateService.remove(event.id);
+                                  setEvents(prev => prev.filter(e => !(e.type==='block' && e.id===event.id)));
+                                } catch(e) {
+                                  // TODO: notification
+                                }
+                              }}>
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

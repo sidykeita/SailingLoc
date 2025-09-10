@@ -56,6 +56,10 @@ app.use('/api/owner-docs', ownerDocsRoutes);
 const favoriteRoutes = require('./src/routes/favoriteRoutes');
 app.use('/api/favorites', favoriteRoutes);
 
+// Blocages calendrier
+const blockedDateRoutes = require('./src/routes/blockedDate.routes');
+app.use('/api/blocks', blockedDateRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');
