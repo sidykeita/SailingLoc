@@ -18,6 +18,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
+import ReservationEditModal from '../../components/ReservationEditModal';
 
 const Calendrier = () => {
   const { currentUser, logout } = useAuth();
@@ -29,6 +30,9 @@ const Calendrier = () => {
   const [events, setEvents] = useState([]);
   const [boats, setBoats] = useState([]);
   const [selectedBoatId, setSelectedBoatId] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState(null);
+
   // Blocage formulaire
   const [blockStart, setBlockStart] = useState('');
   const [blockEnd, setBlockEnd] = useState('');
@@ -55,37 +59,37 @@ const Calendrier = () => {
     fetchBoats();
   }, []);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      if (!currentUser) return;
-      try {
-        let reservationsData = [];
-        if (currentUser.role === 'propriétaire') {
-          reservationsData = await reservationService.getMyBoatsReservations();
-        } else if (currentUser.role === 'locataire') {
-          reservationsData = await reservationService.getMyReservations();
-        } else {
-          setEvents([]);
-          return;
-        }
-        const mappedReservations = (reservationsData || [])
-          .filter(r => r.status === 'confirmed' && r.startDate && r.endDate)
-          .map(r => ({
-            id: r._id || r.id,
-            reservationId: r._id || r.id,
-            title: `Réservation ${r.boat?.name || r.boat?.title || 'Bateau'}`,
+  const fetchEvents = async () => {
+    if (!currentUser) return;
+    try {
+      let reservationsData = [];
+
+      if (currentUser.role === 'propriétaire') {
+        reservationsData = await reservationService.getMyBoatsReservations();
+      } else if (currentUser.role === 'locataire') {
+        reservationsData = await reservationService.getMyReservations();
+      } else {
+        setEvents([]);
+        return;
+      }
+      const mappedReservations = (reservationsData || [])
+        .filter(r => r.status === 'confirmed' && r.startDate && r.endDate)
+        .map(r => ({
+          id: r._id || r.id,
+          reservationId: r._id || r.id,
+          title: `Réservation ${r.boat?.name || r.boat?.title || 'Bateau'}`,
+          start: new Date(r.startDate),
+          end: new Date(r.endDate),
+          client: r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.tenantName || ''),
+          location: r.boat?.port || '',
+          type: 'reservation',
+          status: r.status,
+          boatId: r.boat?._id || r.boat || r.boatId,
+          period: {
             start: new Date(r.startDate),
-            end: new Date(r.endDate),
-            client: r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.tenantName || ''),
-            location: r.boat?.port || '',
-            type: 'reservation',
-            status: r.status,
-            boatId: r.boat?._id || r.boat || r.boatId,
-            period: {
-              start: new Date(r.startDate),
-              end: new Date(r.endDate)
-            }
-          }));
+            end: new Date(r.endDate)
+          }
+        }));
 
         // Charger les blocages si propriétaire et bateau sélectionné
         let mappedBlocks = [];
@@ -112,7 +116,9 @@ const Calendrier = () => {
       } catch (error) {
         setEvents([]);
       }
-    };
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, [currentUser, selectedBoatId]);
 
@@ -543,7 +549,7 @@ const Calendrier = () => {
                               <EyeIcon className="h-4 w-4" />
                             </button>
                             {event.type==='reservation' && (
-                              <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                              <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" onClick={() => { setEditTarget(event); setEditOpen(true); }}>
                                 <PencilIcon className="h-4 w-4" />
                               </button>
                             )}
@@ -590,6 +596,30 @@ const Calendrier = () => {
       </main>
       {/* Panneau latéral de détail réservation */}
       <ReservationDetailModal reservation={selectedReservation} onClose={() => setSelectedReservation(null)} />
+
+      {/* Modale d'édition de réservation */}
+      <ReservationEditModal
+        reservation={editTarget ? { ...editTarget, startDate: editTarget.start, endDate: editTarget.end, status: editTarget.status, price: editTarget.price } : null}
+        open={editOpen}
+        onClose={() => { setEditOpen(false); setEditTarget(null); }}
+        onSave={async (form) => {
+          try {
+            const id = editTarget?.reservationId || editTarget?.id;
+            await reservationService.updateReservation(id, {
+              startDate: form.startDate,
+              endDate: form.endDate,
+              status: form.status,
+              price: form.price,
+            });
+            setEditOpen(false);
+            setEditTarget(null);
+            await fetchEvents();
+          } catch (e) {
+            // TODO: toast/notification
+            console.error('Update reservation failed', e);
+          }
+        }}
+      />
 
       {/* Footer - identique à OwnerDashboard */}
       <footer className="bg-primary text-white mt-12 py-8">

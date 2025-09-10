@@ -489,30 +489,6 @@ const BoatDetail = () => {
                       minDate={new Date()}
                       rangeColors={["#274991"]}
                       disabledDates={disabledDates}
-                      dayContentRenderer={(date) => {
-                        const label = date.getDate();
-                        const blocked = isDayBlocked(date);
-                        const reserved = isDayReserved(date);
-                        return (
-                          <div style={{ position: 'relative' }}>
-                            <span>{label}</span>
-                            {(blocked || reserved) && (
-                              <span
-                                title={blocked ? 'Bloqué' : 'Réservé'}
-                                style={{
-                                  position: 'absolute',
-                                  right: 2,
-                                  bottom: 2,
-                                  width: 6,
-                                  height: 6,
-                                  borderRadius: '50%',
-                                  backgroundColor: blocked ? '#dc2626' : '#2563eb'
-                                }}
-                              />
-                            )}
-                          </div>
-                        );
-                      }}
                     />
                   </div>
                 )}

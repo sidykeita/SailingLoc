@@ -111,13 +111,60 @@ exports.updateReservationStatus = async (req, res) => {
 // Modifier une réservation
 exports.updateReservation = async (req, res) => {
   try {
-    const reservation = await Reservation.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!reservation) return res.status(404).json({ error: 'Not found' });
-    res.json(reservation);
+    const { id } = req.params;
+    const existing = await Reservation.findById(id);
+    if (!existing) return res.status(404).json({ error: 'Not found' });
+
+    // Autorisation: propriétaire du bateau ou admin
+    const boat = await Boat.findById(existing.boat);
+    if (!boat || (boat.owner.toString() !== req.user.id && req.user.role !== 'admin')) {
+      return res.status(403).json({ message: 'Accès non autorisé' });
+    }
+
+    const payload = { ...req.body };
+    const startDate = payload.startDate ? new Date(payload.startDate) : new Date(existing.startDate);
+    const endDate = payload.endDate ? new Date(payload.endDate) : new Date(existing.endDate);
+    if (isNaN(startDate) || isNaN(endDate) || startDate >= endDate) {
+      return res.status(400).json({ message: 'Plage de dates invalide' });
+    }
+
+    // Vérifier chevauchement avec autres réservations du même bateau (exclude current, except cancelled)
+    const overlapReservation = await Reservation.findOne({
+      _id: { $ne: id },
+      boat: existing.boat,
+      status: { $ne: 'cancelled' },
+      $expr: {
+        $and: [
+          { $lte: ['$startDate', endDate] },
+          { $gte: ['$endDate', startDate] }
+        ]
+      }
+    });
+    if (overlapReservation) {
+      return res.status(409).json({ message: 'Chevauchement avec une autre réservation' });
+    }
+
+    // Vérifier chevauchement avec blocages
+    const BlockedDate = require('../models/blockedDate');
+    const overlapBlock = await BlockedDate.findOne({
+      boat: existing.boat,
+      $expr: {
+        $and: [
+          { $lte: ['$startDate', endDate] },
+          { $gte: ['$endDate', startDate] }
+        ]
+      }
+    });
+    if (overlapBlock) {
+      return res.status(409).json({ message: 'Chevauchement avec une période bloquée' });
+    }
+
+    existing.startDate = startDate;
+    existing.endDate = endDate;
+    if (payload.status) existing.status = payload.status;
+    if (payload.price !== undefined) existing.price = payload.price;
+    await existing.save();
+    res.json(existing);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
