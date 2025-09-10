@@ -55,7 +55,8 @@ const SimpleDashboard = () => {
       await logout();
       navigate('/');
     } catch (e) {
-      setDeleteError(e?.message || 'Erreur lors de la suppression du compte');
+      const serverMsg = e?.response?.data?.message || e?.response?.data?.error;
+      setDeleteError(serverMsg || e?.message || 'Erreur lors de la suppression du compte');
     } finally {
       setDeleteLoading(false);
     }

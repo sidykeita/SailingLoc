@@ -12,6 +12,11 @@ import userService from '../../services/user.service';
 
 const OwnerDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
+  // Suppression de compte (propriétaire)
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const [selectedReservation, setSelectedReservation] = useState(null);
   // ...
@@ -76,6 +81,21 @@ const [deleteDone, setDeleteDone] = useState(false);
   const handleLogout = () => {
     logout();
     // La redirection sera gérée par le ProtectedRoute
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleteError('');
+      setDeleteLoading(true);
+      await userService.deleteMe(deletePassword);
+      logout();
+      navigate('/');
+    } catch (e) {
+      const serverMsg = e?.response?.data?.message || e?.response?.data?.error;
+      setDeleteError(serverMsg || e?.message || 'Erreur lors de la suppression du compte');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   if (loading) {
@@ -187,6 +207,7 @@ const [deleteDone, setDeleteDone] = useState(false);
                 <p className="font-medium">Propriétaire</p>
               </div>
               <button className="btn-secondary mt-4" onClick={() => setEditModalOpen(true)}>Modifier mon profil</button>
+              <button className="btn-outline mt-2" style={{ borderColor: '#dc2626', color: '#dc2626' }} onClick={() => setDeleteOpen(true)}>Supprimer mon compte</button>
               <EditProfileModal
                 isOpen={editModalOpen}
                 onClose={() => setEditModalOpen(false)}
@@ -467,6 +488,32 @@ const [deleteDone, setDeleteDone] = useState(false);
         
         <ReservationDetailModal reservation={selectedReservation} onClose={() => setSelectedReservation(null)} />
       </main>
+      {/* Modal suppression de compte */}
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold mb-2">Supprimer mon compte</h3>
+            <p className="text-sm text-gray-600 mb-4">Cette action est irréversible. Vos bateaux seront automatiquement rendus indisponibles. Entrez votre mot de passe pour confirmer.</p>
+            <input
+              type="password"
+              className="w-full border rounded px-3 py-2 mb-2"
+              placeholder="Mot de passe actuel"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+            />
+            {deleteError && <p className="text-red-600 text-sm mb-2">{deleteError}</p>}
+            <div className="flex justify-end gap-2 mt-2">
+              <button className="px-4 py-2 rounded border" onClick={() => setDeleteOpen(false)} disabled={deleteLoading}>Annuler</button>
+              <button
+                className="px-4 py-2 rounded text-white"
+                style={{ backgroundColor: '#dc2626' }}
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading || !deletePassword}
+              >{deleteLoading ? 'Suppression...' : 'Confirmer la suppression'}</button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Footer */}
       <footer className="bg-primary text-white mt-12 py-8">
