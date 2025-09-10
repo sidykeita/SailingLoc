@@ -37,7 +37,13 @@ const SimpleDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(() => {
+    try {
+      return localStorage.getItem('profilePhotoUrl') || null;
+    } catch (_) {
+      return null;
+    }
+  });
   // Suppression de compte
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -116,7 +122,7 @@ const SimpleDashboard = () => {
           <div className="profile-avatar">
             <img src={photoUrl || currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
               e.target.onerror = null;
-              e.target.style.display = 'none';
+              e.currentTarget.src = profileImage;
             }} />
           </div>
           <label className="add-photo" style={{cursor: 'pointer'}}>

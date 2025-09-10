@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   // Fonction de déconnexion
   const logout = () => {
     authService.logout();
-    localStorage.removeItem('profilePhotoUrl');
+    // Ne pas supprimer profilePhotoUrl pour conserver l'avatar entre les sessions
     setCurrentUser(null);
     setUserRole(null);
   };
