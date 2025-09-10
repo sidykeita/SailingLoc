@@ -9,6 +9,7 @@ import logoBlc from '../../assets/images/logo-blc.png';
 import profileImage from '../../assets/images/profil.jpg';
 import userService from '../../services/user.service';
 import EditProfileModal from '../../components/EditProfileModal';
+import ViewProfileModal from '../../components/ViewProfileModal';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -33,6 +34,7 @@ const SimpleDashboard = () => {
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   // Suppression de compte
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -97,7 +99,7 @@ const SimpleDashboard = () => {
           
           <div className="profile-buttons">
             <button onClick={() => setEditModalOpen(true)} className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</button>
-            <Link to="/account?section=modifier-informations" className="btn btn-outline">Voir mon profil</Link>
+            <button onClick={() => setViewModalOpen(true)} className="btn btn-outline">Voir mon profil</button>
             <button className="btn btn-outline" style={{ borderColor: '#dc2626', color: '#dc2626' }} onClick={() => setDeleteOpen(true)}>Supprimer mon compte</button>
           </div>
           
@@ -105,22 +107,22 @@ const SimpleDashboard = () => {
             <div className="verification-item">
               <FontAwesomeIcon icon={faEnvelope} /> {/* Icône */}
               <span>Adresse email</span>
-              <a href="#">valider</a>
+              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>valider</a>
             </div>
             <div className="verification-item">
               <FontAwesomeIcon icon={faMobileAlt} /> {/* Icône */}
               <span>Numéro de téléphone</span>
-              <a href="#">vérifier</a>
+              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>vérifier</a>
             </div>
             <div className="verification-item">
               <FontAwesomeIcon icon={faIdCard} /> {/* Icône */}
               <span>Carte d'identité</span>
-              <a href="#">vérifier</a>
+              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>vérifier</a>
             </div>
             <div className="verification-item">
               <FontAwesomeIcon icon={faFileAlt} /> {/* Icône */}
               <span>CV Nautique</span>
-              <a href="#">compléter</a>
+              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>compléter</a>
             </div>
           </div>
           
@@ -269,6 +271,13 @@ const SimpleDashboard = () => {
             currentUser.phone = phone;
           }
         }}
+      />
+
+      {/* Modal lecture seule du profil */}
+      <ViewProfileModal
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        user={currentUser}
       />
 
       {/* Modal suppression de compte */}
