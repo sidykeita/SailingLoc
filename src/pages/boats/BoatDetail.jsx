@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
 import reviewService from '../../services/review.service';
+import blockedDateService from '../../services/blockedDate.service';
 import LeaveReviewModal from '../../components/LeaveReviewModal';
 import { 
   faAnchor, 
@@ -65,6 +66,7 @@ const BoatDetail = () => {
   const [success, setSuccess] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [reservations, setReservations] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -73,7 +75,7 @@ const BoatDetail = () => {
   const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
   const canBook = boat && boat.status === 'disponible' && isLocataire;
 
-  // Charger les réservations confirmées du bateau
+  // Charger les réservations confirmées et les blocages du bateau
   useEffect(() => {
     const fetchReservations = async () => {
       try {
@@ -86,7 +88,19 @@ const BoatDetail = () => {
         setReservations([]);
       }
     };
-    if (id) fetchReservations();
+    const fetchBlockedDates = async () => {
+      try {
+        const blocks = await blockedDateService.listByBoat(id);
+        setBlockedDates(blocks || []);
+      } catch (err) {
+        // Ignore les erreurs (pas propriétaire ou autre)
+        setBlockedDates([]);
+      }
+    };
+    if (id) {
+      fetchReservations();
+      fetchBlockedDates();
+    }
   }, [id]);
 
   // Utilitaires calendrier
@@ -202,7 +216,7 @@ const BoatDetail = () => {
       setError("Veuillez sélectionner une date de début et de fin.");
       return;
     }
-    // Vérifier la disponibilité
+    // Vérifier la disponibilité (réservations + blocages)
     const s = new Date(startDate);
     const eD = new Date(endDate);
     const isOverlap = reservations.some(r => {
@@ -213,6 +227,16 @@ const BoatDetail = () => {
     });
     if (isOverlap) {
       setError("Ce bateau est déjà réservé sur cette période. Veuillez choisir d'autres dates.");
+      return;
+    }
+    // Vérifier les blocages du propriétaire
+    const isBlocked = blockedDates.some(b => {
+      const bStart = new Date(b.startDate);
+      const bEnd = new Date(b.endDate);
+      return (s <= bEnd && eD >= bStart);
+    });
+    if (isBlocked) {
+      setError("Ces dates sont bloquées par le propriétaire. Veuillez choisir d'autres dates.");
       return;
     }
     try {
