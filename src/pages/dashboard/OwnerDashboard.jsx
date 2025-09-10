@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
+import profileImage from '../../assets/images/profil.jpg';
 import boatService from '../../services/boat.service';
 import reservationService from '../../services/reservation.service';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,9 +10,16 @@ import ReservationDetailModal from '../../components/ReservationDetailModal';
 import EditProfileModal from '../../components/EditProfileModal';
 import OwnerDocsSection from '../../components/OwnerDocsSection';
 import userService from '../../services/user.service';
+import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
 
 const OwnerDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState(() => {
+    try {
+      return localStorage.getItem('profilePhotoUrl') || null;
+    } catch(_) { return null; }
+  });
   // Suppression de compte (propriétaire)
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -68,6 +76,15 @@ const [deleteDone, setDeleteDone] = useState(false);
     fetchOwnerData();
   }, [currentUser]);
 
+  // Initialise/maj l'avatar depuis currentUser ou localStorage pour persister après refresh
+  useEffect(() => {
+    try {
+      const persisted = localStorage.getItem('profilePhotoUrl');
+      const initial = currentUser?.profilePhotoUrl || persisted || null;
+      setPhotoUrl(initial);
+    } catch(_) {}
+  }, [currentUser?.profilePhotoUrl]);
+
   useEffect(() => {
     // Affiche le message de succès si on vient d’ajouter un bateau
     if (location.state && location.state.added) {
@@ -81,6 +98,23 @@ const [deleteDone, setDeleteDone] = useState(false);
   const handleLogout = () => {
     logout();
     // La redirection sera gérée par le ProtectedRoute
+  };
+
+  // Upload photo de profil (Firebase)
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    setPhotoUploading(true);
+    try {
+      const uploadResult = await uploadProfilePhoto(file, currentUser._id);
+      await userService.updateProfile(currentUser._id, { profilePhotoUrl: uploadResult.url });
+      localStorage.setItem('profilePhotoUrl', uploadResult.url);
+      setPhotoUrl(uploadResult.url);
+    } catch (e) {
+      alert("Erreur lors de l'upload: " + (e?.message || 'inconnue'));
+    } finally {
+      setPhotoUploading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -189,6 +223,23 @@ const [deleteDone, setDeleteDone] = useState(false);
           {/* Profil propriétaire */}
           <div className="card p-6 md:col-span-1">
             <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Mon profil</h2>
+            {/* Avatar centré et circulaire */}
+            <div className="w-full flex justify-center mb-4">
+              <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                <img
+                  src={photoUrl || currentUser?.profilePhotoUrl || profileImage}
+                  alt="Profil"
+                  className="w-full h-full object-cover"
+                  onError={(e)=>{ e.currentTarget.src = profileImage; }}
+                />
+              </div>
+            </div>
+            <div className="w-full text-center mb-6">
+              <label className="text-primary cursor-pointer">
+                {photoUploading ? 'Upload en cours...' : (photoUrl || currentUser?.profilePhotoUrl ? 'Changer la photo' : '+ Ajouter une photo')}
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} disabled={photoUploading} />
+              </label>
+            </div>
             <div className="flex flex-col space-y-4">
               <div>
                 <p className="text-gray-500 text-sm">Nom</p>
@@ -196,11 +247,19 @@ const [deleteDone, setDeleteDone] = useState(false);
               </div>
               <div>
                 <p className="text-gray-500 text-sm">Email</p>
-                <p className="font-medium">{currentUser?.email || 'Non défini'}</p>
+                <div className="flex items-center">
+                  <p className="font-medium">{currentUser?.email || 'Non défini'}</p>
+                  <span className="ml-2"></span>
+                  <a href="#" className="text-primary ml-2" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
+                </div>
               </div>
               <div>
                 <p className="text-gray-500 text-sm">téléphone</p>
-                <p className="font-medium">{currentUser?.phone || 'Non défini'}</p>
+                <div className="flex items-center">
+                  <p className="font-medium">{currentUser?.phone || 'Non défini'}</p>
+                  <span className="ml-2"></span>
+                  <a href="#" className="text-primary ml-2" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
+                </div>
               </div>
               <div>
                 <p className="text-gray-500 text-sm">Rôle</p>

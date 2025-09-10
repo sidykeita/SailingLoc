@@ -24,11 +24,18 @@ export const AuthProvider = ({ children }) => {
         if (localStorage.getItem('token')) {
           // Récupérer les informations de l'utilisateur depuis l'API
           try {
-            const userData = await authService.getCurrentUser();
+            let userData = await authService.getCurrentUser();
             console.log('[DEBUG][AuthContext] userData:', userData);
+            // Injecte l'avatar persisté si manquant côté backend
+            try {
+              const persisted = localStorage.getItem('profilePhotoUrl');
+              if (!userData?.profilePhotoUrl && persisted) {
+                userData = { ...userData, profilePhotoUrl: persisted };
+              }
+            } catch(_) {}
             setCurrentUser(userData);
             setUserRole(userData.role || 'tenant'); // Par défaut 'tenant' si aucun rôle n'est spécifié
-            // Persiste l'avatar pour éviter la disparition après refresh
+            // Persiste l'avatar si fourni par le backend
             if (userData?.profilePhotoUrl) {
               localStorage.setItem('profilePhotoUrl', userData.profilePhotoUrl);
             }
@@ -73,14 +80,21 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.login(email, password, recaptchaToken);
       
       // Mise à jour de l'état utilisateur
-      setCurrentUser(data.user);
-      setUserRole(data.user.role);
+      let userObj = data.user;
+      try {
+        const persisted = localStorage.getItem('profilePhotoUrl');
+        if (!userObj?.profilePhotoUrl && persisted) {
+          userObj = { ...userObj, profilePhotoUrl: persisted };
+        }
+      } catch(_) {}
+      setCurrentUser(userObj);
+      setUserRole(userObj.role);
       // Persiste l'avatar s'il est renvoyé par le backend
-      if (data?.user?.profilePhotoUrl) {
-        localStorage.setItem('profilePhotoUrl', data.user.profilePhotoUrl);
+      if (userObj?.profilePhotoUrl) {
+        localStorage.setItem('profilePhotoUrl', userObj.profilePhotoUrl);
       }
       
-      return data.user;
+      return userObj;
     } catch (err) {
       console.error('Erreur de connexion:', err);
       setError(err.message || 'Erreur lors de la connexion');
