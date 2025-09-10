@@ -5,7 +5,29 @@ class BoatService {
   async getAllBoats(filters = {}) {
     try {
       const response = await apiClient.get('/boats', { params: filters });
-      return response.data;
+      const boats = response.data;
+      
+      // Enrichir chaque bateau avec ses réservations pour le filtrage
+      const enrichedBoats = await Promise.all(boats.map(async (boat) => {
+        try {
+          const reservationsResponse = await apiClient.get(`/reservations/boat/${boat._id}`);
+          const reservations = reservationsResponse.data;
+          // Ajouter les réservations confirmées/pending comme bookings
+          boat.bookings = reservations
+            .filter(r => ['confirmed', 'pending'].includes(r.status))
+            .map(r => ({
+              startDate: r.startDate,
+              endDate: r.endDate,
+              status: r.status
+            }));
+        } catch (err) {
+          console.warn(`Impossible de charger les réservations pour le bateau ${boat._id}:`, err);
+          boat.bookings = [];
+        }
+        return boat;
+      }));
+      
+      return enrichedBoats;
     } catch (error) {
       throw this.handleError(error);
     }

@@ -140,9 +140,42 @@ const AllBoats = () => {
       if (capacityFilter === 'large') return cap > 8;
       return true;
     });
-    // Filtre date/dispo
-    if (startParam && endParam) return filtered;
-    if (dateParam && dateParam.length > 0) return filtered.filter((boat) => !isUnavailableAtDate(boat, dateParam));
+      // Filtre date/dispo - améliorer pour prendre en compte les réservations réelles
+    if (startParam && endParam) {
+      // Filtrer les bateaux disponibles pour la plage de dates
+      filtered = filtered.filter(boat => {
+        if (boat?.status !== 'disponible') return false;
+        // Vérifier si le bateau a des réservations qui chevauchent
+        const start = parseISO(startParam);
+        const end = parseISO(endParam);
+        if (!start || !end) return true;
+        
+        // Vérifier les dates indisponibles explicites
+        if (Array.isArray(boat?.unavailableDates)) {
+          const hasUnavailable = boat.unavailableDates.some(dateStr => {
+            const d = parseISO(dateStr);
+            return d && d >= start && d <= end;
+          });
+          if (hasUnavailable) return false;
+        }
+        
+        // Vérifier les réservations existantes
+        if (Array.isArray(boat?.bookings)) {
+          const hasConflict = boat.bookings.some(booking => {
+            const bStart = parseISO(booking?.startDate);
+            const bEnd = parseISO(booking?.endDate);
+            if (!bStart || !bEnd) return false;
+            // Chevauchement: start <= bEnd && end >= bStart
+            return start <= bEnd && end >= bStart;
+          });
+          if (hasConflict) return false;
+        }
+        
+        return true;
+      });
+    } else if (dateParam && dateParam.length > 0) {
+      filtered = filtered.filter((boat) => !isUnavailableAtDate(boat, dateParam));
+    }
     return filtered;
   }, [boats, activeCityQuery, dateParam, startParam, endParam, searchTerm, priceFilter, capacityFilter]);
 
