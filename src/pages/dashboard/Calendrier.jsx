@@ -148,9 +148,13 @@ const Calendrier = () => {
 
   const getEventsForDate = (date) => {
     if (!date) return [];
-    return events.filter(event => 
-      event.date.toDateString() === date.toDateString()
-    );
+    const dayTime = new Date(date).setHours(0, 0, 0, 0);
+    return events.filter(event => {
+      const start = event.start ? new Date(event.start).setHours(0,0,0,0) : (event.date ? new Date(event.date).setHours(0,0,0,0) : null);
+      const end = event.end ? new Date(event.end).setHours(0,0,0,0) : start;
+      if (start === null) return false;
+      return start <= dayTime && dayTime <= end;
+    });
   };
 
   // Fermer le panneau latéral/modal
