@@ -149,6 +149,12 @@ const Home = () => {
       if (startNorm) params.set('start', startNorm);
       if (endNorm) params.set('end', endNorm);
       navigate(`/boats?${params.toString()}`);
+    } else if (startNorm || endNorm) {
+      // Recherche par dates uniquement
+      const params = new URLSearchParams();
+      if (startNorm) params.set('start', startNorm);
+      if (endNorm) params.set('end', endNorm);
+      navigate(`/boats?${params.toString()}`);
     }
   };
 

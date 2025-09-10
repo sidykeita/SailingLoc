@@ -89,7 +89,7 @@ exports.getAvailableBoats = async (req, res) => {
     // Réservations qui se chevauchent avec la période demandée
     // Overlap si: startDate <= end ET endDate >= start
     const overlapping = await Reservation.find({
-      status: { $in: ['pending', 'confirmed'] },
+      status: 'confirmed',
       startDate: { $lte: endDate },
       endDate: { $gte: startDate },
     }).select('boat');
