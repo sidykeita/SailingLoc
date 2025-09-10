@@ -104,11 +104,10 @@ const SimpleDashboard = () => {
       <div className="dashboard-container">
         {/* User Profile Section */}
         <div className="user-profile">
-          <div className="profile-image">
+          <div className="profile-avatar">
             <img src={currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
               e.target.onerror = null;
               e.target.style.display = 'none';
-              e.target.parentNode.textContent = 'Ce';
             }} />
           </div>
           <label className="add-photo" style={{cursor: 'pointer'}}>
