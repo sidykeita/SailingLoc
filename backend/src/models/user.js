@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String, unique: true },  // Champ optionnel pour le téléphone
+  // Champ optionnel pour le téléphone (unique uniquement quand présent)
+  phone: { type: String, unique: true, sparse: true },
   role: { 
     type: String, 
     enum: ['locataire', 'propriétaire', 'admin'], 
