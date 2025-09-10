@@ -31,8 +31,6 @@ export const AuthProvider = ({ children }) => {
             // Persiste l'avatar pour éviter la disparition après refresh
             if (userData?.profilePhotoUrl) {
               localStorage.setItem('profilePhotoUrl', userData.profilePhotoUrl);
-            } else {
-              localStorage.removeItem('profilePhotoUrl');
             }
           } catch (err) {
             console.error('[DEBUG][AuthContext] getCurrentUser error:', err);
@@ -77,6 +75,10 @@ export const AuthProvider = ({ children }) => {
       // Mise à jour de l'état utilisateur
       setCurrentUser(data.user);
       setUserRole(data.user.role);
+      // Persiste l'avatar s'il est renvoyé par le backend
+      if (data?.user?.profilePhotoUrl) {
+        localStorage.setItem('profilePhotoUrl', data.user.profilePhotoUrl);
+      }
       
       return data.user;
     } catch (err) {
