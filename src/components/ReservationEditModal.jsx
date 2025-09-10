@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
+// Helper: format any date-like value to YYYY-MM-DD string for <input type="date" />
+function toDateInputValue(v) {
+  if (!v) return '';
+  const d = v instanceof Date ? v : new Date(v);
+  if (isNaN(d)) return '';
+  return d.toISOString().slice(0, 10);
+}
+
 /**
  * Modale d'édition de réservation pour l'admin.
  * Props :
@@ -10,18 +18,18 @@ import React, { useState, useEffect } from 'react';
  */
 export default function ReservationEditModal({ reservation, open, onClose, onSave }) {
   const [form, setForm] = useState({
-    startDate: reservation?.startDate || '',
-    endDate: reservation?.endDate || '',
-    status: reservation?.status || '',
+    startDate: toDateInputValue(reservation?.startDate || reservation?.start),
+    endDate: toDateInputValue(reservation?.endDate || reservation?.end),
+    status: reservation?.status || 'confirmed',
     price: reservation?.price || '',
   });
 
   useEffect(() => {
     if (reservation) {
       setForm({
-        startDate: reservation.startDate || '',
-        endDate: reservation.endDate || '',
-        status: reservation.status || '',
+        startDate: toDateInputValue(reservation.startDate || reservation.start),
+        endDate: toDateInputValue(reservation.endDate || reservation.end),
+        status: reservation.status || 'confirmed',
         price: reservation.price || '',
       });
     }
@@ -46,11 +54,11 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
         <form onSubmit={handleSubmit}>
           <div style={{marginBottom:16}}>
             <label>Date de début :</label>
-            <input type="date" name="startDate" value={form.startDate?.slice(0,10)} onChange={handleChange} required style={{width:'100%',padding:8,marginTop:4}} />
+            <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required style={{width:'100%',padding:8,marginTop:4}} />
           </div>
           <div style={{marginBottom:16}}>
             <label>Date de fin :</label>
-            <input type="date" name="endDate" value={form.endDate?.slice(0,10)} onChange={handleChange} required style={{width:'100%',padding:8,marginTop:4}} />
+            <input type="date" name="endDate" value={form.endDate} onChange={handleChange} required style={{width:'100%',padding:8,marginTop:4}} />
           </div>
           <div style={{marginBottom:16}}>
             <label>Statut :</label>
