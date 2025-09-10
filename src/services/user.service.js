@@ -1,15 +1,24 @@
 import axios from 'axios';
 import { API_URL } from '../lib/api';
 
-const updateProfile = async (userId, data) => {
-  // Récupère le token du localStorage (ou autre selon ton AuthContext)
+const updateProfile = async (userData) => {
   const token = localStorage.getItem('token');
+  const { _id, ...data } = userData;
+  
+  // Ne garder que les champs qui peuvent être mis à jour
+  const updateData = {
+    email: data.email,
+    phone: data.phone,
+    // Ajouter d'autres champs modifiables si nécessaire
+  };
+
   const res = await axios.patch(
-    `${API_URL}/users/${userId}`,
-    data,
+    `${API_URL}/users/${_id}`,
+    updateData,
     {
       headers: {
         Authorization: token ? `Bearer ${token}` : undefined,
+        'Content-Type': 'application/json',
       },
     }
   );

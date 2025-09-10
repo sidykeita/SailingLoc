@@ -27,6 +27,7 @@ import SailingBoats from './pages/boats/SailingBoats';
 import AddBoat from './pages/boats/AddBoat';
 import EditBoat from './pages/boats/EditBoat';
 import AllBoats from './pages/boats/AllBoats';
+import ProfilePage from './pages/profile/ProfilePage';
 
 // Pages des destinations
 import Marseille from './pages/destinations/Marseille';
@@ -144,6 +145,9 @@ function App() {
           <Route path="/payment/success" element={<Layout><PaymentSuccess /></Layout>} />
           <Route path="/payment/cancel" element={<Layout><PaymentCancel /></Layout>} />
           <Route path="/payment/test" element={<Layout><PaymentTest /></Layout>} />
+          
+          {/* Route du profil utilisateur */}
+          <Route path="/profile" element={<ProtectedRoute><Layout><ProfilePage /></Layout></ProtectedRoute>} />
           
           {/* Conserver l'ancienne route pour la compatibilité */}
           <Route path="/register/old" element={!currentUser ? <Register /> : <Navigate to={userRole === 'propriétaire' ? '/owner/dashboard' : '/dashboard'} />} />
