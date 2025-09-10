@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { API_URL } from '../../lib/api';
 
 export default function PaymentSuccess() {
   const location = useLocation();
@@ -16,11 +17,17 @@ export default function PaymentSuccess() {
       if (!sessionId) return;
       try {
         // Confirme le paiement côté backend (met à jour réservation + crée Payment)
-        const res = await fetch(`/api/stripe/confirm?session_id=${sessionId}`, {
+        const res = await fetch(`${API_URL}/stripe/confirm?session_id=${sessionId}`, {
           method: 'POST',
         });
         if (!res.ok) {
-          const errText = await res.text();
+          let errText = '';
+          try {
+            const data = await res.json();
+            errText = data?.message || JSON.stringify(data);
+          } catch (_) {
+            errText = await res.text();
+          }
           setStatusMsg(`La confirmation du paiement a échoué: ${errText}`);
         } else {
           setStatusMsg('Paiement confirmé. Redirection vers vos réservations...');

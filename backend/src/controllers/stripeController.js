@@ -118,25 +118,43 @@ exports.createReservationCheckoutSession = async (req, res) => {
 exports.confirmPayment = async (req, res) => {
   try {
     const { session_id } = req.query;
-    
-    if (!session_id) {
-      return res.status(400).json({ message: 'session_id requis' });
-    }
+    if (!session_id) return res.status(400).json({ message: 'session_id requis' });
 
-    // Retrieve session from Stripe
+    // 1) Récupérer la session Stripe
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    
     if (session.payment_status !== 'paid') {
       return res.status(400).json({ message: 'Paiement non confirmé' });
     }
 
-    const { reservationId } = session.metadata || {};
-    
+    // 2) Retrouver reservationId de manière robuste
+    let reservationId = session.metadata?.reservationId;
+    if (!reservationId && session.payment_intent) {
+      try {
+        const intent = await stripe.paymentIntents.retrieve(session.payment_intent);
+        reservationId = intent?.metadata?.reservationId || reservationId;
+      } catch (_) {}
+    }
+    if (!reservationId) {
+      // Fallback: essayer de retrouver une réservation avec ce paymentSessionId
+      const existing = await Reservation.findOne({ paymentSessionId: session.id }).select('_id');
+      if (existing?._id) reservationId = existing._id.toString();
+    }
     if (!reservationId) {
       return res.status(400).json({ message: 'Aucune réservation associée' });
     }
 
-    // Update reservation (ne pas auto-confirmer, laisser en 'pending')
+    // 3) Idempotence: si déjà paid, répondre 200
+    const current = await Reservation.findById(reservationId);
+    if (!current) return res.status(404).json({ message: 'Réservation non trouvée' });
+    if (current.paymentStatus === 'paid') {
+      return res.json({
+        message: 'Paiement déjà confirmé (idempotent) : réservation en attente de validation du propriétaire',
+        reservation: current,
+        session_id: session.id,
+      });
+    }
+
+    // 4) Mettre à jour uniquement le paiement (laisser status = pending)
     const reservation = await Reservation.findByIdAndUpdate(
       reservationId,
       {
@@ -148,27 +166,26 @@ exports.confirmPayment = async (req, res) => {
       },
       { new: true }
     );
+    if (!reservation) return res.status(404).json({ message: 'Réservation non trouvée' });
 
-    if (!reservation) {
-      return res.status(404).json({ message: 'Réservation non trouvée' });
-    }
+    // 5) Créer un enregistrement Payment (best effort)
+    let payment = null;
+    try {
+      payment = await Payment.create({
+        reservation: reservationId,
+        amount: typeof session.amount_total === 'number' ? session.amount_total / 100 : 0,
+        method: 'carte',
+        status: 'effectué',
+        paymentDate: new Date(),
+      });
+    } catch (_) {}
 
-    // Create Payment record
-    const payment = await Payment.create({
-      reservation: reservationId,
-      amount: typeof session.amount_total === 'number' ? session.amount_total / 100 : 0,
-      method: 'carte',
-      status: 'effectué',
-      paymentDate: new Date(),
-    });
-
-    res.json({ 
-      message: 'Paiement confirmé: réservation en attente de validation du propriétaire', 
-      reservation, 
+    res.json({
+      message: 'Paiement confirmé: réservation en attente de validation du propriétaire',
+      reservation,
       payment,
-      session_id: session.id 
+      session_id: session.id,
     });
-
   } catch (error) {
     console.error('Erreur confirmation paiement:', error);
     res.status(500).json({ message: 'Erreur serveur', error: error.message });
