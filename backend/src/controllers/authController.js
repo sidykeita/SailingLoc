@@ -83,6 +83,9 @@ exports.login = async (req, res) => {
       console.log('[LOGIN] Aucun user trouvé pour cet email');
       return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
     }
+    if (user.isDeleted) {
+      return res.status(403).json({ message: 'Ce compte a été supprimé' });
+    }
     console.log('[LOGIN] User trouvé, hash password:', user.password);
     console.log('[DEBUG] password reçu:', password);
     console.log('[DEBUG] hash stocké:', user.password);

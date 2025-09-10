@@ -15,7 +15,10 @@ const userSchema = new mongoose.Schema({
     default: 'locataire' 
   },
   createdAt: { type: Date, default: Date.now },
-  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Boat' }]
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Boat' }],
+  // Soft delete
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date }
 });
 
 // Ajout de la méthode pour comparer les mots de passe

@@ -12,7 +12,7 @@ const boatSchema = new mongoose.Schema({
   description: { type: String },
   dailyPrice: { type: Number, required: true }, // Prix journalier en euros
   photos: [{ type: String }],
-  status: { type: String, enum: ['disponible', 'en location'], default: 'disponible' },
+  status: { type: String, enum: ['disponible', 'en location', 'indisponible'], default: 'disponible' },
   features: [{ type: String }], // équipements
 technicalSpecs: {             // caractéristiques techniques
   year: String,
