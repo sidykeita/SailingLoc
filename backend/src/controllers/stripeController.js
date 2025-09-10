@@ -136,14 +136,15 @@ exports.confirmPayment = async (req, res) => {
       return res.status(400).json({ message: 'Aucune réservation associée' });
     }
 
-    // Update reservation
+    // Update reservation (ne pas auto-confirmer, laisser en 'pending')
     const reservation = await Reservation.findByIdAndUpdate(
       reservationId,
       {
-        status: 'confirmed',
-        paymentStatus: 'paid',
-        paymentSessionId: session.id,
-        paymentIntentId: session.payment_intent || '',
+        $set: {
+          paymentStatus: 'paid',
+          paymentSessionId: session.id,
+          paymentIntentId: session.payment_intent || '',
+        },
       },
       { new: true }
     );
@@ -162,7 +163,7 @@ exports.confirmPayment = async (req, res) => {
     });
 
     res.json({ 
-      message: 'Paiement confirmé', 
+      message: 'Paiement confirmé: réservation en attente de validation du propriétaire', 
       reservation, 
       payment,
       session_id: session.id 
@@ -198,10 +199,11 @@ exports.webhook = async (req, res) => {
             await Reservation.findByIdAndUpdate(
               reservationId,
               {
-                status: 'confirmed',
-                paymentStatus: 'paid',
-                paymentSessionId: session.id,
-                paymentIntentId: session.payment_intent || '',
+                $set: {
+                  paymentStatus: 'paid',
+                  paymentSessionId: session.id,
+                  paymentIntentId: session.payment_intent || '',
+                },
               },
               { new: true }
             );
@@ -250,9 +252,10 @@ exports.webhook = async (req, res) => {
               await Reservation.findByIdAndUpdate(
                 reservationId,
                 {
-                  status: 'confirmed',
-                  paymentStatus: 'paid',
-                  paymentIntentId: intent.id,
+                  $set: {
+                    paymentStatus: 'paid',
+                    paymentIntentId: intent.id,
+                  },
                 },
                 { new: true }
               );
