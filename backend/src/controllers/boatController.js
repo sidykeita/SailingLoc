@@ -83,8 +83,8 @@ exports.getAvailableBoats = async (req, res) => {
     if (type) boatFilters.type = type;
     if (capacity) boatFilters.capacity = Number(capacity);
     if (port) boatFilters.port = { $regex: port, $options: 'i' };
-    // Ex: n'afficher que les bateaux louables
-    // boatFilters.status = 'disponible';
+    // N'afficher que les bateaux louables
+    boatFilters.status = 'disponible';
 
     // Réservations qui se chevauchent avec la période demandée
     // Overlap si: startDate <= end ET endDate >= start
@@ -97,7 +97,43 @@ exports.getAvailableBoats = async (req, res) => {
     const excluded = new Set(overlapping.map(r => String(r.boat)));
 
     const boats = await Boat.find(boatFilters).populate('owner', 'firstName lastName');
-    const available = boats.filter(b => !excluded.has(String(b._id)));
+    // Exclure les bateaux ayant des réservations qui se chevauchent
+    let available = boats.filter(b => !excluded.has(String(b._id)));
+
+    // Exclure également selon unavailableDates définies sur le bateau
+    const overlaps = (aStart, aEnd, bStart, bEnd) => (aStart <= bEnd && aEnd >= bStart);
+    const toDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const reqStartDay = toDay(startDate);
+    const reqEndDay = toDay(endDate);
+    available = available.filter((boat) => {
+      const ud = boat && boat.unavailableDates;
+      if (!ud) return true;
+      // Formats supportés:
+      //  - ["YYYY-MM-DD", ...]
+      //  - [{ date: "YYYY-MM-DD" }, ...]
+      //  - [{ startDate: "YYYY-MM-DD", endDate: "YYYY-MM-DD" }, ...]
+      try {
+        if (Array.isArray(ud)) {
+          for (const entry of ud) {
+            if (typeof entry === 'string') {
+              const d = new Date(`${entry}T00:00:00.000Z`);
+              const day = toDay(d);
+              if (day >= reqStartDay && day <= reqEndDay) return false;
+            } else if (entry && typeof entry === 'object') {
+              if (entry.startDate && entry.endDate) {
+                const s = toDay(new Date(`${entry.startDate}T00:00:00.000Z`));
+                const e = toDay(new Date(`${entry.endDate}T00:00:00.000Z`));
+                if (overlaps(reqStartDay, reqEndDay, s, e)) return false;
+              } else if (entry.date) {
+                const d = toDay(new Date(`${entry.date}T00:00:00.000Z`));
+                if (d >= reqStartDay && d <= reqEndDay) return false;
+              }
+            }
+          }
+        }
+      } catch (_) { /* noop */ }
+      return true;
+    });
 
     res.json(available);
   } catch (err) {

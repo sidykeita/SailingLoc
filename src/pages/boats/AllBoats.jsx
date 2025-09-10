@@ -54,17 +54,36 @@ const AllBoats = () => {
   const [capacityFilter, setCapacityFilter] = useState('all');
 
   useEffect(() => {
-  setLoading(true);
-  setError('');
-  fetch(`${API_URL}/boats`, { credentials: 'include' })
-    .then(res => {
-      if (!res.ok) throw new Error('Bad response');
-      return res.json();
-    })
-    .then(data => setBoats(Array.isArray(data) ? data : []))
-    .catch(() => setError('Erreur lors du chargement des bateaux'))
-    .finally(() => setLoading(false));
-}, []);
+    const controller = new AbortController();
+    const loadBoats = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const params = new URLSearchParams();
+        let url = `${API_URL}/boats`;
+        // Si des dates sont présentes, déléguer le filtrage au backend
+        if ((startParam && endParam) || dateParam) {
+          const start = dateParam || startParam;
+          const end = dateParam || endParam;
+          url = `${API_URL}/boats/available`;
+          if (start) params.set('start', start);
+          if (end) params.set('end', end);
+          if (locationParam) params.set('port', locationParam);
+        }
+        const qs = params.toString();
+        const res = await fetch(qs ? `${url}?${qs}` : url, { credentials: 'include', signal: controller.signal });
+        if (!res.ok) throw new Error('Bad response');
+        const data = await res.json();
+        setBoats(Array.isArray(data) ? data : []);
+      } catch (e) {
+        if (e.name !== 'AbortError') setError('Erreur lors du chargement des bateaux');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadBoats();
+    return () => controller.abort();
+  }, [API_URL, locationParam, startParam, endParam, dateParam]);
 
   // Filtrage client en secours pour matcher ville/port
   const activeCityQuery = (locationParam || textQuery).toLowerCase();
@@ -140,40 +159,9 @@ const AllBoats = () => {
       if (capacityFilter === 'large') return cap > 8;
       return true;
     });
-      // Filtre date/dispo - améliorer pour prendre en compte les réservations réelles
-    if (startParam && endParam) {
-      // Filtrer les bateaux disponibles pour la plage de dates
-      filtered = filtered.filter(boat => {
-        if (boat?.status !== 'disponible') return false;
-        // Vérifier si le bateau a des réservations qui chevauchent
-        const start = parseISO(startParam);
-        const end = parseISO(endParam);
-        if (!start || !end) return true;
-        
-        // Vérifier les dates indisponibles explicites
-        if (Array.isArray(boat?.unavailableDates)) {
-          const hasUnavailable = boat.unavailableDates.some(dateStr => {
-            const d = parseISO(dateStr);
-            return d && d >= start && d <= end;
-          });
-          if (hasUnavailable) return false;
-        }
-        
-        // Vérifier les réservations existantes
-        if (Array.isArray(boat?.bookings)) {
-          const hasConflict = boat.bookings.some(booking => {
-            const bStart = parseISO(booking?.startDate);
-            const bEnd = parseISO(booking?.endDate);
-            if (!bStart || !bEnd) return false;
-            // Chevauchement: start <= bEnd && end >= bStart
-            return start <= bEnd && end >= bStart;
-          });
-          if (hasConflict) return false;
-        }
-        
-        return true;
-      });
-    } else if (dateParam && dateParam.length > 0) {
+      // Pas de filtrage date côté client si start/end présents, déjà traité backend via /boats/available
+    // Pour compat d'une seule date, on peut encore filtrer côté client si l'API par défaut a été utilisée
+    if (!startParam && !endParam && dateParam && dateParam.length > 0) {
       filtered = filtered.filter((boat) => !isUnavailableAtDate(boat, dateParam));
     }
     return filtered;
