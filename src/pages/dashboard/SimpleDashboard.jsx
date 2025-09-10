@@ -10,6 +10,7 @@ import profileImage from '../../assets/images/profil.jpg';
 import userService from '../../services/user.service';
 import EditProfileModal from '../../components/EditProfileModal';
 import ViewProfileModal from '../../components/ViewProfileModal';
+import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -35,6 +36,7 @@ const SimpleDashboard = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
   // Suppression de compte
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -50,17 +52,44 @@ const SimpleDashboard = () => {
       console.error("Erreur lors de la déconnexion", error);
     }
   };
-  
-  const handleDeleteAccount = async () => {
+
+  // Fonction pour gérer l'upload de photo de profil
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setPhotoUploading(true);
     try {
-      setDeleteError('');
-      setDeleteLoading(true);
-      await userService.deleteMe(deletePassword);
+      const uploadResult = await uploadProfilePhoto(file, currentUser._id);
+      await userService.updateProfile(currentUser._id, { profilePhotoUrl: uploadResult.url });
+      
+      // Mettre à jour localement
+      if (currentUser) {
+        currentUser.profilePhotoUrl = uploadResult.url;
+      }
+    } catch (error) {
+      alert('Erreur lors de l\'upload: ' + error.message);
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
+  // Fonction pour gérer la suppression de compte
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      setDeleteError('Veuillez entrer votre mot de passe');
+      return;
+    }
+
+    setDeleteLoading(true);
+    setDeleteError('');
+
+    try {
+      await userService.deleteAccount(currentUser._id, deletePassword);
       await logout();
       navigate('/');
-    } catch (e) {
-      const serverMsg = e?.response?.data?.message || e?.response?.data?.error;
-      setDeleteError(serverMsg || e?.message || 'Erreur lors de la suppression du compte');
+    } catch (error) {
+      setDeleteError(error.message || 'Erreur lors de la suppression du compte');
     } finally {
       setDeleteLoading(false);
     }
@@ -75,14 +104,23 @@ const SimpleDashboard = () => {
       <div className="dashboard-container">
         {/* User Profile Section */}
         <div className="user-profile">
-          <div className="profile-avatar">
-            <img src={profileImage} alt="Photo de profil" onError={(e) => {
+          <div className="profile-image">
+            <img src={currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
               e.target.onerror = null;
               e.target.style.display = 'none';
               e.target.parentNode.textContent = 'Ce';
             }} />
           </div>
-          <a href="#" className="add-photo">+ Ajouter une photo</a>
+          <label className="add-photo" style={{cursor: 'pointer'}}>
+            {photoUploading ? 'Upload en cours...' : '+ Ajouter une photo'}
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handlePhotoUpload}
+              style={{display: 'none'}}
+              disabled={photoUploading}
+            />
+          </label>
           
           <h2 className="profile-name">{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</h2>
           <p className="member-since">Membre depuis 2025</p>
