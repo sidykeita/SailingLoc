@@ -24,6 +24,11 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import '../../assets/css/BoatDetail.css';
 import { payReservation } from '../../services/stripe.service';
+// Date range picker
+import { DateRange } from 'react-date-range';
+import fr from 'date-fns/locale/fr';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
 
 // Importation des images
 import logoBlc from '../../assets/images/logo-blc.png';
@@ -55,8 +60,8 @@ const BoatDetail = () => {
   const [boat, setBoat] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [dateRange, setDateRange] = useState([{ startDate: null, endDate: null, key: 'selection' }]);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [success, setSuccess] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [reservations, setReservations] = useState([]);
@@ -83,6 +88,20 @@ const BoatDetail = () => {
     };
     if (id) fetchReservations();
   }, [id]);
+
+  // Utilitaires calendrier
+  const enumerateDates = (start, end) => {
+    const list = [];
+    if (!start || !end) return list;
+    const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    while (cur <= last) {
+      list.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return list;
+  };
+  const disabledDates = reservations.flatMap(r => enumerateDates(new Date(r.startDate), new Date(r.endDate)));
 
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
@@ -176,6 +195,9 @@ const BoatDetail = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    const sel = dateRange[0] || {};
+    const startDate = sel.startDate ? new Date(sel.startDate) : null;
+    const endDate = sel.endDate ? new Date(sel.endDate) : null;
     if (!startDate || !endDate) {
       setError("Veuillez sélectionner une date de début et de fin.");
       return;
@@ -203,9 +225,9 @@ const BoatDetail = () => {
         body: JSON.stringify({
           boatId: boat._id,
           userId: currentUser._id,
-          startDate,
-          endDate,
-          price: boat.dailyPrice * Math.max(1, Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)))
+          startDate: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).toISOString().slice(0,10),
+          endDate: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).toISOString().slice(0,10),
+          price: boat.dailyPrice * Math.max(1, Math.floor((eD - s) / (1000 * 60 * 60 * 24)))
         }),
       });
       if (!res.ok) {
@@ -343,86 +365,62 @@ const BoatDetail = () => {
               </div>
             )}
             <form onSubmit={handleReservation}>
-              <div className="mb-4">
-                <label htmlFor="startDate" className="form-label">Date de début</label>
-                <div className="relative">
-                  <div className="input-icon">
-                    <FontAwesomeIcon icon={faCalendarAlt} />
-                  </div>
-                  <input
-                    type="date"
-                    id="startDate"
-                    className="form-input"
-                    value={startDate}
-                    onChange={e => {
-                      const val = e.target.value;
-                      setStartDate(val);
-                    }}
-                    min={new Date().toISOString().split('T')[0]}
-                    disabled={!canBook}
-                    onFocus={e => e.target.showPicker && e.target.showPicker()}
-                    style={{
-                      backgroundColor: isDateReserved(startDate) ? '#e5e7eb' : undefined,
-                      color: isDateReserved(startDate) ? '#a1a1aa' : undefined,
-                      cursor: isDateReserved(startDate) ? 'not-allowed' : undefined
-                    }}
-                    // Désactive la sélection des dates réservées via un pattern HTML5
-                    pattern={reservations.map(r => {
-                      const rStart = new Date(r.startDate).toISOString().split('T')[0];
-                      const rEnd = new Date(r.endDate).toISOString().split('T')[0];
-                      return `^(?!${rStart}|${rEnd}).*$`;
-                    }).join('')}
-                  />
-                </div>
-              </div>
               <div className="mb-6">
-                <label htmlFor="endDate" className="form-label">Date de fin</label>
-                <div className="relative">
-                  <div className="input-icon">
-                    <FontAwesomeIcon icon={faCalendarAlt} />
+                <label className="form-label">Sélectionnez vos dates</label>
+                <button
+                  type="button"
+                  className="form-input flex justify-between items-center"
+                  onClick={() => setShowCalendar(v => !v)}
+                  disabled={!canBook}
+                >
+                  <span>
+                    {(() => {
+                      const sel = dateRange[0] || {};
+                      const sd = sel.startDate ? new Date(sel.startDate) : null;
+                      const ed = sel.endDate ? new Date(sel.endDate) : null;
+                      if (sd && ed) return `Du ${sd.toLocaleDateString('fr-FR')} au ${ed.toLocaleDateString('fr-FR')}`;
+                      if (sd) return `À partir du ${sd.toLocaleDateString('fr-FR')}`;
+                      return 'Choisissez vos dates';
+                    })()}
+                  </span>
+                  <FontAwesomeIcon icon={faCalendarAlt} />
+                </button>
+                {showCalendar && (
+                  <div className="mt-2">
+                    <DateRange
+                      onChange={(item) => setDateRange([item.selection])}
+                      moveRangeOnFirstSelection={false}
+                      ranges={dateRange}
+                      months={1}
+                      direction="horizontal"
+                      locale={fr}
+                      minDate={new Date()}
+                      rangeColors={["#274991"]}
+                      disabledDates={disabledDates}
+                    />
                   </div>
-                  <input
-                    type="date"
-                    id="endDate"
-                    className="form-input"
-                    value={endDate}
-                    onChange={e => {
-                      const val = e.target.value;
-                      setEndDate(val);
-                    }}
-                    min={startDate || new Date().toISOString().split('T')[0]}
-                    disabled={!canBook}
-                    onFocus={e => e.target.showPicker && e.target.showPicker()}
-                    style={{
-                      backgroundColor: isDateReserved(endDate) ? '#e5e7eb' : undefined,
-                      color: isDateReserved(endDate) ? '#a1a1aa' : undefined,
-                      cursor: isDateReserved(endDate) ? 'not-allowed' : undefined
-                    }}
-                    pattern={reservations.map(r => {
-                      const rStart = new Date(r.startDate).toISOString().split('T')[0];
-                      const rEnd = new Date(r.endDate).toISOString().split('T')[0];
-                      return `^(?!${rStart}|${rEnd}).*$`;
-                    }).join('')}
-                  />
-                </div>
+                )}
+                {disabledDates?.length > 0 && (
+                  <p className="text-sm text-gray-500 mt-2">Les dates grisées / barrées sont indisponibles.</p>
+                )}
               </div>
               <div className="mb-6">
                 <div className="flex justify-between text-gray-700 mb-2">
                   <span>Prix par jour:</span>
                   <span className="font-bold">{boat.dailyPrice}€</span>
                 </div>
-                {startDate && endDate && (
+                {(() => { const sel = dateRange[0] || {}; return sel.startDate && sel.endDate; })() && (
                   <div className="flex justify-between text-gray-700 mb-2">
                     <span>Durée:</span>
                     <span className="font-bold">
-                      {Math.max(1, Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)))} jours
+                      {(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24))); })()} jours
                     </span>
                   </div>
                 )}
-                {startDate && endDate && (
+                {(() => { const sel = dateRange[0] || {}; return sel.startDate && sel.endDate; })() && (
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total:</span>
-                    <span>{boat.dailyPrice * Math.max(1, Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)))}€</span>
+                    <span>{(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return boat.dailyPrice * Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24))); })()}€</span>
                   </div>
                 )}
               </div>
