@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, onSave }) {
   const [email, setEmail] = useState(currentEmail || '');
   const [phone, setPhone] = useState(currentPhone || '');
+  const [idCard, setIdCard] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -47,6 +48,16 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
               onChange={e => setPhone(e.target.value)}
               required
             />
+          </div>
+          <div>
+            <label className="block text-gray-600 mb-1">Carte d'identité</label>
+            <input
+              type="file"
+              className="w-full border rounded px-3 py-2"
+              accept="image/*,.pdf"
+              onChange={e => setIdCard(e.target.files[0])}
+            />
+            <p className="text-xs text-gray-500 mt-1">Formats acceptés: JPG, PNG, PDF</p>
           </div>
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <div className="flex justify-end space-x-2 mt-4">

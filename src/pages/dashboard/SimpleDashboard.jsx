@@ -87,15 +87,6 @@ const SimpleDashboard = () => {
           <h2 className="profile-name">{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</h2>
           <p className="member-since">Membre depuis 2025</p>
           
-          <div className="profile-completion">
-            <div className="completion-text">
-              <span>Profil complété à</span>
-              <span>14%</span>
-            </div>
-            <div className="completion-bar">
-              <div className="completion-progress"></div>
-            </div>
-          </div>
           
           <div className="profile-buttons">
             <button onClick={() => setEditModalOpen(true)} className="btn btn-primary" style={orangeButtonStyle}>Compléter mon profil</button>
@@ -106,23 +97,13 @@ const SimpleDashboard = () => {
           <div className="verification-list">
             <div className="verification-item">
               <FontAwesomeIcon icon={faEnvelope} /> {/* Icône */}
-              <span>Adresse email</span>
-              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>valider</a>
+              <span>{currentUser?.email || 'Email non renseigné'}</span>
+              <a href="#" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
             </div>
             <div className="verification-item">
               <FontAwesomeIcon icon={faMobileAlt} /> {/* Icône */}
-              <span>Numéro de téléphone</span>
-              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>vérifier</a>
-            </div>
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faIdCard} /> {/* Icône */}
-              <span>Carte d'identité</span>
-              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>vérifier</a>
-            </div>
-            <div className="verification-item">
-              <FontAwesomeIcon icon={faFileAlt} /> {/* Icône */}
-              <span>CV Nautique</span>
-              <a href="#" onClick={(e)=>{e.preventDefault(); alert('Fonctionnalité à venir');}}>compléter</a>
+              <span>{currentUser?.phone || 'Téléphone non renseigné'}</span>
+              <a href="#" onClick={(e)=>{e.preventDefault(); setEditModalOpen(true);}}>modifier</a>
             </div>
           </div>
           
