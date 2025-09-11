@@ -88,9 +88,9 @@ const BoatDetail = () => {
   const isBoatOwner = isOwnerUser && boat && (
     (boat.owner && (boat.owner._id === currentUser._id || boat.owner === currentUser._id))
   );
-  // Autoriser la réservation si: locataire OU propriétaire du bateau, et bateau disponible
+  // Autoriser la réservation si: locataire OU propriétaire (n'importe quel bateau), et bateau disponible
   const isBoatAvailable = boat && (boat.status === 'disponible' || boat.status === 'available');
-  const canBook = isBoatAvailable && (isLocataire || isBoatOwner);
+  const canBook = isBoatAvailable && (isLocataire || isOwnerUser);
 
   // Charger les réservations confirmées et les blocages du bateau
   useEffect(() => {
