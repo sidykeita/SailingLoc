@@ -12,7 +12,12 @@ const reservationSchema = new mongoose.Schema({
   paymentStatus: { type: String, enum: ['unpaid', 'paid', 'refunded'], default: 'unpaid' },
   paymentSessionId: { type: String },
   paymentIntentId: { type: String },
-  currency: { type: String, default: 'eur' }
+  currency: { type: String, default: 'eur' },
+  // Optional metadata when a reservation is created by an owner on behalf of a guest
+  createdByOwner: { type: Boolean, default: false },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  guestName: { type: String },
+  guestEmail: { type: String }
 }, { timestamps: true });
 
 // Index pour accélérer la recherche d'overlaps lors du calcul de disponibilité

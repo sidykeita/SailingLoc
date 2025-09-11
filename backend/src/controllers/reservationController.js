@@ -16,8 +16,8 @@ exports.getReservationsByBoat = async (req, res) => {
 // Créer une réservation
 exports.createReservation = async (req, res) => {
   try {
-    const { boatId, startDate, endDate, price } = req.body;
-    const user = req.user.id;
+    const { boatId, startDate, endDate, price, onBehalfOfUserId, guestName, guestEmail } = req.body;
+    const requesterId = req.user.id;
 
     // Vérifier la disponibilité du bateau
     const boat = await Boat.findById(boatId);
@@ -25,21 +25,42 @@ exports.createReservation = async (req, res) => {
       return res.status(404).json({ message: 'Bateau non trouvé' });
     }
 
+    // Autorisation minimale: tout utilisateur authentifié peut réserver.
+    // Si c'est un propriétaire qui réserve "au nom de" quelqu'un, il doit être propriétaire du bateau.
+    if (req.user.role === 'owner' && String(boat.owner) !== String(requesterId) && onBehalfOfUserId) {
+      return res.status(403).json({ message: 'Seul le propriétaire du bateau peut réserver au nom d\'un client pour ce bateau' });
+    }
+
     // Vérifier les dates
-    if (new Date(startDate) >= new Date(endDate)) {
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    if (isNaN(s) || isNaN(e) || s >= e) {
       return res.status(400).json({ message: 'La date de fin doit être après la date de début' });
     }
 
-    // Refuser si chevauchement avec un blocage du propriétaire
+    // 1) Conflit avec d'autres réservations CONFIRMÉES (logique stricte; adjacent autorisé)
+    const overlapReservation = await Reservation.findOne({
+      boat: boatId,
+      status: 'confirmed',
+      $expr: {
+        $and: [
+          { $lt: ['$startDate', e] },
+          { $gt: ['$endDate', s] }
+        ]
+      }
+    });
+    if (overlapReservation) {
+      return res.status(409).json({ message: 'Chevauchement avec une autre réservation confirmée' });
+    }
+
+    // 2) Conflit avec des périodes bloquées (logique stricte; adjacent autorisé)
     const BlockedDate = require('../models/blockedDate');
-    const s = new Date(startDate);
-    const e = new Date(endDate);
     const overlappingBlock = await BlockedDate.findOne({
       boat: boatId,
       $expr: {
         $and: [
-          { $lte: ['$startDate', e] },
-          { $gte: ['$endDate', s] }
+          { $lt: ['$startDate', e] },
+          { $gt: ['$endDate', s] }
         ]
       }
     });
@@ -48,12 +69,31 @@ exports.createReservation = async (req, res) => {
     }
 
     // Créer la réservation
+    let reservationUser = requesterId;
+    const meta = {};
+    if (req.user.role === 'owner') {
+      meta.createdByOwner = true;
+      meta.createdBy = requesterId;
+      if (onBehalfOfUserId) {
+        reservationUser = onBehalfOfUserId;
+      }
+      if (guestName) meta.guestName = guestName;
+      if (guestEmail) meta.guestEmail = guestEmail;
+    }
+
+    // Calcul serveur du prix pour cohérence
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const days = Math.max(1, Math.floor((e - s) / MS_PER_DAY));
+    const daily = Number(boat.dailyPrice) || 0;
+    const computedPrice = daily * days;
+
     const reservation = new Reservation({
       boat: boatId,
-      user,
-      startDate,
-      endDate,
-      price // <-- Ajout du champ price
+      user: reservationUser,
+      startDate: s,
+      endDate: e,
+      price: computedPrice || price,
+      ...meta
     });
 
     await reservation.save();

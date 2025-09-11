@@ -84,7 +84,12 @@ const BoatDetail = () => {
 
   // Ajout logique pour locataire
   const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
-  const canBook = boat && boat.status === 'disponible' && isLocataire;
+  const isOwnerUser = currentUser && currentUser.role === 'owner';
+  const isBoatOwner = isOwnerUser && boat && (
+    (boat.owner && (boat.owner._id === currentUser._id || boat.owner === currentUser._id))
+  );
+  // Autoriser la réservation si: locataire OU propriétaire du bateau, et bateau disponible
+  const canBook = boat && boat.status === 'disponible' && (isLocataire || isBoatOwner);
 
   // Charger les réservations confirmées et les blocages du bateau
   useEffect(() => {
@@ -290,8 +295,8 @@ const BoatDetail = () => {
     const isOverlap = reservations.some(r => {
       const rStart = new Date(r.startDate);
       const rEnd = new Date(r.endDate);
-      // Chevauchement strict (inclusif)
-      return (s <= rEnd && eD >= rStart);
+      // Chevauchement strict (adjacent autorisé): s < rEnd && eD > rStart
+      return (s < rEnd && eD > rStart);
     });
     if (isOverlap) {
       setError("Ce bateau est déjà réservé sur cette période. Veuillez choisir d'autres dates.");
@@ -301,7 +306,8 @@ const BoatDetail = () => {
     const isBlocked = blockedDates.some(b => {
       const bStart = new Date(b.startDate);
       const bEnd = new Date(b.endDate);
-      return (s <= bEnd && eD >= bStart);
+      // Logique stricte identique (adjacent autorisé)
+      return (s < bEnd && eD > bStart);
     });
     if (isBlocked) {
       setError("Ces dates sont bloquées par le propriétaire. Veuillez choisir d'autres dates.");
@@ -327,7 +333,12 @@ const BoatDetail = () => {
         throw new Error(data.message || "Erreur lors de la réservation.");
       }
       const created = await res.json();
-      // Redirige immédiatement vers Stripe Checkout pour paiement
+      // Propriétaire: on ne lance pas le paiement Stripe (réservation interne)
+      if (currentUser?.role === 'owner') {
+        setSuccess('Réservation créée avec succès.');
+        return;
+      }
+      // Locataire: redirige vers Stripe Checkout pour paiement
       await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
