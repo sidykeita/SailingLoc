@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import HeaderDashboard from '../../components/HeaderDashboard';
 import { getFavorites, removeFavorite as removeFavoriteApi } from '../../services/favoriteService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faMapMarkerAlt, faEye, faShare, faTrash, faUsers, faAnchor, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faMapMarkerAlt, faEye, faTrash, faUsers, faAnchor } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 const OwnerFavorites = () => {
@@ -118,10 +118,6 @@ const OwnerFavorites = () => {
                       <FontAwesomeIcon icon={getTypeIcon(favorite.type)} />
                       <span>{getTypeLabel(favorite.type)}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-yellow-500">
-                      <FontAwesomeIcon icon={faStar} />
-                      <span>{favorite.rating || 0}</span>
-                    </div>
                   </div>
                   <h3 className="font-semibold text-lg">{favorite.name}</h3>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
@@ -138,7 +134,6 @@ const OwnerFavorites = () => {
                       <span className="text-sm text-gray-500"> / jour</span>
                     </div>
                     <div className="flex gap-2">
-                      <button className="btn-secondary"><FontAwesomeIcon icon={faShare} /> Partager</button>
                       <Link to={`/boats/${favorite._id || favorite.id}`} className="btn-primary"><FontAwesomeIcon icon={faEye} /> Voir</Link>
                     </div>
                   </div>

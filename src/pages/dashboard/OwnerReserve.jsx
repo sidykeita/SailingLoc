@@ -297,6 +297,8 @@ const OwnerReserve = () => {
                   ? { ...res, review: createdReview || { _id: 'temp', rating: 5 } }
                   : res
               ));
+              // Notifier le reste de l'app (Mes avis -> onglet Avis donnés)
+              try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'created', review: createdReview } })); } catch (_) {}
             }}
             onSubmit={async (reviewData) => {
               if (!reviewBoat?.locationId) return;
@@ -312,6 +314,7 @@ const OwnerReserve = () => {
                     ? { ...res, review: result }
                     : res
                 ));
+                try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'saved', review: result } })); } catch (_) {}
                 setReviewModalOpen(false);
                 setReviewBoat(null);
               } catch (error) {

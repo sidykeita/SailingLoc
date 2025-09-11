@@ -77,6 +77,33 @@ const OwnerReviews = () => {
     return () => { mounted = false; };
   }, []);
 
+  // Recharger les avis donnés à la réception de l'évènement global
+  useEffect(() => {
+    const reloadGiven = async () => {
+      try {
+        const givenResp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
+        const givenArr = Array.isArray(givenResp) ? givenResp : (Array.isArray(givenResp?.data) ? givenResp.data : []);
+        setGiven(givenArr);
+      } catch (_) {}
+    };
+    const handler = () => reloadGiven();
+    window.addEventListener('review:updated', handler);
+    return () => window.removeEventListener('review:updated', handler);
+  }, []);
+
+  // Optionnel: quand on passe sur l'onglet "Avis donnés", on peut rafraîchir
+  useEffect(() => {
+    if (activeTab === 'given') {
+      (async () => {
+        try {
+          const resp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
+          const arr = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+          setGiven(arr);
+        } catch (_) {}
+      })();
+    }
+  }, [activeTab]);
+
   const onChangeResponse = (id, text) => setResponding((m) => ({ ...m, [id]: text }));
 
   const submitResponse = async (id) => {
