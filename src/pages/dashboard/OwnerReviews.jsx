@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import HeaderDashboard from '../../components/HeaderDashboard';
 import reviewService from '../../services/review.service';
 import userService from '../../services/user.service';
@@ -310,11 +311,16 @@ const OwnerReviews = () => {
               const reviewerRaw = rev.user || rev.author || rev.reviewer || {};
               const createdAt = rev.createdAt || rev.date;
               const isGivenTab = activeTab === 'given';
-              // Construire un nom d'affichage robuste
+              // Construire un nom d'affichage robuste (même logique pour reçus et donnés)
               const currentName = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || currentUser?.username || currentUser?.pseudo || currentUser?.displayName || (currentUser?.email ? String(currentUser.email).split('@')[0] : '');
-              const reviewerNameFromObj = (typeof reviewerRaw === 'object' && reviewerRaw) ? ([reviewerRaw.firstName, reviewerRaw.lastName].filter(Boolean).join(' ').trim() || reviewerRaw.name) : '';
+              const reviewerNameFromObj = (typeof reviewerRaw === 'object' && reviewerRaw) ? ([reviewerRaw.firstName, reviewerRaw.lastName].filter(Boolean).join(' ').trim() || reviewerRaw.name || reviewerRaw.username || reviewerRaw.pseudo || reviewerRaw.displayName || (reviewerRaw.email ? String(reviewerRaw.email).split('@')[0] : '')) : '';
               const displayName = rev.reviewerName || (isGivenTab ? (currentName || reviewerNameFromObj || 'Moi') : (reviewerNameFromObj || 'Utilisateur'));
               const initials = (displayName || 'U').split(' ').map(s => s.charAt(0)).slice(0,2).join('').toUpperCase();
+              // Dates de réservation si présentes
+              const start = rev?.reservation?.startDate ? new Date(rev.reservation.startDate) : null;
+              const end = rev?.reservation?.endDate ? new Date(rev.reservation.endDate) : null;
+              const datesStr = (start && end) ? `${start.toLocaleDateString('fr-FR')} - ${end.toLocaleDateString('fr-FR')}` : '';
+              const boatId = boat?._id || boat?.id || rev?.reservation?.boat?._id || rev?.reservation?.boat?.id || null;
               return (
                 <div key={id} className="card p-6">
                   <div className="flex items-start justify-between gap-4">
@@ -330,8 +336,17 @@ const OwnerReviews = () => {
                       </div>
                       <div className="mt-3 inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded">
                         <span className="font-semibold">{boatName}</span>
+                        {port && <span>{' '}</span>}
+                        {port && <span>• {port}</span>}
+                        {datesStr && <span>{' '}</span>}
+                        {datesStr && <span>• {datesStr}</span>}
                       </div>
                       <p className="mt-3">{rev.comment || rev.text || rev.content || ''}</p>
+                      {boatId && (
+                        <div className="mt-3">
+                          <Link className="text-primary hover:underline" to={`/boats/${boatId}`}>Voir l'annonce</Link>
+                        </div>
+                      )}
                     </div>
                     <div className="text-right">
                       <div className="flex justify-end">{renderStars(rating)}</div>
