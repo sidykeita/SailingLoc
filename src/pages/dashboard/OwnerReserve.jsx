@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
 import api from '../../services/api.service';
 import HeaderDashboard from '../../components/HeaderDashboard';
+import LeaveReviewModal from '../../components/LeaveReviewModal';
+import reviewService from '../../services/review.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSearch,
@@ -31,6 +33,8 @@ const OwnerReserve = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [flash, setFlash] = useState(null); // { type: 'success'|'error'|'warning', message: string }
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewBoat, setReviewBoat] = useState(null); // { locationId, boatId, name, type, imageUrl, existingReview }
 
   useEffect(() => {
     // Afficher un message après retour Stripe
@@ -163,7 +167,7 @@ const OwnerReserve = () => {
               {flash.message}
             </div>
           )}
-          <h1 className="font-pacifico text-primary text-3xl mb-6">Réservation propriétaire</h1>
+          <h1 className="font-pacifico text-primary text-3xl mb-6">Mes locations</h1>
 
           {/* Barre de recherche & filtres */}
           <div className="card p-6 mb-6">
@@ -255,6 +259,24 @@ const OwnerReserve = () => {
                       <FontAwesomeIcon icon={faEye} />
                       Voir détails
                     </Link>
+                    {r.status === 'confirmed' && (
+                      <button
+                        className="action-btn secondary"
+                        onClick={() => {
+                          setReviewBoat({
+                            locationId: r.id,
+                            boatId: r.boatId,
+                            name: r.boatName,
+                            type: r.boatType,
+                            imageUrl: r.imageUrl,
+                            existingReview: r.review || null,
+                          });
+                          setReviewModalOpen(true);
+                        }}
+                      >
+                        Laisser un avis
+                      </button>
+                    )}
                   </div>
                 </div>
               ))

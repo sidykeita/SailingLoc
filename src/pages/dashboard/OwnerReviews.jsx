@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import HeaderDashboard from '../../components/HeaderDashboard';
 import reviewService from '../../services/review.service';
+import userService from '../../services/user.service';
+import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSort, faCalendar, faStar as faStarFull } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
 
 const OwnerReviews = () => {
+  const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [received, setReceived] = useState([]);
@@ -29,7 +32,39 @@ const OwnerReviews = () => {
         const givenResp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
         const givenArr = Array.isArray(givenResp) ? givenResp : (Array.isArray(givenResp?.data) ? givenResp.data : []);
         if (!mounted) return;
-        setReceived(receivedArr);
+        // Filtrage strict côté front au cas où l'API ne filtre pas correctement: ne garder que les avis sur mes bateaux
+        const uid = currentUser?._id || currentUser?.id;
+        const receivedStrict = receivedArr.filter(r => {
+          const boatOwner = r?.boat?.owner || r?.reservation?.boat?.owner || {};
+          const ownerId = boatOwner?._id || boatOwner?.id || boatOwner;
+          return uid && ownerId && String(ownerId) === String(uid);
+        });
+
+        // Enrichir les pseudos/auteurs pour éviter 'Utilisateur'
+        const candidateIds = Array.from(new Set(
+          receivedStrict
+            .map(r => (r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer))
+            .filter(Boolean)
+            .map(String)
+        ))
+        .slice(0, 20); // éviter trop d'appels
+        let usersMap = {};
+        if (candidateIds.length > 0) {
+          const fetched = await Promise.all(
+            candidateIds.map(id => userService.getUserById(id).catch(() => null))
+          );
+          usersMap = fetched.filter(Boolean).reduce((acc,u)=>{ const id=u._id||u.id; if(id) acc[id]=u; return acc; },{});
+        }
+        const receivedEnriched = receivedStrict.map(r => {
+          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+          const u = uid ? usersMap[String(uid)] : null;
+          if (!u) return r;
+          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Utilisateur';
+          const reviewer = r.user || r.author || r.reviewer || {};
+          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName } };
+        });
+
+        setReceived(receivedEnriched);
         setGiven(givenArr);
       } catch (e) {
         if (!mounted) return;
