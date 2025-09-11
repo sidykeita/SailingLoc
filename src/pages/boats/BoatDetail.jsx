@@ -269,12 +269,16 @@ const BoatDetail = () => {
         
         // Enrichir les pseudos/auteurs pour éviter 'Utilisateur'
         const candidateIds = Array.from(new Set(
-          list
-            .map(r => (r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer))
-            .filter(Boolean)
-            .map(String)
-        ))
-        .slice(0, 20); // éviter trop d'appels
+          list.flatMap(r => ([
+            r.user?._id || r.user || null,
+            r.author?._id || r.author || null,
+            r.reviewer?._id || r.reviewer || null,
+            r?.reservation?.user?._id || r?.reservation?.user || null,
+            r?.reservation?.tenant?._id || r?.reservation?.tenant || null,
+            r?.renter?._id || r?.renter || null,
+          ]).filter(Boolean))
+        )).map(String)
+        .slice(0, 30); // limite de sécurité
         let usersMap = {};
         if (candidateIds.length > 0) {
           const fetched = await Promise.all(
@@ -286,17 +290,23 @@ const BoatDetail = () => {
           usersMap = fetched.filter(Boolean).reduce((acc,u)=>{ const id=u._id||u.id; if(id) acc[id]=u; return acc; },{});
         }
         const enrichedList = list.map(r => {
-          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer || r?.reservation?.user?._id || r?.reservation?.user || r?.reservation?.tenant?._id || r?.reservation?.tenant || r?.renter?._id || r?.renter;
           const u = uid ? usersMap[String(uid)] : null;
-          if (!u) return r;
-          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || u.username || (u.email ? String(u.email).split('@')[0] : '') || 'Utilisateur';
-          const avatar = u.avatar || u.photo || u.picture || null;
-          const reviewer = r.user || r.author || r.reviewer || {};
-          return { 
-            ...r, 
-            reviewerName: name, 
+          const direct = r?.reservation?.user || r?.reservation?.tenant || r?.renter || (typeof r.user === 'object' ? r.user : null) || (typeof r.author === 'object' ? r.author : null) || (typeof r.reviewer === 'object' ? r.reviewer : null) || null;
+          const source = u || direct;
+          if (!source) return r;
+          const name = [source.firstName, source.lastName].filter(Boolean).join(' ').trim()
+            || source.name
+            || source.username
+            || (source.email ? String(source.email).split('@')[0] : '')
+            || 'Utilisateur';
+          const avatar = source.avatar || source.photo || source.picture || null;
+          const baseUser = (typeof r.user === 'object' && r.user !== null) ? r.user : {};
+          return {
+            ...r,
+            reviewerName: name,
             reviewerAvatar: avatar,
-            user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName, avatar }
+            user: { ...baseUser, name, firstName: source.firstName, lastName: source.lastName, avatar }
           };
         });
         
@@ -644,18 +654,18 @@ const BoatDetail = () => {
               {reviews.map((r) => (
                 <div key={r._id || r.id} className="p-4 rounded-lg border border-gray-200 bg-white">
                   {(() => {
-                    let name = (r.reviewerName && String(r.reviewerName).trim())
+                    const name = (r.reviewerName && String(r.reviewerName).trim())
+                      || ([r.reservation?.user?.firstName, r.reservation?.user?.lastName].filter(Boolean).join(' ').trim())
                       || ([r.user?.firstName, r.user?.lastName].filter(Boolean).join(' ').trim())
                       || r.user?.name
                       || r.user?.username
+                      || (r.reservation?.user?.email ? String(r.reservation.user.email).split('@')[0] : '')
                       || (r.user?.email ? String(r.user.email).split('@')[0] : '')
                       || 'Utilisateur';
-                    const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
-                    if (!name || name === 'Utilisateur') {
-                      const idStr = uid ? String(uid) : '';
-                      if (idStr) name = `Locataire #${idStr.slice(-4)}`;
-                    }
-                    const avatar = r.reviewerAvatar || r.user?.avatar || r.user?.photo || r.user?.picture || null;
+                    const avatar = r.reviewerAvatar 
+                      || r.reservation?.user?.avatar || r.reservation?.user?.photo || r.reservation?.user?.picture
+                      || r.user?.avatar || r.user?.photo || r.user?.picture 
+                      || null;
                     const initials = name.split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0,2).toUpperCase();
                     const created = new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR');
                     return (
