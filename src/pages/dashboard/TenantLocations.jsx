@@ -4,6 +4,7 @@ import reviewService from '../../services/review.service.js';
 import reservationService from '../../backup/reservationService.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSearch,
@@ -44,12 +45,34 @@ const TenantLocations = () => {
   const [showModelsSubmenu, setShowModelsSubmenu] = useState(false);
   const [showAboutSubmenu, setShowAboutSubmenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [flash, setFlash] = useState(null); // { type: 'success'|'warning'|'error', message }
 
   // Modale d'avis
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewBoat, setReviewBoat] = useState(null); // { locationId, boatId, name, type, imageUrl, existingReview }
 
   useEffect(() => {
+    // Stripe return handling (success/cancel) for tenant flow
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const sessionId = params.get('session_id');
+    (async () => {
+      try {
+        if (status === 'success') {
+          if (sessionId) {
+            try { await api.post(`/stripe/confirm?session_id=${encodeURIComponent(sessionId)}`); } catch (_) {}
+          }
+          setFlash({ type: 'success', message: 'Paiement réussi. Votre réservation est bien enregistrée.' });
+        } else if (status === 'cancel') {
+          setFlash({ type: 'warning', message: 'Paiement annulé. Votre réservation n’a pas été payée.' });
+        }
+      } finally {
+        if (status || sessionId) {
+          const url = window.location.pathname;
+          window.history.replaceState({}, document.title, url);
+        }
+      }
+    })();
     fetchLocations();
   }, []);
 
@@ -279,6 +302,11 @@ const TenantLocations = () => {
           </div>
         </div>
       </header>
+
+      {/* Stripe flash message */}
+      {flash && (
+        <div className={`container mx-auto px-4 mt-4 ${flash.type==='success' ? 'bg-green-50 text-green-700 border border-green-200' : flash.type==='warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' : 'bg-red-50 text-red-700 border border-red-200'} p-3 rounded`}>{flash.message}</div>
+      )}
 
       {/* Navigation secondaire */}
       <div className="secondary-nav">

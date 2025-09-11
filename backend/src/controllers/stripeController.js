@@ -23,6 +23,10 @@ exports.createCheckoutSession = async (req, res) => {
       return res.status(400).json({ message: 'Montant invalide' });
     }
 
+    // Generic redirect (used for non-reservation flows): send users back to tenant locations
+    const successRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=cancel`;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -36,8 +40,8 @@ exports.createCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=cancel`,
+      success_url: successRedirect,
+      cancel_url: cancelRedirect,
       metadata,
       // Propager les métadonnées vers le PaymentIntent pour les événements payment_intent.*
       payment_intent_data: {
@@ -77,6 +81,13 @@ exports.createReservationCheckoutSession = async (req, res) => {
 
     const description = `Réservation bateau ${reservation.boat?._id || ''} du ${new Date(reservation.startDate).toLocaleDateString()} au ${new Date(reservation.endDate).toLocaleDateString()}`.trim();
 
+    // Role-based redirect: owner -> owner reservations page, tenant -> locations page
+    const isOwner = (reservation.user?.role === 'propriétaire' || reservation.user?.role === 'owner');
+    const successOwner = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelOwner = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=cancel`;
+    const successTenant = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelTenant = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=cancel`;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -90,8 +101,8 @@ exports.createReservationCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/owner/dashboard/reserver?status=cancel`,
+      success_url: isOwner ? successOwner : successTenant,
+      cancel_url: isOwner ? cancelOwner : cancelTenant,
       metadata: {
         reservationId: reservation._id.toString(),
         userId: reservation.user?._id?.toString() || '',
