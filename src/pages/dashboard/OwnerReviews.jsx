@@ -77,11 +77,25 @@ const OwnerReviews = () => {
         });
 
         setReceived(receivedEnriched);
-        // Enrichir les avis donnés avec les infos du currentUser (pour éviter 'Utilisateur')
+        // Enrichir les avis donnés avec un profil fiable (currentUser ou fetch API)
+        let displayUser = currentUser;
+        if (!((displayUser?.firstName) || (displayUser?.lastName) || (displayUser?.name))) {
+          try {
+            const fetchedMe = await userService.getUserById(uid).catch(() => null);
+            if (fetchedMe) displayUser = fetchedMe;
+          } catch (_) {}
+        }
         const givenEnriched = givenArr.map(r => {
           const reviewer = r.user || r.author || r.reviewer || {};
-          const name = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || 'Utilisateur';
-          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: currentUser?.firstName, lastName: currentUser?.lastName } };
+          const fallbackName =
+            [displayUser?.firstName, displayUser?.lastName].filter(Boolean).join(' ').trim() ||
+            displayUser?.name ||
+            displayUser?.username ||
+            displayUser?.pseudo ||
+            displayUser?.displayName ||
+            (displayUser?.email ? String(displayUser.email).split('@')[0] : '') ||
+            'Utilisateur';
+          return { ...r, reviewerName: fallbackName, user: { ...reviewer, name: fallbackName, firstName: displayUser?.firstName, lastName: displayUser?.lastName } };
         });
         setGiven(givenEnriched);
       } catch (e) {
@@ -293,18 +307,24 @@ const OwnerReviews = () => {
               const boat = rev.boat || rev?.reservation?.boat || {};
               const boatName = boat?.name || 'Bateau';
               const port = boat?.port || rev?.reservation?.port || rev?.reservation?.location || '';
-              const reviewer = rev.user || rev.author || rev.reviewer || {};
+              const reviewerRaw = rev.user || rev.author || rev.reviewer || {};
               const createdAt = rev.createdAt || rev.date;
+              const isGivenTab = activeTab === 'given';
+              // Construire un nom d'affichage robuste
+              const currentName = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || currentUser?.username || currentUser?.pseudo || currentUser?.displayName || (currentUser?.email ? String(currentUser.email).split('@')[0] : '');
+              const reviewerNameFromObj = (typeof reviewerRaw === 'object' && reviewerRaw) ? ([reviewerRaw.firstName, reviewerRaw.lastName].filter(Boolean).join(' ').trim() || reviewerRaw.name) : '';
+              const displayName = rev.reviewerName || (isGivenTab ? (currentName || reviewerNameFromObj || 'Moi') : (reviewerNameFromObj || 'Utilisateur'));
+              const initials = (displayName || 'U').split(' ').map(s => s.charAt(0)).slice(0,2).join('').toUpperCase();
               return (
                 <div key={id} className="card p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gray-200 grid place-items-center text-gray-500 font-semibold">
-                          {`${(reviewer.firstName||'').charAt(0)}${(reviewer.lastName||'').charAt(0)}`.trim()}
+                          {initials}
                         </div>
                         <div>
-                          <div className="font-semibold">{rev.reviewerName || (reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName||''}`.trim() : (reviewer.name || 'Utilisateur'))}</div>
+                          <div className="font-semibold">{displayName}</div>
                           <div className="text-sm text-gray-500">{port || '—'}</div>
                         </div>
                       </div>
