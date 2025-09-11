@@ -40,6 +40,12 @@ const getUserById = async (userId) => {
   return res.data;
 };
 
+// Public profile fetch (no auth header). Backend should expose basic public info.
+const getPublicUserById = async (userId) => {
+  const res = await axios.get(`${API_URL}/users/${userId}`);
+  return res.data;
+};
+
 const deleteUser = async (userId) => {
   const token = localStorage.getItem('token');
   const res = await axios.delete(`${API_URL}/auth/users/${userId}`, {
@@ -54,6 +60,7 @@ export default {
   updateProfile,
   getAllUsers,
   getUserById,
+  getPublicUserById,
   deleteUser,
   // Supprimer le compte courant (soft delete) avec confirmation de mot de passe
   async deleteMe(currentPassword) {

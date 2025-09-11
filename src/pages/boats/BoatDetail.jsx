@@ -278,7 +278,10 @@ const BoatDetail = () => {
         let usersMap = {};
         if (candidateIds.length > 0) {
           const fetched = await Promise.all(
-            candidateIds.map(id => userService.getUserById(id).catch(() => null))
+            candidateIds.map(id => 
+              userService.getUserById(id)
+                .catch(() => userService.getPublicUserById(id).catch(() => null))
+            )
           );
           usersMap = fetched.filter(Boolean).reduce((acc,u)=>{ const id=u._id||u.id; if(id) acc[id]=u; return acc; },{});
         }
@@ -641,12 +644,17 @@ const BoatDetail = () => {
               {reviews.map((r) => (
                 <div key={r._id || r.id} className="p-4 rounded-lg border border-gray-200 bg-white">
                   {(() => {
-                    const name = (r.reviewerName && String(r.reviewerName).trim())
+                    let name = (r.reviewerName && String(r.reviewerName).trim())
                       || ([r.user?.firstName, r.user?.lastName].filter(Boolean).join(' ').trim())
                       || r.user?.name
                       || r.user?.username
                       || (r.user?.email ? String(r.user.email).split('@')[0] : '')
                       || 'Utilisateur';
+                    const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+                    if (!name || name === 'Utilisateur') {
+                      const idStr = uid ? String(uid) : '';
+                      if (idStr) name = `Locataire #${idStr.slice(-4)}`;
+                    }
                     const avatar = r.reviewerAvatar || r.user?.avatar || r.user?.photo || r.user?.picture || null;
                     const initials = name.split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0,2).toUpperCase();
                     const created = new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR');
