@@ -65,7 +65,7 @@ const Calendrier = () => {
     try {
       let reservationsData = [];
 
-      if (currentUser.role === 'propriétaire') {
+      if (currentUser.role === 'propriétaire' || currentUser.role === 'owner') {
         reservationsData = await reservationService.getMyBoatsReservations();
       } else if (currentUser.role === 'locataire') {
         reservationsData = await reservationService.getMyReservations();
@@ -237,35 +237,9 @@ const Calendrier = () => {
       <main className="bg-background min-h-screen">
         <div className="container mx-auto px-4 py-8">
           <h1 className="font-pacifico text-primary text-3xl mb-8">Calendrier</h1>
-
+          
           {/* En-tête simplifié: suppression du switch de vue */}
           <div className="mb-2" />
-
-          {/* Actions rapides (propriétaire) */}
-          {(currentUser?.role === 'propriétaire' || currentUser?.role === 'owner') && (
-            <section className="mb-8">
-              <h2 className="text-marine text-lg font-semibold mb-3">Actions rapides</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (boats.length > 0 && selectedBoatId) {
-                      navigate(`/boats/${selectedBoatId}`);
-                    } else {
-                      navigate('/boats/motor');
-                    }
-                  }}
-                  className="card p-4 flex items-center gap-3 hover:shadow-md transition-shadow text-left"
-                >
-                  <CalendarIcon className="h-6 w-6 text-primary" />
-                  <div>
-                    <div className="font-semibold text-marine">Réservation propriétaire</div>
-                    <div className="text-sm text-gray-500">Réserver via la fiche bateau</div>
-                  </div>
-                </button>
-              </div>
-            </section>
-          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Main Calendar */}

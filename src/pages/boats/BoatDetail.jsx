@@ -84,12 +84,13 @@ const BoatDetail = () => {
 
   // Ajout logique pour locataire
   const isLocataire = currentUser && (currentUser.role === 'locataire' || currentUser.role === 'tenant');
-  const isOwnerUser = currentUser && currentUser.role === 'owner';
+  const isOwnerUser = currentUser && (currentUser.role === 'owner' || currentUser.role === 'propriétaire');
   const isBoatOwner = isOwnerUser && boat && (
     (boat.owner && (boat.owner._id === currentUser._id || boat.owner === currentUser._id))
   );
   // Autoriser la réservation si: locataire OU propriétaire du bateau, et bateau disponible
-  const canBook = boat && boat.status === 'disponible' && (isLocataire || isBoatOwner);
+  const isBoatAvailable = boat && (boat.status === 'disponible' || boat.status === 'available');
+  const canBook = isBoatAvailable && (isLocataire || isBoatOwner);
 
   // Charger les réservations confirmées et les blocages du bateau
   useEffect(() => {
@@ -334,7 +335,7 @@ const BoatDetail = () => {
       }
       const created = await res.json();
       // Propriétaire: on ne lance pas le paiement Stripe (réservation interne)
-      if (currentUser?.role === 'owner') {
+      if (currentUser && (currentUser.role === 'owner' || currentUser.role === 'propriétaire')) {
         setSuccess('Réservation créée avec succès.');
         return;
       }
