@@ -213,15 +213,21 @@ const [deleteDone, setDeleteDone] = useState(false);
           {/* Profil propriétaire */}
           <div className="card p-6 md:col-span-1">
             <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Mon profil</h2>
-            {/* Avatar centré et circulaire */}
+            {/* Avatar centré et circulaire (vierge si pas de photo) */}
             <div className="w-full flex justify-center mb-4">
               <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                <img
-                  src={photoUrl || currentUser?.profilePhotoUrl || profileImage}
-                  alt="Profil"
-                  className="w-full h-full object-cover"
-                  onError={(e)=>{ e.currentTarget.src = profileImage; }}
-                />
+                { (photoUrl || currentUser?.profilePhotoUrl) ? (
+                  <img
+                    src={photoUrl || currentUser?.profilePhotoUrl}
+                    alt="Profil"
+                    className="w-full h-full object-cover"
+                    onError={(e)=>{ e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span className="text-gray-500 text-xl font-semibold">
+                    {`${(currentUser?.firstName || '').charAt(0)}${(currentUser?.lastName || '').charAt(0)}`.trim() || ''}
+                  </span>
+                )}
               </div>
             </div>
             <div className="w-full text-center mb-6">

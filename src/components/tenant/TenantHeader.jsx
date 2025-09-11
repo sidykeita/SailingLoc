@@ -4,7 +4,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faSignOutAlt, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import logoBlc from '../../assets/images/logo-blc.png';
-import profileImage from '../../assets/images/profil.jpg';
 import '../../assets/css/SimpleDashboard.css';
 
 /**
@@ -42,12 +41,18 @@ const TenantHeader = ({ activeSection }) => {
               <div className="flag-icon">
                 <img src="/france-flag.svg" alt="Drapeau français" />
               </div>
-              <div className="user-avatar">
-                <img src={profileImage} alt="Photo de profil" onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                  e.target.parentNode.textContent = 'Ce';
-                }} />
+              <div className="user-avatar" style={{ width: 32, height: 32, borderRadius: '9999px', overflow: 'hidden', backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {currentUser?.profilePhotoUrl ? (
+                  <img
+                    src={currentUser.profilePhotoUrl}
+                    alt="Photo de profil"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span style={{ color: '#6b7280', fontWeight: 600, fontSize: 14 }}>
+                    {`${(currentUser?.firstName || '').charAt(0)}${(currentUser?.lastName || '').charAt(0)}`.trim() || ''}
+                  </span>
+                )}
               </div>
               <span>{currentUser?.displayName || currentUser?.name || currentUser?.email || 'Utilisateur'}</span>
               <FontAwesomeIcon icon={faChevronDown} />
