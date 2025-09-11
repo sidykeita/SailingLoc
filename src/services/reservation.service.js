@@ -16,7 +16,7 @@ class ReservationService {
   async getMyReservations() {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/reservations/user/my-reservations`, {
+      const response = await axios.get(`${API_URL}/reservations/my-reservations`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       return response.data;

@@ -22,12 +22,12 @@ const HeaderDashboard = () => {
         </Link>
       </div>
       <div className="dashboard-header-right">
-        <nav className="dashboard-nav">
-          <Link to="/add-boat" className="dashboard-nav-link">Ajouter un bateau</Link>
-          <Link to="/owner/dashboard/revenus" className="dashboard-nav-link">Revenus</Link>
-        </nav>
-        <span className="dashboard-greeting">Bonjour, {displayName}</span>
-        <button className="login-button dashboard-logout-btn" onClick={logout}>Déconnexion</button>
+        <span className="dashboard-greeting">
+          Bonjour, {currentUser?.firstName && currentUser?.lastName || 'Utilisateur'}
+        </span>
+        <button className="login-button dashboard-logout-btn" onClick={logout}>
+          Déconnexion
+        </button>
       </div>
     </header>
   );

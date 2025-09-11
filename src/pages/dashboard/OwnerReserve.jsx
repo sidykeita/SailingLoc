@@ -35,8 +35,12 @@ const OwnerReserve = () => {
       setLoading(true);
       try {
         // On charge UNIQUEMENT les réservations effectuées par l'utilisateur courant
-        const data = await reservationService.getMyReservations();
-        const mapped = (data || []).map((res) => {
+        const resp = await reservationService.getMyReservations();
+        const list = Array.isArray(resp)
+          ? resp
+          : (Array.isArray(resp?.data) ? resp.data : (Array.isArray(resp?.items) ? resp.items : []));
+        console.debug('[OwnerReserve] reservations loaded:', list?.length || 0);
+        const mapped = (list || []).map((res) => {
           let boatImage = '';
           if (Array.isArray(res.boat?.photos) && res.boat.photos.length > 0) boatImage = res.boat.photos[0];
           else if (Array.isArray(res.boat?.images) && res.boat.images.length > 0) boatImage = res.boat.images[0];

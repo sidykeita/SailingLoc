@@ -5,17 +5,12 @@ import { storage } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 import boatService from '../../services/boat.service';
 import { useAuth } from '../../contexts/AuthContext';
-import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
+import HeaderDashboard from '../../components/HeaderDashboard';
 
 const AddBoat = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser } = useAuth();
   const fileInputRef = useRef(null);
-
-  const handleLogout = () => {
-    logout();
-    // La redirection sera gérée par le ProtectedRoute
-  };
 
   const [customFeatures, setCustomFeatures] = useState([]);
 
@@ -188,27 +183,8 @@ const AddBoat = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header identique OwnerDashboard */}
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/">
-                <div className="h-12">
-                  <img src={logoColor} alt="SailingLOC" className="h-full" />
-                </div>
-              </Link>
-          </div>
-          <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
-            <button 
-              onClick={handleLogout}
-              className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <HeaderDashboard />
       <main className="container mx-auto px-4 py-8">
         <div className="card p-6 max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-4">
