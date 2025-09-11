@@ -59,7 +59,7 @@ const OwnerReviews = () => {
             .filter(Boolean)
             .map(String)
         ))
-        .slice(0, 20); // éviter trop d'appels
+        .slice(0, 100); // élargir l'enrichissement pour éviter 'Utilisateur'
         let usersMap = {};
         if (candidateIds.length > 0) {
           const fetched = await Promise.all(

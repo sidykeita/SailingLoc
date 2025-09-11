@@ -17,7 +17,6 @@ import {
   faSort,
   faEye,
   faReply,
-  faFlag,
   faEdit
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
@@ -93,6 +92,7 @@ const TenantReviews = () => {
             },
             booking: {
               boat: boat?.name || 'Bateau',
+              boatId: (boat?._id || boat?.id || boat) || null,
               location: port || '—',
               dates: reservation?.startDate && reservation?.endDate
                 ? `${new Date(reservation.startDate).toLocaleDateString('fr-FR')} - ${new Date(reservation.endDate).toLocaleDateString('fr-FR')}`
@@ -437,20 +437,16 @@ const TenantReviews = () => {
                   )}
 
                   <div className="review-actions">
-                    <button className="action-btn">
+                    <Link className="action-btn" to={review.booking.boatId ? `/boats/${review.booking.boatId}` : '#'}>
                       <FontAwesomeIcon icon={faEye} />
-                      Voir la réservation
-                    </button>
+                      Voir l'annonce
+                    </Link>
                     {!review.response && (
                       <button className="action-btn primary">
                         <FontAwesomeIcon icon={faReply} />
                         Répondre
                       </button>
                     )}
-                    <button className="action-btn">
-                      <FontAwesomeIcon icon={faFlag} />
-                      Signaler
-                    </button>
                     <span className="helpful-count">
                       {review.helpful} personnes ont trouvé cet avis utile
                     </span>
@@ -488,10 +484,10 @@ const TenantReviews = () => {
                   </div>
 
                   <div className="review-actions">
-                    <button className="action-btn">
+                    <Link className="action-btn" to={review.booking.boatId ? `/boats/${review.booking.boatId}` : '#'}>
                       <FontAwesomeIcon icon={faEye} />
-                      Voir la réservation
-                    </button>
+                      Voir l'annonce
+                    </Link>
                     <button className="action-btn" onClick={() => openEdit(review)}>
                       <FontAwesomeIcon icon={faEdit} />
                       Modifier l'avis
