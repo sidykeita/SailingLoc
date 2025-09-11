@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
+import api from '../../services/api.service';
 import HeaderDashboard from '../../components/HeaderDashboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -29,8 +30,36 @@ const OwnerReserve = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
+  const [flash, setFlash] = useState(null); // { type: 'success'|'error'|'warning', message: string }
 
   useEffect(() => {
+    // Afficher un message après retour Stripe
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const sessionId = params.get('session_id');
+    (async () => {
+      try {
+        if (status === 'success') {
+          if (sessionId) {
+            try {
+              await api.post(`/stripe/confirm?session_id=${encodeURIComponent(sessionId)}`);
+            } catch (_) {
+              // même si la confirmation échoue, on affiche succès si Stripe a renvoyé success
+            }
+          }
+          setFlash({ type: 'success', message: 'Paiement réussi. Votre réservation est bien enregistrée.' });
+        } else if (status === 'cancel') {
+          setFlash({ type: 'warning', message: 'Paiement annulé. Votre réservation n’a pas été payée.' });
+        }
+      } finally {
+        if (status || sessionId) {
+          // Nettoyer l’URL
+          const url = window.location.pathname;
+          window.history.replaceState({}, document.title, url);
+        }
+      }
+    })();
+
     const load = async () => {
       setLoading(true);
       try {
@@ -129,6 +158,11 @@ const OwnerReserve = () => {
       {/* Main content */}
       <main className="bg-background min-h-screen">
         <div className="container mx-auto px-4 py-8">
+          {flash && (
+            <div className={`mb-6 p-4 rounded ${flash.type==='success' ? 'bg-green-50 text-green-700 border border-green-200' : flash.type==='warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' : 'bg-red-50 text-red-700 border border-red-200' }`}>
+              {flash.message}
+            </div>
+          )}
           <h1 className="font-pacifico text-primary text-3xl mb-6">Réservation propriétaire</h1>
 
           {/* Barre de recherche & filtres */}

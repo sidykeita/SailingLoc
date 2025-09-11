@@ -8,7 +8,7 @@ import '../assets/css/HeaderDashboard.css';
 const HeaderDashboard = () => {
   const { currentUser, logout } = useAuth();
   const displayName = (() => {
-    const full = `${currentUser?.firstName } '' ${currentUser?.lastName || ''}`.trim();
+    const full = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim();
     if (full) return full;
     if (currentUser?.name) return currentUser.name;
     if (currentUser?.email) return currentUser.email;
@@ -22,9 +22,7 @@ const HeaderDashboard = () => {
         </Link>
       </div>
       <div className="dashboard-header-right">
-        <span className="dashboard-greeting">
-          Bonjour, {currentUser?.firstName && currentUser?.lastName || 'Utilisateur'}
-        </span>
+        <span className="dashboard-greeting">Bonjour, {displayName}</span>
         <button className="login-button dashboard-logout-btn" onClick={logout}>
           Déconnexion
         </button>
