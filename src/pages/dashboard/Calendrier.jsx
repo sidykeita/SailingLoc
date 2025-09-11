@@ -32,6 +32,7 @@ const Calendrier = () => {
   const [selectedBoatId, setSelectedBoatId] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [editError, setEditError] = useState('');
 
   // Blocage formulaire
   const [blockStart, setBlockStart] = useState('');
@@ -585,11 +586,41 @@ const Calendrier = () => {
 
       {/* Modale d'édition de réservation */}
       <ReservationEditModal
-        reservation={editTarget ? { ...editTarget, startDate: editTarget.start, endDate: editTarget.end, status: editTarget.status, price: editTarget.price } : null}
+        reservation={editTarget ? { ...editTarget, startDate: editTarget.start, endDate: editTarget.end, status: editTarget.status } : null}
         open={editOpen}
-        onClose={() => { setEditOpen(false); setEditTarget(null); }}
+        errorMessage={editError}
+        onClose={() => { setEditOpen(false); setEditTarget(null); setEditError(''); }}
         onSave={async (form) => {
           try {
+            setEditError('');
+            // Client-side validation to avoid 409: check overlap with same boat events (excluding current)
+            const s = new Date(form.startDate);
+            const e = new Date(form.endDate);
+            if (!(s instanceof Date) || isNaN(s) || !(e instanceof Date) || isNaN(e) || s >= e) {
+              setEditError('Plage de dates invalide.');
+              return;
+            }
+            const overlaps = (ev) => {
+              const evStart = new Date(ev.start);
+              const evEnd = new Date(ev.end);
+              return s <= evEnd && e >= evStart;
+            };
+            const sameBoatFilter = (ev) => (!selectedBoatId || ev.boatId === selectedBoatId);
+            const currentId = editTarget?.reservationId || editTarget?.id;
+            const conflictReservation = events
+              .filter(ev => ev.type === 'reservation' && (ev.reservationId || ev.id) !== currentId && sameBoatFilter(ev))
+              .some(overlaps);
+            if (conflictReservation) {
+              setEditError('Chevauchement avec une autre réservation.');
+              return;
+            }
+            const conflictBlock = events
+              .filter(ev => ev.type === 'block' && sameBoatFilter(ev))
+              .some(overlaps);
+            if (conflictBlock) {
+              setEditError('Chevauchement avec une période bloquée.');
+              return;
+            }
             const id = editTarget?.reservationId || editTarget?.id;
             await reservationService.updateReservation(id, {
               startDate: form.startDate,
@@ -600,7 +631,8 @@ const Calendrier = () => {
             setEditTarget(null);
             await fetchEvents();
           } catch (e) {
-            // TODO: toast/notification
+            const msg = e?.message || e?.response?.data?.message || 'Échec de la mise à jour';
+            setEditError(msg);
             console.error('Update reservation failed', e);
           }
         }}
