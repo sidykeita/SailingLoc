@@ -8,7 +8,7 @@ import '../assets/css/HeaderDashboard.css';
 const HeaderDashboard = () => {
   const { currentUser, logout } = useAuth();
   const displayName = (() => {
-    const full = `${currentUser?.firstName && ''} ${currentUser?.lastName || ''}`.trim();
+    const full = `${currentUser?.firstName } '' ${currentUser?.lastName || ''}`.trim();
     if (full) return full;
     if (currentUser?.name) return currentUser.name;
     if (currentUser?.email) return currentUser.email;
