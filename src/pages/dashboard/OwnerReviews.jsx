@@ -56,11 +56,17 @@ const OwnerReviews = () => {
         // Enrichir les pseudos/auteurs pour éviter 'Utilisateur'
         const candidateIds = Array.from(new Set(
           receivedStrict
-            .map(r => (r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer))
+            .flatMap(r => [
+              r.user?._id || r.user,
+              r.author?._id || r.author,
+              r.reviewer?._id || r.reviewer,
+              r?.reservation?.user?._id || r?.reservation?.user,
+              r?.reservation?.tenant?._id || r?.reservation?.tenant,
+              r?.renter?._id || r?.renter,
+            ])
             .filter(Boolean)
             .map(String)
-        ))
-        .slice(0, 100); // élargir l'enrichissement pour éviter 'Utilisateur'
+        ));
         let usersMap = {};
         if (candidateIds.length > 0) {
           const fetched = await Promise.all(
@@ -69,12 +75,27 @@ const OwnerReviews = () => {
           usersMap = fetched.filter(Boolean).reduce((acc,u)=>{ const id=u._id||u.id; if(id) acc[id]=u; return acc; },{});
         }
         const receivedEnriched = receivedStrict.map(r => {
-          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+          // essayer par ID -> usersMap
+          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer || r?.reservation?.user?._id || r?.reservation?.user || r?.reservation?.tenant?._id || r?.reservation?.tenant || r?.renter?._id || r?.renter;
           const u = uid ? usersMap[String(uid)] : null;
-          if (!u) return r;
-          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Utilisateur';
+          // sinon, tenter de lire depuis l'objet reservation.user/tenant directement
+          const direct = r?.reservation?.user || r?.reservation?.tenant || r?.renter || null;
+          const source = u || direct;
+          
+          // Si on n'a pas de source, créer un nom générique avec l'ID
+          let name, since;
+          if (source) {
+            name = [source.firstName, source.lastName].filter(Boolean).join(' ').trim() || source.name || source.username || source.pseudo || source.displayName || (source.email ? String(source.email).split('@')[0] : '') || 'Utilisateur';
+            since = source.createdAt;
+          } else {
+            // Fallback avec l'ID pour identifier le locataire
+            const shortId = uid ? String(uid).slice(-4) : 'xxxx';
+            name = `Locataire #${shortId}`;
+            since = null;
+          }
+          
           const reviewer = r.user || r.author || r.reviewer || {};
-          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName } };
+          return { ...r, reviewerName: name, reviewerSince: since, user: { ...reviewer, name, firstName: source?.firstName, lastName: source?.lastName, createdAt: since } };
         });
 
         setReceived(receivedEnriched);
@@ -96,7 +117,7 @@ const OwnerReviews = () => {
             displayUser?.displayName ||
             (displayUser?.email ? String(displayUser.email).split('@')[0] : '') ||
             'Utilisateur';
-          return { ...r, reviewerName: fallbackName, user: { ...reviewer, name: fallbackName, firstName: displayUser?.firstName, lastName: displayUser?.lastName } };
+          return { ...r, reviewerName: fallbackName, reviewerSince: displayUser?.createdAt, user: { ...reviewer, name: fallbackName, firstName: displayUser?.firstName, lastName: displayUser?.lastName, createdAt: displayUser?.createdAt } };
         });
         setGiven(givenEnriched);
       } catch (e) {
@@ -331,6 +352,7 @@ const OwnerReviews = () => {
                         </div>
                         <div>
                           <div className="font-semibold">{displayName}</div>
+                          <div className="text-xs text-gray-400">Membre depuis {rev.reviewerSince ? new Date(rev.reviewerSince).toLocaleDateString('fr-FR') : '—'}</div>
                           <div className="text-sm text-gray-500">{port || '—'}</div>
                         </div>
                       </div>

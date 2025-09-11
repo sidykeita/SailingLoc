@@ -508,7 +508,7 @@ const AdminDashboard = () => {
   const renderReviews = () => (
     <div className="admin-section">
       <div className="section-header">
-        <h2>Gestion des avis</h2>
+        <h2>Modération des avis</h2>
         <div className="section-actions">
           <button className="btn-secondary">Exporter</button>
         </div>
@@ -523,6 +523,12 @@ const AdminDashboard = () => {
           <option value="2">2 étoiles</option>
           <option value="1">1 étoile</option>
         </select>
+        <select>
+          <option value="">Tous les statuts</option>
+          <option value="published">Publié</option>
+          <option value="pending">En attente</option>
+          <option value="rejected">Rejeté</option>
+        </select>
         <input type="text" placeholder="Rechercher..." />
       </div>
 
@@ -535,6 +541,7 @@ const AdminDashboard = () => {
               <th>Note</th>
               <th>Commentaire</th>
               <th>Date</th>
+              <th>Statut</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -544,12 +551,33 @@ const AdminDashboard = () => {
                 <td>{review.boat}</td>
                 <td>{review.reviewer}</td>
                 <td>{'⭐'.repeat(Math.max(0, Math.min(5, Number(review.rating) || 0)))}</td>
-                <td style={{maxWidth: '420px'}}>{review.comment}</td>
+                <td style={{maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis'}}>{review.comment}</td>
                 <td>{review.date ? new Date(review.date).toLocaleDateString() : ''}</td>
                 <td>
+                  <span className={`status ${review.status || 'published'}`}>
+                    {review.status === 'pending' ? 'En attente' : 
+                     review.status === 'rejected' ? 'Rejeté' : 'Publié'}
+                  </span>
+                </td>
+                <td>
                   <div className="action-buttons">
-                    <button className="btn-icon" title="Voir">👁️</button>
-                    <button className="btn-icon" title="Modifier">✏️</button>
+                    <button className="btn-icon" title="Voir" onClick={() => alert(`Avis complet:\n\n${review.comment}`)}>👁️</button>
+                    <button className="btn-icon success" title="Approuver" onClick={async () => {
+                      try {
+                        await reviewService.updateReview(review.id, { status: 'published' });
+                        fetchData();
+                      } catch (err) {
+                        alert('Erreur lors de l\'approbation : ' + (err?.message || 'inconnue'));
+                      }
+                    }}>✅</button>
+                    <button className="btn-icon warning" title="Rejeter" onClick={async () => {
+                      try {
+                        await reviewService.updateReview(review.id, { status: 'rejected' });
+                        fetchData();
+                      } catch (err) {
+                        alert('Erreur lors du rejet : ' + (err?.message || 'inconnue'));
+                      }
+                    }}>❌</button>
                     <button className="btn-icon danger" title="Supprimer" onClick={() => handleDeleteReview(review)}>🗑️</button>
                   </div>
                 </td>
@@ -567,25 +595,101 @@ const AdminDashboard = () => {
         <h2>Gestion des paiements</h2>
         <div className="section-actions">
           <button className="btn-primary">Nouveau remboursement</button>
+          <button className="btn-secondary">Exporter</button>
         </div>
       </div>
 
-      <div className="payment-actions">
-        <div className="action-card">
-          <h3>Remboursements</h3>
-          <p>Gérer les demandes de remboursement</p>
-          <button className="btn-secondary">Voir les demandes (3)</button>
+      <div className="payment-stats">
+        <div className="stat-card">
+          <h3>{reservationsRaw.reduce((acc, r) => acc + (r.price || 0), 0).toLocaleString()}€</h3>
+          <p>Volume total des paiements</p>
         </div>
-        <div className="action-card">
-          <h3>Paiements en attente</h3>
-          <p>Valider les paiements en cours</p>
-          <button className="btn-secondary">Voir les paiements (7)</button>
+        <div className="stat-card">
+          <h3>{(reservationsRaw.reduce((acc, r) => acc + (r.price || 0), 0) * 0.10).toLocaleString()}€</h3>
+          <p>Commissions perçues</p>
         </div>
-        <div className="action-card">
-          <h3>Litiges</h3>
-          <p>Résoudre les litiges de paiement</p>
-          <button className="btn-secondary">Voir les litiges (2)</button>
+        <div className="stat-card">
+          <h3>{reservationsRaw.filter(r => r.status === 'confirmée').length}</h3>
+          <p>Paiements confirmés</p>
         </div>
+        <div className="stat-card">
+          <h3>{reservationsRaw.filter(r => r.status === 'en_attente').length}</h3>
+          <p>Paiements en attente</p>
+        </div>
+      </div>
+
+      <div className="filters">
+        <select>
+          <option value="">Tous les statuts</option>
+          <option value="confirmée">Confirmé</option>
+          <option value="en_attente">En attente</option>
+          <option value="annulée">Annulé</option>
+          <option value="remboursé">Remboursé</option>
+        </select>
+        <input type="date" placeholder="Date de début" />
+        <input type="date" placeholder="Date de fin" />
+        <input type="text" placeholder="Rechercher..." />
+      </div>
+
+      <div className="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Transaction</th>
+              <th>Bateau</th>
+              <th>Locataire</th>
+              <th>Propriétaire</th>
+              <th>Montant</th>
+              <th>Commission</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reservationsRaw.map(payment => (
+              <tr key={payment._id}>
+                <td>#{String(payment._id).slice(-6)}</td>
+                <td>{payment.boat?.name || payment.boat}</td>
+                <td>{payment.user ? `${payment.user.firstName || ''} ${payment.user.lastName || ''}`.trim() : ''}</td>
+                <td>{payment.boat?.owner ? `${payment.boat.owner.firstName || ''} ${payment.boat.owner.lastName || ''}`.trim() : ''}</td>
+                <td>{payment.price}€</td>
+                <td>{(payment.price * 0.10).toFixed(2)}€</td>
+                <td>{payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : ''}</td>
+                <td>
+                  <span className={`status ${payment.status}`}>
+                    {payment.status === 'confirmée' ? 'Confirmé' :
+                     payment.status === 'en_attente' ? 'En attente' :
+                     payment.status === 'annulée' ? 'Annulé' : payment.status}
+                  </span>
+                </td>
+                <td>
+                  <div className="action-buttons">
+                    <button className="btn-icon" title="Voir détails" onClick={() => setSelectedReservation(payment)}>👁️</button>
+                    <button className="btn-icon success" title="Confirmer paiement" onClick={async () => {
+                      try {
+                        await reservationService.updateReservation(payment._id, { status: 'confirmée' });
+                        fetchData();
+                      } catch (err) {
+                        alert('Erreur lors de la confirmation : ' + (err?.message || 'inconnue'));
+                      }
+                    }}>✅</button>
+                    <button className="btn-icon warning" title="Rembourser" onClick={async () => {
+                      if (window.confirm('Confirmer le remboursement ?')) {
+                        try {
+                          await reservationService.updateReservation(payment._id, { status: 'remboursé' });
+                          fetchData();
+                        } catch (err) {
+                          alert('Erreur lors du remboursement : ' + (err?.message || 'inconnue'));
+                        }
+                      }
+                    }}>💰</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -597,7 +701,7 @@ const AdminDashboard = () => {
       case 'boats': return renderBoats();
       case 'reservations': return renderReservations();
       case 'reviews': return renderReviews();
-      // case 'payments': return renderPayments(); // Fonction non définie, à corriger ou implémenter si besoin.
+      case 'payments': return renderPayments();
       default: return renderOverview();
     }
   };
