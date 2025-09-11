@@ -16,7 +16,7 @@ function toDateInputValue(v) {
  *   - onClose: fonction fermeture
  *   - onSave: fonction de sauvegarde (async)
  */
-export default function ReservationEditModal({ reservation, open, onClose, onSave }) {
+export default function ReservationEditModal({ reservation, open, onClose, onSave, errorMessage }) {
   const [form, setForm] = useState({
     startDate: toDateInputValue(reservation?.startDate || reservation?.start),
     endDate: toDateInputValue(reservation?.endDate || reservation?.end),
@@ -74,6 +74,18 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
             </select>
           </div>
           {/* Montant supprimé selon demande */}
+          {errorMessage && (
+            <div style={{
+              background:'#fdecec',
+              border:'1px solid #f5c2c2',
+              color:'#b71c1c',
+              padding:'10px',
+              borderRadius:'8px',
+              marginBottom:12
+            }}>
+              {errorMessage}
+            </div>
+          )}
           <div style={{display:'flex',justifyContent:'space-between',gap:16}}>
             <button type="button" onClick={onClose} style={{flex:1,padding:'10px',border:'1px solid #e0e0e0',borderRadius:'8px',background:'#fff',color:'#3a3a3a',fontWeight:500,fontSize:'1rem',marginRight:8}}>Annuler</button>
             <button type="submit" disabled={saving} style={{flex:1,padding:'10px',border:'none',borderRadius:'8px',background:'linear-gradient(90deg,#5a84f7,#8e5bf7)',opacity:saving?0.7:1,color:'#fff',fontWeight:600,fontSize:'1rem'}}>{saving ? 'En cours...' : 'Enregistrer'}</button>
