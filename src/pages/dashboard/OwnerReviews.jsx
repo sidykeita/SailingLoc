@@ -28,18 +28,18 @@ const OwnerReviews = () => {
         // Avis reçus (mes bateaux)
         const receivedResp = await reviewService.getAllReviews({ owner: 'me', limit: 100 }).catch(() => []);
         const receivedArr = Array.isArray(receivedResp) ? receivedResp : (Array.isArray(receivedResp?.data) ? receivedResp.data : []);
-        // Avis donnés (en tant qu'utilisateur propriétaire) — essayer plusieurs paramètres
+        // Avis donnés (en tant qu'utilisateur propriétaire) — filtrer par ID utilisateur
         let givenArr = [];
         try {
-          // Essayer d'abord avec author: 'me'
-          const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-          givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+          // Récupérer tous les avis et filtrer côté front par l'ID utilisateur
+          const allReviewsResp = await reviewService.getAllReviews({ limit: 1000 }).catch(() => []);
+          const allReviews = Array.isArray(allReviewsResp) ? allReviewsResp : (Array.isArray(allReviewsResp?.data) ? allReviewsResp.data : []);
           
-          // Si vide, essayer avec user: currentUser._id
-          if (givenArr.length === 0 && uid) {
-            const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
-            givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
-          }
+          // Filtrer pour ne garder que les avis créés par cet utilisateur
+          givenArr = allReviews.filter(r => {
+            const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+            return uid && reviewUserId && String(reviewUserId) === String(uid);
+          });
         } catch (e) {
           givenArr = [];
         }
@@ -95,15 +95,15 @@ const OwnerReviews = () => {
       const uid = currentUser?._id || currentUser?.id;
       let givenArr = [];
       try {
-        // Essayer d'abord avec author: 'me'
-        const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-        givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+        // Récupérer tous les avis et filtrer côté front par l'ID utilisateur
+        const allReviewsResp = await reviewService.getAllReviews({ limit: 1000 }).catch(() => []);
+        const allReviews = Array.isArray(allReviewsResp) ? allReviewsResp : (Array.isArray(allReviewsResp?.data) ? allReviewsResp.data : []);
         
-        // Si vide, essayer avec user: currentUser._id
-        if (givenArr.length === 0 && uid) {
-          const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
-          givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
-        }
+        // Filtrer pour ne garder que les avis créés par cet utilisateur
+        givenArr = allReviews.filter(r => {
+          const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+          return uid && reviewUserId && String(reviewUserId) === String(uid);
+        });
         setGiven(givenArr);
       } catch (_) {}
     };
@@ -119,15 +119,15 @@ const OwnerReviews = () => {
         const uid = currentUser?._id || currentUser?.id;
         let givenArr = [];
         try {
-          // Essayer d'abord avec author: 'me'
-          const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-          givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+          // Récupérer tous les avis et filtrer côté front par l'ID utilisateur
+          const allReviewsResp = await reviewService.getAllReviews({ limit: 1000 }).catch(() => []);
+          const allReviews = Array.isArray(allReviewsResp) ? allReviewsResp : (Array.isArray(allReviewsResp?.data) ? allReviewsResp.data : []);
           
-          // Si vide, essayer avec user: currentUser._id
-          if (givenArr.length === 0 && uid) {
-            const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
-            givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
-          }
+          // Filtrer pour ne garder que les avis créés par cet utilisateur
+          givenArr = allReviews.filter(r => {
+            const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+            return uid && reviewUserId && String(reviewUserId) === String(uid);
+          });
           setGiven(givenArr);
         } catch (_) {}
       })();
