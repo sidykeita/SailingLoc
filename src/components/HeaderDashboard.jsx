@@ -7,6 +7,13 @@ import '../assets/css/HeaderDashboard.css';
 
 const HeaderDashboard = () => {
   const { currentUser, logout } = useAuth();
+  const displayName = (() => {
+    const full = `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim();
+    if (full) return full;
+    if (currentUser?.name) return currentUser.name;
+    if (currentUser?.email) return currentUser.email;
+    return 'Utilisateur';
+  })();
   return (
     <header className="site-header dashboard-header">
       <div className="logo">
@@ -15,12 +22,12 @@ const HeaderDashboard = () => {
         </Link>
       </div>
       <div className="dashboard-header-right">
-        <span className="dashboard-greeting">
-          Bonjour, {currentUser?.name || currentUser?.email || 'Utilisateur'}
-        </span>
-        <button className="login-button dashboard-logout-btn" onClick={logout}>
-          Déconnexion
-        </button>
+        <nav className="dashboard-nav">
+          <Link to="/add-boat" className="dashboard-nav-link">Ajouter un bateau</Link>
+          <Link to="/owner/dashboard/revenus" className="dashboard-nav-link">Revenus</Link>
+        </nav>
+        <span className="dashboard-greeting">Bonjour, {displayName}</span>
+        <button className="login-button dashboard-logout-btn" onClick={logout}>Déconnexion</button>
       </div>
     </header>
   );

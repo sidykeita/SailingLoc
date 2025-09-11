@@ -15,7 +15,10 @@ class ReservationService {
   // Obtenir les réservations d'un locataire
   async getMyReservations() {
     try {
-      const response = await axios.get(`${API_URL}/reservations/user/my-reservations`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/reservations/user/my-reservations`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       return response.data;
     } catch (error) {
       throw this.handleError(error);
