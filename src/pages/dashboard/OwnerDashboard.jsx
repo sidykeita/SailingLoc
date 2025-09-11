@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 import profileImage from '../../assets/images/profil.jpg';
 import boatService from '../../services/boat.service';
 import reservationService from '../../services/reservation.service';
@@ -12,6 +11,7 @@ import ViewProfileModal from '../../components/ViewProfileModal';
 import OwnerDocsSection from '../../components/OwnerDocsSection';
 import userService from '../../services/user.service';
 import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
+import HeaderDashboard from '../../components/HeaderDashboard';
 
 const OwnerDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -97,10 +97,7 @@ const [deleteDone, setDeleteDone] = useState(false);
     }
   }, [location.state]);
 
-  const handleLogout = () => {
-    logout();
-    // La redirection sera gérée par le ProtectedRoute
-  };
+  // HeaderDashboard gère la déconnexion
 
   // Upload photo de profil (Firebase)
   const handlePhotoUpload = async (event) => {
@@ -160,28 +157,8 @@ const [deleteDone, setDeleteDone] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/">
-              <div className="h-12">
-                <img src={logoColor} alt="SailingLOC" className="h-full" />
-              </div>
-            </Link>
-          </div>
-          
-          <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
-            <button 
-              onClick={handleLogout}
-              className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <HeaderDashboard />
 
       {/* Main content */}
       <main className="container mx-auto px-4 py-8">

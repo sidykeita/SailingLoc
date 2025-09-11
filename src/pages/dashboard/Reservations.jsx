@@ -3,8 +3,8 @@ import ReservationDetailModal from '../../components/ReservationDetailModal';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
 import reservationService from '../../services/reservation.service';
+import HeaderDashboard from '../../components/HeaderDashboard';
 
 const Reservations = () => {
   const [selectedReservation, setSelectedReservation] = useState(null);
@@ -43,9 +43,7 @@ const Reservations = () => {
     fetchReservations();
   }, [currentUser]);
 
-  const handleLogout = () => {
-    logout();
-  };
+  // HeaderDashboard gère la déconnexion
 
   const handleStatusChange = (reservationId, newStatus) => {
     setReservations(prev => 
@@ -105,28 +103,8 @@ const Reservations = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - identique à OwnerDashboard */}
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-          <Link to="/">
-              <div className="h-12">
-                <img src={logoColor} alt="SailingLOC" className="h-full" />
-              </div>
-            </Link>
-          </div>
-          
-          <div className="flex items-center">
-            <span className="text-dark mr-4">Bonjour, {currentUser?.name || ((currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')).trim() || 'Propriétaire'}</span>
-            <button 
-              onClick={handleLogout}
-              className="bg-neutral hover:bg-gray-300 text-dark py-2 px-4 rounded-md transition-colors"
-            >
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <HeaderDashboard />
 
       {/* Main content - même arrière-plan et titre que OwnerDashboard */}
       <main className="bg-background min-h-screen">
