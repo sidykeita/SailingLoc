@@ -283,6 +283,42 @@ const OwnerReserve = () => {
             )}
           </div>
 
+          {/* Modale d'avis */}
+          <LeaveReviewModal
+            open={reviewModalOpen}
+            onClose={() => { setReviewModalOpen(false); setReviewBoat(null); }}
+            boat={reviewBoat}
+            userId={currentUser?._id || currentUser?.id}
+            onSuccess={(createdReview) => {
+              // Marquer localement la réservation comme commentée
+              setReservations((prev) => prev.map((res) =>
+                res.id === (reviewBoat?._id || reviewBoat?.locationId || res.id)
+                  ? { ...res, review: createdReview || { _id: 'temp', rating: 5 } }
+                  : res
+              ));
+            }}
+            onSubmit={async (reviewData) => {
+              if (!reviewBoat?.locationId) return;
+              try {
+                const result = await reviewService.createReview({
+                  boat: reviewBoat.boatId,
+                  reservation: reviewBoat.locationId,
+                  rating: reviewData.rating,
+                  comment: reviewData.comment
+                });
+                setReservations((prev) => prev.map((res) =>
+                  res.id === (reviewBoat?._id || reviewBoat?.locationId || res.id)
+                    ? { ...res, review: result }
+                    : res
+                ));
+                setReviewModalOpen(false);
+                setReviewBoat(null);
+              } catch (error) {
+                alert('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+              }
+            }}
+          />
+
           {/* Bouton retour au tableau de bord */}
           <div className="flex justify-center mt-10">
             <Link to="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">
