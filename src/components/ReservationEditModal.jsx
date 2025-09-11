@@ -64,9 +64,7 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
             <label>Statut :</label>
             <select name="status" value={form.status} onChange={handleChange} style={{width:'100%',padding:8,marginTop:4}}>
               <option value="confirmed">Confirmée</option>
-              <option value="pending">En attente</option>
               <option value="cancelled">Annulée</option>
-              <option value="completed">Terminée</option>
             </select>
           </div>
           <div style={{marginBottom:16}}>

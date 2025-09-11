@@ -74,6 +74,7 @@ const Calendrier = () => {
       }
       const mappedReservations = (reservationsData || [])
         .filter(r => r.status === 'confirmed' && r.startDate && r.endDate)
+        .filter(r => !selectedBoatId || (r.boat?._id || r.boat || r.boatId) === selectedBoatId)
         .map(r => ({
           id: r._id || r.id,
           reservationId: r._id || r.id,
@@ -156,6 +157,7 @@ const Calendrier = () => {
     if (!date) return [];
     const dayTime = new Date(date).setHours(0, 0, 0, 0);
     return events.filter(event => {
+      if (selectedBoatId && event.boatId && event.boatId !== selectedBoatId) return false;
       const start = event.start ? new Date(event.start).setHours(0,0,0,0) : (event.date ? new Date(event.date).setHours(0,0,0,0) : null);
       const end = event.end ? new Date(event.end).setHours(0,0,0,0) : start;
       if (start === null) return false;
@@ -235,21 +237,8 @@ const Calendrier = () => {
         <div className="container mx-auto px-4 py-8">
           <h1 className="font-pacifico text-primary text-3xl mb-8">Calendrier</h1>
           
-          {/* View Toggle and New Event Button */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setView('month')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  view === 'month' 
-                    ? 'bg-white text-marine shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Mois
-              </button>
-            </div>
-          </div>
+          {/* En-tête simplifié: suppression du switch de vue */}
+          <div className="mb-2" />
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Main Calendar */}
@@ -570,12 +559,9 @@ const Calendrier = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="mt-6 text-center text-gray-500">
                       <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                       <p>Aucun événement prévu pour cette date</p>
-                      <button className="mt-3 btn-primary">
-                        Ajouter un événement
-                      </button>
                     </div>
                   )}
                 </div>
