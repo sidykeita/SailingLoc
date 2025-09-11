@@ -275,7 +275,7 @@ const OwnerReserve = () => {
                           setReviewModalOpen(true);
                         }}
                       >
-                        Laisser un avis
+                        {r.review ? 'Modifier mon avis' : 'Laisser un avis'}
                       </button>
                     )}
                   </div>

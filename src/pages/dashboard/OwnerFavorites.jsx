@@ -148,6 +148,9 @@ const OwnerFavorites = () => {
           </div>
         )}
       </main>
+      <div className="flex justify-center mt-10">
+        <a href="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">Retour au tableau de bord</a>
+      </div>
     </div>
   );
 };

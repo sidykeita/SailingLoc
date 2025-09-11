@@ -229,7 +229,7 @@ const OwnerReviews = () => {
                           {`${(reviewer.firstName||'').charAt(0)}${(reviewer.lastName||'').charAt(0)}`.trim()}
                         </div>
                         <div>
-                          <div className="font-semibold">{reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName||''}`.trim() : (reviewer.name || 'Utilisateur')}</div>
+                          <div className="font-semibold">{rev.reviewerName || (reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName||''}`.trim() : (reviewer.name || 'Utilisateur'))}</div>
                           <div className="text-sm text-gray-500">{port || '—'}</div>
                         </div>
                       </div>
@@ -276,6 +276,11 @@ const OwnerReviews = () => {
             })}
           </div>
         )}
+
+        {/* Retour tableau de bord */}
+        <div className="flex justify-center mt-10">
+          <a href="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">Retour au tableau de bord</a>
+        </div>
       </main>
     </div>
   );
