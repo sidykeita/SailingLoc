@@ -7,11 +7,16 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // reset propre à chaque ouverture
+  // reset / pré-remplissage propre à chaque ouverture
   useEffect(() => {
     if (open) {
-      setRating(5);
-      setComment('');
+      if (boat?.existingReview) {
+        setRating(Number(boat.existingReview.rating || 5));
+        setComment(boat.existingReview.comment || '');
+      } else {
+        setRating(5);
+        setComment('');
+      }
       setPhotos([]);
       setError('');
       setSuccess('');
@@ -43,13 +48,21 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
         setError("Impossible de trouver l'identifiant du bateau ou de la réservation.");
         return;
       }
-      const result = await import('../services/review.service.js').then(m => m.default.createReview({
-        boat: boatId,
-        reservation: locationId,
-        user: userId,
-        rating,
-        comment
-      }));
+      const svc = await import('../services/review.service.js').then(m => m.default);
+      let result;
+      if (boat?.existingReview?._id) {
+        // Mise à jour de l'avis existant
+        result = await svc.updateReview(boat.existingReview._id, { rating, comment });
+      } else {
+        // Création d'un nouvel avis
+        result = await svc.createReview({
+          boat: boatId,
+          reservation: locationId,
+          user: userId,
+          rating,
+          comment
+        });
+      }
       setSuccess('Votre avis a été envoyé avec succès. Merci !');
       setError('');
       // Optionnel: reset des champs après succès

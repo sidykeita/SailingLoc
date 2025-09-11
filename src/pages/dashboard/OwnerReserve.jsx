@@ -91,6 +91,7 @@ const OwnerReserve = () => {
             status: res.status,
             price: Number(res.totalPrice || res.price || 0),
             imageUrl: boatImage,
+            review: res.review || null,
           };
         });
         setReservations(mapped);
