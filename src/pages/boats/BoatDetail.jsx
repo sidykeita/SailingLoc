@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import boatService from '../../services/boat.service';
 import reviewService from '../../services/review.service';
 import blockedDateService from '../../services/blockedDate.service';
+import userService from '../../services/user.service';
 import LeaveReviewModal from '../../components/LeaveReviewModal';
 import { 
   faAnchor, 
@@ -265,7 +266,32 @@ const BoatDetail = () => {
         };
         const list = pickArray(resp);
         console.log('[BoatDetail] normalized reviews list length:', list.length);
-        setReviews(list);
+        
+        // Enrichir les pseudos/auteurs pour éviter 'Utilisateur'
+        const candidateIds = Array.from(new Set(
+          list
+            .map(r => (r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer))
+            .filter(Boolean)
+            .map(String)
+        ))
+        .slice(0, 20); // éviter trop d'appels
+        let usersMap = {};
+        if (candidateIds.length > 0) {
+          const fetched = await Promise.all(
+            candidateIds.map(id => userService.getUserById(id).catch(() => null))
+          );
+          usersMap = fetched.filter(Boolean).reduce((acc,u)=>{ const id=u._id||u.id; if(id) acc[id]=u; return acc; },{});
+        }
+        const enrichedList = list.map(r => {
+          const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
+          const u = uid ? usersMap[String(uid)] : null;
+          if (!u) return r;
+          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || u.username || 'Utilisateur';
+          const reviewer = r.user || r.author || r.reviewer || {};
+          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName } };
+        });
+        
+        setReviews(enrichedList);
       } catch (e) {
         setReviews([]);
       } finally {
@@ -610,9 +636,9 @@ const BoatDetail = () => {
                 <div key={r._id || r.id} className="p-4 rounded-lg border border-gray-200 bg-white">
                   <div className="flex items-center justify-between mb-1">
                     <div className="font-medium">
-                      {(r.user && (r.user.firstName || r.user.lastName))
+                      {r.reviewerName || (r.user && (r.user.firstName || r.user.lastName))
                         ? `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim()
-                        : 'Utilisateur'}
+                        : (r.user?.name || r.user?.username || 'Utilisateur')}
                     </div>
                     <div className="text-sm text-gray-500">
                       {new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR')}

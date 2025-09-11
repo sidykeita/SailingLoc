@@ -28,9 +28,21 @@ const OwnerReviews = () => {
         // Avis reçus (mes bateaux)
         const receivedResp = await reviewService.getAllReviews({ owner: 'me', limit: 100 }).catch(() => []);
         const receivedArr = Array.isArray(receivedResp) ? receivedResp : (Array.isArray(receivedResp?.data) ? receivedResp.data : []);
-        // Avis donnés (en tant qu'utilisateur propriétaire) — fallback: liste vide si non dispo
-        const givenResp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-        const givenArr = Array.isArray(givenResp) ? givenResp : (Array.isArray(givenResp?.data) ? givenResp.data : []);
+        // Avis donnés (en tant qu'utilisateur propriétaire) — essayer plusieurs paramètres
+        let givenArr = [];
+        try {
+          // Essayer d'abord avec author: 'me'
+          const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
+          givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+          
+          // Si vide, essayer avec user: currentUser._id
+          if (givenArr.length === 0 && uid) {
+            const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
+            givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
+          }
+        } catch (e) {
+          givenArr = [];
+        }
         if (!mounted) return;
         // Filtrage strict côté front au cas où l'API ne filtre pas correctement: ne garder que les avis sur mes bateaux
         const uid = currentUser?._id || currentUser?.id;
@@ -80,29 +92,47 @@ const OwnerReviews = () => {
   // Recharger les avis donnés à la réception de l'évènement global
   useEffect(() => {
     const reloadGiven = async () => {
+      const uid = currentUser?._id || currentUser?.id;
+      let givenArr = [];
       try {
-        const givenResp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-        const givenArr = Array.isArray(givenResp) ? givenResp : (Array.isArray(givenResp?.data) ? givenResp.data : []);
+        // Essayer d'abord avec author: 'me'
+        const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
+        givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+        
+        // Si vide, essayer avec user: currentUser._id
+        if (givenArr.length === 0 && uid) {
+          const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
+          givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
+        }
         setGiven(givenArr);
       } catch (_) {}
     };
     const handler = () => reloadGiven();
     window.addEventListener('review:updated', handler);
     return () => window.removeEventListener('review:updated', handler);
-  }, []);
+  }, [currentUser]);
 
   // Optionnel: quand on passe sur l'onglet "Avis donnés", on peut rafraîchir
   useEffect(() => {
     if (activeTab === 'given') {
       (async () => {
+        const uid = currentUser?._id || currentUser?.id;
+        let givenArr = [];
         try {
-          const resp = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
-          const arr = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
-          setGiven(arr);
+          // Essayer d'abord avec author: 'me'
+          const givenResp1 = await reviewService.getAllReviews({ author: 'me', limit: 100 }).catch(() => []);
+          givenArr = Array.isArray(givenResp1) ? givenResp1 : (Array.isArray(givenResp1?.data) ? givenResp1.data : []);
+          
+          // Si vide, essayer avec user: currentUser._id
+          if (givenArr.length === 0 && uid) {
+            const givenResp2 = await reviewService.getAllReviews({ user: uid, limit: 100 }).catch(() => []);
+            givenArr = Array.isArray(givenResp2) ? givenResp2 : (Array.isArray(givenResp2?.data) ? givenResp2.data : []);
+          }
+          setGiven(givenArr);
         } catch (_) {}
       })();
     }
-  }, [activeTab]);
+  }, [activeTab, currentUser]);
 
   const onChangeResponse = (id, text) => setResponding((m) => ({ ...m, [id]: text }));
 
