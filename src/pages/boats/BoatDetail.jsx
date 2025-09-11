@@ -286,9 +286,15 @@ const BoatDetail = () => {
           const uid = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
           const u = uid ? usersMap[String(uid)] : null;
           if (!u) return r;
-          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || u.username || 'Utilisateur';
+          const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || u.username || (u.email ? String(u.email).split('@')[0] : '') || 'Utilisateur';
+          const avatar = u.avatar || u.photo || u.picture || null;
           const reviewer = r.user || r.author || r.reviewer || {};
-          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName } };
+          return { 
+            ...r, 
+            reviewerName: name, 
+            reviewerAvatar: avatar,
+            user: { ...reviewer, name, firstName: u.firstName, lastName: u.lastName, avatar }
+          };
         });
         
         setReviews(enrichedList);
@@ -566,7 +572,7 @@ const BoatDetail = () => {
               {boat.status !== 'disponible' && (
                 <p className="text-red-500 text-center mt-2">Ce bateau n'est pas disponible actuellement</p>
               )}
-              {!currentUser && boat.available && (
+              {(!currentUser || !currentUser.role) && (
                 <div className="mt-4 text-center">
                   <Link to="/login" className="text-blue-600 hover:text-blue-800">
                     Connectez-vous pour réserver
@@ -634,16 +640,40 @@ const BoatDetail = () => {
             <div className="space-y-4">
               {reviews.map((r) => (
                 <div key={r._id || r.id} className="p-4 rounded-lg border border-gray-200 bg-white">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-medium">
-                      {r.reviewerName || (r.user && (r.user.firstName || r.user.lastName))
-                        ? `${r.user.firstName || ''} ${r.user.lastName || ''}`.trim()
-                        : (r.user?.name || r.user?.username || 'Utilisateur')}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR')}
-                    </div>
-                  </div>
+                  {(() => {
+                    const name = (r.reviewerName && String(r.reviewerName).trim())
+                      || ([r.user?.firstName, r.user?.lastName].filter(Boolean).join(' ').trim())
+                      || r.user?.name
+                      || r.user?.username
+                      || (r.user?.email ? String(r.user.email).split('@')[0] : '')
+                      || 'Utilisateur';
+                    const avatar = r.reviewerAvatar || r.user?.avatar || r.user?.photo || r.user?.picture || null;
+                    const initials = name.split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0,2).toUpperCase();
+                    const created = new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR');
+                    return (
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 grid place-items-center text-xs text-gray-600">
+                            {avatar ? (
+                              <img
+                                src={avatar}
+                                alt={name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const sibling = e.currentTarget.nextElementSibling;
+                                  if (sibling) sibling.style.display = 'grid';
+                                }}
+                              />
+                            ) : null}
+                            <div style={{display: avatar ? 'none' : 'grid'}}>{initials}</div>
+                          </div>
+                          <div className="font-medium">{name}</div>
+                        </div>
+                        <div className="text-sm text-gray-500">{created}</div>
+                      </div>
+                    );
+                  })()}
                   <div>{renderStars(Number(r.rating) || 0)}</div>
                   <div className="mt-2 text-gray-700">{r.comment || r.text}</div>
                   {r.ownerResponse && (r.ownerResponse.text || r.ownerResponse.comment) && (
