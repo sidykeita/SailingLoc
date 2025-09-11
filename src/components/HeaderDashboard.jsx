@@ -22,12 +22,6 @@ const HeaderDashboard = () => {
         </Link>
       </div>
       <div className="dashboard-header-right">
-        { (currentUser?.role === 'propriétaire' || currentUser?.role === 'owner') && (
-          <nav className="dashboard-nav" style={{ marginRight: 12 }}>
-            <Link to="/owner/dashboard/reserver" className="dashboard-nav-link">Réservation propriétaire</Link>
-            <Link to="/owner/dashboard/revenus" className="dashboard-nav-link">Revenus</Link>
-          </nav>
-        )}
         <span className="dashboard-greeting">Bonjour, {displayName}</span>
         <button className="login-button dashboard-logout-btn" onClick={logout}>
           Déconnexion
