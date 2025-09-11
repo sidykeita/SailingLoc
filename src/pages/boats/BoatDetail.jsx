@@ -334,7 +334,7 @@ const BoatDetail = () => {
         throw new Error(data.message || "Erreur lors de la réservation.");
       }
       const created = await res.json();
-      // Rediriger vers Stripe Checkout pour paiement (même flow pour propriétaires et locataires)
+      // Redirection Stripe pour tous les rôles; la success_url renverra vers /owner/dashboard/reserver
       await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
