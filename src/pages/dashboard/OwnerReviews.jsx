@@ -77,7 +77,13 @@ const OwnerReviews = () => {
         });
 
         setReceived(receivedEnriched);
-        setGiven(givenArr);
+        // Enrichir les avis donnés avec les infos du currentUser (pour éviter 'Utilisateur')
+        const givenEnriched = givenArr.map(r => {
+          const reviewer = r.user || r.author || r.reviewer || {};
+          const name = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || 'Utilisateur';
+          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: currentUser?.firstName, lastName: currentUser?.lastName } };
+        });
+        setGiven(givenEnriched);
       } catch (e) {
         if (!mounted) return;
         setError("Impossible de charger les avis pour l'instant.");
@@ -104,7 +110,13 @@ const OwnerReviews = () => {
           const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
           return uid && reviewUserId && String(reviewUserId) === String(uid);
         });
-        setGiven(givenArr);
+        // Enrichir avec le pseudo du currentUser
+        const givenEnriched = givenArr.map(r => {
+          const reviewer = r.user || r.author || r.reviewer || {};
+          const name = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || 'Utilisateur';
+          return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: currentUser?.firstName, lastName: currentUser?.lastName } };
+        });
+        setGiven(givenEnriched);
       } catch (_) {}
     };
     const handler = () => reloadGiven();
@@ -128,7 +140,13 @@ const OwnerReviews = () => {
             const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
             return uid && reviewUserId && String(reviewUserId) === String(uid);
           });
-          setGiven(givenArr);
+          // Enrichir avec le pseudo du currentUser
+          const givenEnriched = givenArr.map(r => {
+            const reviewer = r.user || r.author || r.reviewer || {};
+            const name = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || 'Utilisateur';
+            return { ...r, reviewerName: name, user: { ...reviewer, name, firstName: currentUser?.firstName, lastName: currentUser?.lastName } };
+          });
+          setGiven(givenEnriched);
         } catch (_) {}
       })();
     }
