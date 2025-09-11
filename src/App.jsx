@@ -70,6 +70,7 @@ import TenantLocations from './pages/dashboard/TenantLocations';
 import TenantReviews from './pages/dashboard/TenantReviews';
 import TenantFavorites from './pages/dashboard/TenantFavorites';
 import CookieConsent from './components/common/CookieConsent';
+import OwnerReserve from './pages/dashboard/OwnerReserve';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -207,6 +208,11 @@ function App() {
           <Route path="/owner/dashboard/revenus" element={
             <ProtectedRoute userRole="propriétaire">
               <Revenus />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner/dashboard/reserver" element={
+            <ProtectedRoute userRole="propriétaire">
+              <OwnerReserve />
             </ProtectedRoute>
           } />
           {/* Redirections anciennes URLs vers les nouvelles préfixées par /owner */}

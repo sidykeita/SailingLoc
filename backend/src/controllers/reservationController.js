@@ -25,11 +25,9 @@ exports.createReservation = async (req, res) => {
       return res.status(404).json({ message: 'Bateau non trouvé' });
     }
 
-    // Autorisation minimale: tout utilisateur authentifié peut réserver.
-    // Si c'est un propriétaire qui réserve "au nom de" quelqu'un, il doit être propriétaire du bateau.
-    if (req.user.role === 'owner' && String(boat.owner) !== String(requesterId) && onBehalfOfUserId) {
-      return res.status(403).json({ message: 'Seul le propriétaire du bateau peut réserver au nom d\'un client pour ce bateau' });
-    }
+    // Autorisation: tout utilisateur authentifié peut réserver.
+    // Spécifique propriétaires: ils peuvent créer une réservation pour n'importe quel bateau
+    // et éventuellement au nom d'un client (onBehalfOfUserId) sans contrainte de propriété.
 
     // Vérifier les dates
     const s = new Date(startDate);

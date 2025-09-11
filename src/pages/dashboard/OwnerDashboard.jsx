@@ -222,17 +222,7 @@ const [deleteDone, setDeleteDone] = useState(false);
             {/* Réservation propriétaire */}
             <button
               type="button"
-              onClick={() => {
-                if (boats && boats.length > 0) {
-                  const first = boats[0];
-                  const bid = first?._id || first?.id;
-                  if (bid) {
-                    navigate(`/boats/${bid}`);
-                    return;
-                  }
-                }
-                navigate('/boats/motor');
-              }}
+              onClick={() => navigate('/owner/dashboard/reserver')}
               className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
             >
               <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
