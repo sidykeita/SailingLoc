@@ -209,6 +209,22 @@ const [deleteDone, setDeleteDone] = useState(false);
               <span className="font-medium">Revenus</span>
             </Link>
 
+            {/* Avis */}
+            <Link to="/owner/dashboard/avis" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.977 2.889a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.977-2.889a1 1 0 00-1.175 0l-3.977 2.889c-.784.57-1.838-.197-1.54-1.118l1.518-4.674a1 1 0 00-.364-1.118L3.978 10.1c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.518-4.674z" />
+              </svg>
+              <span className="font-medium">Avis</span>
+            </Link>
+
+            {/* Favoris */}
+            <Link to="/owner/dashboard/favoris" className="card p-6 flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+              </svg>
+              <span className="font-medium">Favoris</span>
+            </Link>
+
            
           </div>
         </div>
