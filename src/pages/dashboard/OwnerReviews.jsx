@@ -25,17 +25,18 @@ const OwnerReviews = () => {
       try {
         setLoading(true);
         setError('');
+        // Définir l'id utilisateur en amont
+        const uid = currentUser?._id || currentUser?.id;
+
         // Avis reçus (mes bateaux)
         const receivedResp = await reviewService.getAllReviews({ owner: 'me', limit: 100 }).catch(() => []);
         const receivedArr = Array.isArray(receivedResp) ? receivedResp : (Array.isArray(receivedResp?.data) ? receivedResp.data : []);
-        // Avis donnés (en tant qu'utilisateur propriétaire) — filtrer par ID utilisateur
+
+        // Avis donnés (en tant qu'utilisateur connecté) — filtrer par ID utilisateur
         let givenArr = [];
         try {
-          // Récupérer tous les avis et filtrer côté front par l'ID utilisateur
           const allReviewsResp = await reviewService.getAllReviews({ limit: 1000 }).catch(() => []);
           const allReviews = Array.isArray(allReviewsResp) ? allReviewsResp : (Array.isArray(allReviewsResp?.data) ? allReviewsResp.data : []);
-          
-          // Filtrer pour ne garder que les avis créés par cet utilisateur
           givenArr = allReviews.filter(r => {
             const reviewUserId = r.user?._id || r.user || r.author?._id || r.author || r.reviewer?._id || r.reviewer;
             return uid && reviewUserId && String(reviewUserId) === String(uid);
@@ -45,7 +46,6 @@ const OwnerReviews = () => {
         }
         if (!mounted) return;
         // Filtrage strict côté front au cas où l'API ne filtre pas correctement: ne garder que les avis sur mes bateaux
-        const uid = currentUser?._id || currentUser?.id;
         const receivedStrict = receivedArr.filter(r => {
           const boatOwner = r?.boat?.owner || r?.reservation?.boat?.owner || {};
           const ownerId = boatOwner?._id || boatOwner?.id || boatOwner;
