@@ -21,8 +21,8 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
     startDate: toDateInputValue(reservation?.startDate || reservation?.start),
     endDate: toDateInputValue(reservation?.endDate || reservation?.end),
     status: reservation?.status || 'confirmed',
-    price: reservation?.price || '',
   });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (reservation) {
@@ -30,7 +30,6 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
         startDate: toDateInputValue(reservation.startDate || reservation.start),
         endDate: toDateInputValue(reservation.endDate || reservation.end),
         status: reservation.status || 'confirmed',
-        price: reservation.price || '',
       });
     }
   }, [reservation, open]);
@@ -41,9 +40,16 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    onSave(form);
+    if (saving) return;
+    setSaving(true);
+    try {
+      await onSave({ startDate: form.startDate, endDate: form.endDate, status: form.status });
+      onClose?.();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -67,13 +73,10 @@ export default function ReservationEditModal({ reservation, open, onClose, onSav
               <option value="cancelled">Annulée</option>
             </select>
           </div>
-          <div style={{marginBottom:16}}>
-            <label>Montant (€) :</label>
-            <input type="number" name="price" value={form.price} onChange={handleChange} style={{width:'100%',padding:8,marginTop:4}} />
-          </div>
+          {/* Montant supprimé selon demande */}
           <div style={{display:'flex',justifyContent:'space-between',gap:16}}>
             <button type="button" onClick={onClose} style={{flex:1,padding:'10px',border:'1px solid #e0e0e0',borderRadius:'8px',background:'#fff',color:'#3a3a3a',fontWeight:500,fontSize:'1rem',marginRight:8}}>Annuler</button>
-            <button type="submit" style={{flex:1,padding:'10px',border:'none',borderRadius:'8px',background:'linear-gradient(90deg,#5a84f7,#8e5bf7)',color:'#fff',fontWeight:600,fontSize:'1rem'}}>Enregistrer</button>
+            <button type="submit" disabled={saving} style={{flex:1,padding:'10px',border:'none',borderRadius:'8px',background:'linear-gradient(90deg,#5a84f7,#8e5bf7)',opacity:saving?0.7:1,color:'#fff',fontWeight:600,fontSize:'1rem'}}>{saving ? 'En cours...' : 'Enregistrer'}</button>
           </div>
         </form>
       </div>

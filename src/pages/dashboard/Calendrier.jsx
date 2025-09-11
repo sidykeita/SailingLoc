@@ -595,7 +595,6 @@ const Calendrier = () => {
               startDate: form.startDate,
               endDate: form.endDate,
               status: form.status,
-              price: form.price,
             });
             setEditOpen(false);
             setEditTarget(null);
