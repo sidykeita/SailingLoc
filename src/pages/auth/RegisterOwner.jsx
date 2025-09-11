@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUpload, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import '../../assets/css/Register.css';
 import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
@@ -12,7 +12,9 @@ const RegisterOwner = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [homePort, setHomePort] = useState('');
+  const [ownerStatus, setOwnerStatus] = useState('particulier'); // particulier ou professionnel
+  const [siret, setSiret] = useState('');
+  const [siren, setSiren] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,6 +24,15 @@ const RegisterOwner = () => {
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const recaptchaRef = useRef({ widgetId: null, initialized: false });
   const recaptchaContainerRef = useRef(null);
+
+  // Documents contractuels obligatoires
+  const [documents, setDocuments] = useState({
+    contratLocation: null,
+    attestationAssurance: null,
+    cvMarin: null,
+    permisBateau: null
+  });
+  const [documentErrors, setDocumentErrors] = useState({});
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -125,6 +136,50 @@ const RegisterOwner = () => {
     };
   }, [isRecaptchaEnabled]);
 
+  // Gestion de l'upload de documents
+  const handleDocumentUpload = (docType, file) => {
+    if (!file) return;
+    
+    // Validation du type de fichier
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setDocumentErrors(prev => ({
+        ...prev,
+        [docType]: 'Format non supporté. Utilisez PDF, JPG ou PNG.'
+      }));
+      return;
+    }
+
+    // Validation de la taille (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setDocumentErrors(prev => ({
+        ...prev,
+        [docType]: 'Fichier trop volumineux. Maximum 5MB.'
+      }));
+      return;
+    }
+
+    setDocuments(prev => ({
+      ...prev,
+      [docType]: file
+    }));
+    setDocumentErrors(prev => ({
+      ...prev,
+      [docType]: null
+    }));
+  };
+
+  // Validation SIRET/SIREN
+  const validateSiret = (value) => {
+    const cleaned = value.replace(/\s/g, '');
+    return cleaned.length === 14 && /^\d{14}$/.test(cleaned);
+  };
+
+  const validateSiren = (value) => {
+    const cleaned = value.replace(/\s/g, '');
+    return cleaned.length === 9 && /^\d{9}$/.test(cleaned);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -134,7 +189,7 @@ const RegisterOwner = () => {
     }
 
     if (!acceptTerms) {
-      setError('Veuvez accepter les conditions d\'utilisation pour continuer.');
+      setError('Veuillez accepter les conditions d\'utilisation pour continuer.');
       return;
     }
 
@@ -143,9 +198,38 @@ const RegisterOwner = () => {
       return;
     }
 
-    // Validation des champs
-    if (!name || !email || !password || !confirmPassword || !phoneNumber || !homePort) {
+    // Validation des champs de base
+    if (!name || !email || !password || !confirmPassword || !phoneNumber) {
       setError('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    // Validation spécifique au statut professionnel
+    if (ownerStatus === 'professionnel') {
+      if (!siret || !validateSiret(siret)) {
+        setError('SIRET invalide. Il doit contenir exactement 14 chiffres sans espaces.');
+        return;
+      }
+      if (!siren || !validateSiren(siren)) {
+        setError('SIREN invalide. Il doit contenir exactement 9 chiffres sans espaces.');
+        return;
+      }
+    }
+
+    // Validation des documents obligatoires
+    const missingDocs = Object.entries(documents)
+      .filter(([key, file]) => !file)
+      .map(([key]) => key);
+    
+    if (missingDocs.length > 0) {
+      const docNames = {
+        contratLocation: 'Contrat de location',
+        attestationAssurance: 'Attestation d\'assurance',
+        cvMarin: 'CV de marin',
+        permisBateau: 'Permis bateau'
+      };
+      const missingNames = missingDocs.map(doc => docNames[doc]).join(', ');
+      setError(`Documents manquants : ${missingNames}`);
       return;
     }
 
@@ -171,11 +255,27 @@ const RegisterOwner = () => {
         email,
         password,
         phoneNumber,
-        homePort,
-        role: 'propriétaire' // Rôle fixé à propriétaire (français)
+        ownerStatus,
+        role: 'propriétaire'
       };
+
+      // Ajout des données professionnelles si nécessaire
+      if (ownerStatus === 'professionnel') {
+        userData.siret = siret.replace(/\s/g, '');
+        userData.siren = siren.replace(/\s/g, '');
+      }
+
       userData.phone = userData.phoneNumber;
       delete userData.phoneNumber;
+
+      // TODO: Upload des documents vers le serveur
+      // Pour l'instant, on simule l'upload réussi
+      userData.documents = {
+        contratLocation: 'uploaded',
+        attestationAssurance: 'uploaded',
+        cvMarin: 'uploaded',
+        permisBateau: 'uploaded'
+      };
 
       // Appel de la fonction register du contexte d'authentification avec le token reCAPTCHA
       const user = await register(userData, recaptchaToken);
@@ -248,17 +348,76 @@ const RegisterOwner = () => {
               />
             </div>
 
+            {/* Statut du propriétaire */}
             <div className="form-group">
-              <label htmlFor="homePort" className="form-label">Port d'attache principal</label>
-              <input
-                type="text"
-                id="homePort"
-                className="form-input"
-                value={homePort}
-                onChange={(e) => setHomePort(e.target.value)}
-                required
-              />
+              <label className="form-label">
+                <FontAwesomeIcon icon={faHome} className="mr-2" />
+                Statut du propriétaire
+              </label>
+              <div className="radio-group">
+                <div className="radio-option">
+                  <input
+                    type="radio"
+                    id="particulier"
+                    name="ownerStatus"
+                    value="particulier"
+                    checked={ownerStatus === 'particulier'}
+                    onChange={(e) => setOwnerStatus(e.target.value)}
+                  />
+                  <label htmlFor="particulier">Particulier</label>
+                </div>
+                <div className="radio-option">
+                  <input
+                    type="radio"
+                    id="professionnel"
+                    name="ownerStatus"
+                    value="professionnel"
+                    checked={ownerStatus === 'professionnel'}
+                    onChange={(e) => setOwnerStatus(e.target.value)}
+                  />
+                  <label htmlFor="professionnel">Professionnel</label>
+                </div>
+              </div>
             </div>
+
+            {/* Informations professionnelles (si professionnel) */}
+            {ownerStatus === 'professionnel' && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Informations professionnelles</label>
+                  <div className="professional-info">
+                    <div className="form-group">
+                      <label htmlFor="siret" className="form-label">SIRET *</label>
+                      <input
+                        type="text"
+                        id="siret"
+                        className="form-input"
+                        value={siret}
+                        onChange={(e) => setSiret(e.target.value)}
+                        placeholder="12345678901234"
+                        maxLength="14"
+                        required={ownerStatus === 'professionnel'}
+                      />
+                      <div className="form-hint">14 chiffres sans espaces</div>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="siren" className="form-label">SIREN *</label>
+                      <input
+                        type="text"
+                        id="siren"
+                        className="form-input"
+                        value={siren}
+                        onChange={(e) => setSiren(e.target.value)}
+                        placeholder="123456789"
+                        maxLength="9"
+                        required={ownerStatus === 'professionnel'}
+                      />
+                      <div className="form-hint">9 chiffres sans espaces</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="form-group">
               <label htmlFor="password" className="form-label">Mot de passe</label>
@@ -283,6 +442,48 @@ const RegisterOwner = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
+            </div>
+
+            {/* Documents contractuels obligatoires */}
+            <div className="form-group">
+              <label className="form-label">Documents contractuels</label>
+              <div className="documents-section">
+                {[
+                  { key: 'contratLocation', label: 'Contrat de location' },
+                  { key: 'attestationAssurance', label: 'Attestation d\'assurance' },
+                  { key: 'cvMarin', label: 'CV de marin' },
+                  { key: 'permisBateau', label: 'Permis bateau' }
+                ].map(({ key, label }) => (
+                  <div key={key} className="document-upload">
+                    <div className="document-header">
+                      <label className="document-label">{label}</label>
+                      {documents[key] && (
+                        <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                      )}
+                    </div>
+                    <div className="upload-area">
+                      <input
+                        type="file"
+                        id={key}
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => handleDocumentUpload(key, e.target.files[0])}
+                        className="file-input"
+                        required
+                      />
+                      <label htmlFor={key} className="upload-button">
+                        <FontAwesomeIcon icon={faUpload} className="mr-2" />
+                        {documents[key] ? documents[key].name : 'Téléverser'}
+                      </label>
+                    </div>
+                    {documentErrors[key] && (
+                      <div className="error-text">
+                        <FontAwesomeIcon icon={faTimes} className="mr-1" />
+                        {documentErrors[key]}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="form-group">
