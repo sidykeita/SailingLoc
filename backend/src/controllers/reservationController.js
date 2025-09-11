@@ -135,8 +135,9 @@ exports.updateReservation = async (req, res) => {
       status: { $ne: 'cancelled' },
       $expr: {
         $and: [
-          { $lte: ['$startDate', endDate] },
-          { $gte: ['$endDate', startDate] }
+          // Utiliser des comparaisons strictes pour autoriser les plages adjacentes (pas de conflit si ev.end === start ou ev.start === end)
+          { $lt: ['$startDate', endDate] },
+          { $gt: ['$endDate', startDate] }
         ]
       }
     });
@@ -144,14 +145,14 @@ exports.updateReservation = async (req, res) => {
       return res.status(409).json({ message: 'Chevauchement avec une autre réservation' });
     }
 
-    // Vérifier chevauchement avec blocages
+    // Vérifier chevauchement avec blocages (même logique stricte)
     const BlockedDate = require('../models/blockedDate');
     const overlapBlock = await BlockedDate.findOne({
       boat: existing.boat,
       $expr: {
         $and: [
-          { $lte: ['$startDate', endDate] },
-          { $gte: ['$endDate', startDate] }
+          { $lt: ['$startDate', endDate] },
+          { $gt: ['$endDate', startDate] }
         ]
       }
     });

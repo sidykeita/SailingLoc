@@ -596,14 +596,18 @@ const Calendrier = () => {
             // Client-side validation to avoid 409: check overlap with same boat events (excluding current)
             const s = new Date(form.startDate);
             const e = new Date(form.endDate);
+            // Normalize to midnight to avoid time-based off-by-one
+            s.setHours(0,0,0,0);
+            e.setHours(0,0,0,0);
             if (!(s instanceof Date) || isNaN(s) || !(e instanceof Date) || isNaN(e) || s >= e) {
               setEditError('Plage de dates invalide.');
               return;
             }
             const overlaps = (ev) => {
-              const evStart = new Date(ev.start);
-              const evEnd = new Date(ev.end);
-              return s <= evEnd && e >= evStart;
+              const evStart = new Date(ev.start); evStart.setHours(0,0,0,0);
+              const evEnd = new Date(ev.end || ev.start); evEnd.setHours(0,0,0,0);
+              // Strict comparisons to allow adjacent ranges (no conflict if e === evStart or s === evEnd)
+              return s < evEnd && e > evStart;
             };
             const sameBoatFilter = (ev) => (!selectedBoatId || ev.boatId === selectedBoatId);
             const currentId = editTarget?.reservationId || editTarget?.id;
