@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
-import logoColor from '../../assets/images/logo-SailingLOC-couleur.png';
+import HeaderDashboard from '../../components/HeaderDashboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSearch,
@@ -34,12 +34,13 @@ const OwnerReserve = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const data = await reservationService.getMyBoatsReservations();
+        // On charge UNIQUEMENT les réservations effectuées par l'utilisateur courant
+        const data = await reservationService.getMyReservations();
         const mapped = (data || []).map((res) => {
           let boatImage = '';
           if (Array.isArray(res.boat?.photos) && res.boat.photos.length > 0) boatImage = res.boat.photos[0];
           else if (Array.isArray(res.boat?.images) && res.boat.images.length > 0) boatImage = res.boat.images[0];
-        else if (res.boat?.imageUrl) boatImage = res.boat.imageUrl;
+          else if (res.boat?.imageUrl) boatImage = res.boat.imageUrl;
           else boatImage = 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop';
 
           return {
@@ -118,19 +119,8 @@ const OwnerReserve = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header blanc comme les autres pages owner */}
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/">
-              <div className="h-12">
-                <img src={logoColor} alt="SailingLOC" className="h-full" />
-              </div>
-            </Link>
-          </div>
-          <div></div>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <HeaderDashboard />
 
       {/* Main content */}
       <main className="bg-background min-h-screen">
@@ -231,6 +221,13 @@ const OwnerReserve = () => {
                 </div>
               ))
             )}
+          </div>
+
+          {/* Bouton retour au tableau de bord */}
+          <div className="flex justify-center mt-10">
+            <Link to="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">
+              Retour au tableau de bord
+            </Link>
           </div>
         </div>
       </main>

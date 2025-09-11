@@ -334,12 +334,7 @@ const BoatDetail = () => {
         throw new Error(data.message || "Erreur lors de la réservation.");
       }
       const created = await res.json();
-      // Propriétaire: on ne lance pas le paiement Stripe (réservation interne)
-      if (currentUser && (currentUser.role === 'owner' || currentUser.role === 'propriétaire')) {
-        setSuccess('Réservation créée avec succès.');
-        return;
-      }
-      // Locataire: redirige vers Stripe Checkout pour paiement
+      // Rediriger vers Stripe Checkout pour paiement (même flow pour propriétaires et locataires)
       await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
