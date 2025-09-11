@@ -162,7 +162,11 @@ exports.updateReservation = async (req, res) => {
     existing.startDate = startDate;
     existing.endDate = endDate;
     if (payload.status) existing.status = payload.status;
-    if (payload.price !== undefined) existing.price = payload.price;
+    // Recalculate price based on boat.dailyPrice and number of days
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const days = Math.max(1, Math.floor((endDate - startDate) / MS_PER_DAY));
+    const daily = Number(boat.dailyPrice) || 0;
+    existing.price = daily * days;
     await existing.save();
     res.json(existing);
   } catch (err) {
