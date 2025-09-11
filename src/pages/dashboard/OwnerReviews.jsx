@@ -347,8 +347,21 @@ const OwnerReviews = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-200 grid place-items-center text-gray-500 font-semibold">
-                          {initials}
+                        <div className="w-10 h-10 rounded-full bg-gray-200 grid place-items-center text-gray-500 font-semibold overflow-hidden">
+                          {reviewerRaw?.avatar || reviewerRaw?.photo ? (
+                            <img 
+                              src={reviewerRaw.avatar || reviewerRaw.photo} 
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'grid';
+                              }}
+                            />
+                          ) : null}
+                          <div className="w-full h-full grid place-items-center text-gray-500 font-semibold" style={{display: reviewerRaw?.avatar || reviewerRaw?.photo ? 'none' : 'grid'}}>
+                            {initials}
+                          </div>
                         </div>
                         <div>
                           <div className="font-semibold">{displayName}</div>

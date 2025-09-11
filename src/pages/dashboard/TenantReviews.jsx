@@ -401,10 +401,25 @@ const TenantReviews = () => {
                 <div key={review.id} className="review-card">
                   <div className="review-header">
                     <div className="reviewer-info">
-                      <img src={review.reviewer.avatar} alt={review.reviewer.name} />
-                      <div>
-                        <h4>{review.reviewer.name}</h4>
-                        <p>Membre depuis {review.reviewer.memberSince}</p>
+                      <div className="reviewer-avatar" style={{overflow: 'hidden'}}>
+                        {review.owner.avatar ? (
+                          <img 
+                            src={review.owner.avatar} 
+                            alt={review.owner.name}
+                            style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div style={{display: review.owner.avatar ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+                          {review.owner.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </div>
+                      </div>
+                      <div className="reviewer-details">
+                        <h4>{review.owner.name}</h4>
+                        <span>Membre depuis {review.owner.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
@@ -447,9 +462,6 @@ const TenantReviews = () => {
                         Répondre
                       </button>
                     )}
-                    <span className="helpful-count">
-                      {review.helpful} personnes ont trouvé cet avis utile
-                    </span>
                   </div>
                 </div>
               ))
@@ -458,10 +470,25 @@ const TenantReviews = () => {
                 <div key={review.id} className="review-card">
                   <div className="review-header">
                     <div className="reviewer-info">
-                      <img src={review.reviewer.avatar} alt={review.reviewer.name} />
-                      <div>
+                      <div className="reviewer-avatar" style={{overflow: 'hidden'}}>
+                        {review.reviewer.avatar ? (
+                          <img 
+                            src={review.reviewer.avatar} 
+                            alt={review.reviewer.name}
+                            style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div style={{display: review.reviewer.avatar ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+                          {review.reviewer.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </div>
+                      </div>
+                      <div className="reviewer-details">
                         <h4>{review.reviewer.name}</h4>
-                        <p>Locataire depuis {review.reviewer.memberSince}</p>
+                        <span>Locataire depuis {review.reviewer.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
