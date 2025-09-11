@@ -19,7 +19,9 @@ const OwnerDashboard = () => {
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(() => {
     try {
-      return localStorage.getItem('profilePhotoUrl') || null;
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const uid = user?._id || user?.id;
+      return (uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null) || null;
     } catch(_) { return null; }
   });
   // Suppression de compte (propriétaire)
@@ -81,11 +83,12 @@ const [deleteDone, setDeleteDone] = useState(false);
   // Initialise/maj l'avatar depuis currentUser ou localStorage pour persister après refresh
   useEffect(() => {
     try {
-      const persisted = localStorage.getItem('profilePhotoUrl');
+      const uid = currentUser?._id || currentUser?.id;
+      const persisted = uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null;
       const initial = currentUser?.profilePhotoUrl || persisted || null;
       setPhotoUrl(initial);
     } catch(_) {}
-  }, [currentUser?.profilePhotoUrl]);
+  }, [currentUser?._id, currentUser?.profilePhotoUrl]);
 
   useEffect(() => {
     // Affiche le message de succès si on vient d’ajouter un bateau
@@ -107,7 +110,8 @@ const [deleteDone, setDeleteDone] = useState(false);
     try {
       const uploadResult = await uploadProfilePhoto(file, currentUser._id);
       await userService.updateProfile(currentUser._id, { profilePhotoUrl: uploadResult.url });
-      localStorage.setItem('profilePhotoUrl', uploadResult.url);
+      const uid = currentUser?._id || currentUser?.id;
+      if (uid) localStorage.setItem(`profilePhotoUrl:${uid}`, uploadResult.url);
       setPhotoUrl(uploadResult.url);
     } catch (e) {
       alert("Erreur lors de l'upload: " + (e?.message || 'inconnue'));

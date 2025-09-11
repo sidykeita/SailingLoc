@@ -6,7 +6,6 @@ import '../../assets/css/SimpleDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown, faEnvelope, faMobileAlt, faIdCard, faFileAlt, faQuestionCircle, faChevronRight, faSignOutAlt, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 import logoBlc from '../../assets/images/logo-blc.png';
-import profileImage from '../../assets/images/profil.jpg';
 import userService from '../../services/user.service';
 import EditProfileModal from '../../components/EditProfileModal';
 import ViewProfileModal from '../../components/ViewProfileModal';
@@ -39,7 +38,9 @@ const SimpleDashboard = () => {
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(() => {
     try {
-      return localStorage.getItem('profilePhotoUrl') || null;
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const uid = user?._id || user?.id;
+      return (uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null) || null;
     } catch (_) {
       return null;
     }
@@ -52,10 +53,11 @@ const SimpleDashboard = () => {
   
   // Initialiser l'URL de photo depuis l'utilisateur ou le localStorage pour persister après refresh
   useEffect(() => {
-    const stored = localStorage.getItem('profilePhotoUrl');
+    const uid = currentUser?._id || currentUser?.id;
+    const stored = uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null;
     const initial = currentUser?.profilePhotoUrl || stored || null;
     setPhotoUrl(initial);
-  }, [currentUser?.profilePhotoUrl]);
+  }, [currentUser?._id, currentUser?.profilePhotoUrl]);
 
   // Fonction pour gérer la déconnexion
   const handleLogout = async () => {
@@ -77,8 +79,9 @@ const SimpleDashboard = () => {
       const uploadResult = await uploadProfilePhoto(file, currentUser._id);
       // Sauvegarder côté backend
       await userService.updateProfile(currentUser._id, { profilePhotoUrl: uploadResult.url });
-      // Persister localement pour éviter la disparition après refresh si l'API ne renvoie pas encore le champ
-      localStorage.setItem('profilePhotoUrl', uploadResult.url);
+      // Persister localement sur une clé spécifique à l'utilisateur
+      const uid = currentUser?._id || currentUser?.id;
+      if (uid) localStorage.setItem(`profilePhotoUrl:${uid}`, uploadResult.url);
       
       // Mettre à jour localement (état réactif)
       setPhotoUrl(uploadResult.url);
@@ -119,11 +122,14 @@ const SimpleDashboard = () => {
       <div className="dashboard-container">
         {/* User Profile Section */}
         <div className="user-profile">
-          <div className="profile-avatar">
-            <img src={photoUrl || currentUser?.profilePhotoUrl || profileImage} alt="Profil" onError={(e) => {
-              e.target.onerror = null;
-              e.currentTarget.src = profileImage;
-            }} />
+          <div className="profile-avatar" style={{ width: 112, height: 112, borderRadius: '9999px', overflow: 'hidden', background: '#e5e7eb', display: 'grid', placeItems: 'center' }}>
+            { (photoUrl || currentUser?.profilePhotoUrl) ? (
+              <img src={photoUrl || currentUser?.profilePhotoUrl} alt="Profil" onError={(e) => { e.currentTarget.style.display='none'; }} />
+            ) : (
+              <span style={{ color: '#6b7280', fontWeight: 700, fontSize: 28 }}>
+                {`${(currentUser?.firstName || '').charAt(0)}${(currentUser?.lastName || '').charAt(0)}`.trim() || ''}
+              </span>
+            )}
           </div>
           <label className="add-photo" style={{cursor: 'pointer'}}>
             {photoUploading ? 'Upload en cours...' : (photoUrl || currentUser?.profilePhotoUrl ? 'Changer la photo' : '+ Ajouter une photo')}

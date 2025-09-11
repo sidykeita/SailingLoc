@@ -71,6 +71,8 @@ import TenantReviews from './pages/dashboard/TenantReviews';
 import TenantFavorites from './pages/dashboard/TenantFavorites';
 import CookieConsent from './components/common/CookieConsent';
 import OwnerReserve from './pages/dashboard/OwnerReserve';
+import OwnerReviews from './pages/dashboard/OwnerReviews';
+import OwnerFavorites from './pages/dashboard/OwnerFavorites';
 
 // La page d'accueil est maintenant importée depuis son propre fichier
 
@@ -208,6 +210,16 @@ function App() {
           <Route path="/owner/dashboard/revenus" element={
             <ProtectedRoute userRole="propriétaire">
               <Revenus />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner/dashboard/avis" element={
+            <ProtectedRoute userRole="propriétaire">
+              <OwnerReviews />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner/dashboard/favoris" element={
+            <ProtectedRoute userRole="propriétaire">
+              <OwnerFavorites />
             </ProtectedRoute>
           } />
           <Route path="/owner/dashboard/reserver" element={

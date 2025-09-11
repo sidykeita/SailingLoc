@@ -26,18 +26,22 @@ export const AuthProvider = ({ children }) => {
           try {
             let userData = await authService.getCurrentUser();
             console.log('[DEBUG][AuthContext] userData:', userData);
-            // Injecte l'avatar persisté si manquant côté backend
+            // Injecte l'avatar persisté lié à cet utilisateur uniquement (clé spécifique)
             try {
-              const persisted = localStorage.getItem('profilePhotoUrl');
+              const uid = userData?._id || userData?.id;
+              const persisted = uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null;
               if (!userData?.profilePhotoUrl && persisted) {
                 userData = { ...userData, profilePhotoUrl: persisted };
               }
             } catch(_) {}
             setCurrentUser(userData);
             setUserRole(userData.role || 'tenant'); // Par défaut 'tenant' si aucun rôle n'est spécifié
-            // Persiste l'avatar si fourni par le backend
+            // Persiste l'avatar si fourni par le backend sur une clé spécifique à l'utilisateur
             if (userData?.profilePhotoUrl) {
-              localStorage.setItem('profilePhotoUrl', userData.profilePhotoUrl);
+              try {
+                const uid = userData?._id || userData?.id;
+                if (uid) localStorage.setItem(`profilePhotoUrl:${uid}`, userData.profilePhotoUrl);
+              } catch(_) {}
             }
           } catch (err) {
             console.error('[DEBUG][AuthContext] getCurrentUser error:', err);
@@ -82,16 +86,20 @@ export const AuthProvider = ({ children }) => {
       // Mise à jour de l'état utilisateur
       let userObj = data.user;
       try {
-        const persisted = localStorage.getItem('profilePhotoUrl');
+        const uid = userObj?._id || userObj?.id;
+        const persisted = uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null;
         if (!userObj?.profilePhotoUrl && persisted) {
           userObj = { ...userObj, profilePhotoUrl: persisted };
         }
       } catch(_) {}
       setCurrentUser(userObj);
       setUserRole(userObj.role);
-      // Persiste l'avatar s'il est renvoyé par le backend
+      // Persiste l'avatar s'il est renvoyé par le backend (clé spécifique)
       if (userObj?.profilePhotoUrl) {
-        localStorage.setItem('profilePhotoUrl', userObj.profilePhotoUrl);
+        try {
+          const uid = userObj?._id || userObj?.id;
+          if (uid) localStorage.setItem(`profilePhotoUrl:${uid}`, userObj.profilePhotoUrl);
+        } catch(_) {}
       }
       
       return userObj;
