@@ -155,3 +155,41 @@ exports.deleteDocument = async (req, res) => {
 exports.uploadMiddleware = upload.single('document');
 
 module.exports = exports;
+ 
+// Upload depuis une URL Firebase (upload côté client)
+exports.uploadDocumentFromUrl = async (req, res) => {
+  try {
+    const userId = req.user && (req.user.id || req.user._id);
+    if (!userId) return res.status(401).json({ message: 'Non authentifié' });
+
+    const { documentType, firebaseUrl, firebasePath, originalName, fileSize, mimeType } = req.body;
+
+    if (!documentType || !['contratLocation', 'attestationAssurance', 'cvMarin', 'permisBateau'].includes(documentType)) {
+      return res.status(400).json({ message: 'Type de document invalide' });
+    }
+    if (!firebaseUrl || !firebasePath) {
+      return res.status(400).json({ message: 'URL ou chemin Firebase manquant' });
+    }
+
+    // Remplacer l'ancien document de ce type s'il existe
+    await ContractualDocument.findOneAndDelete({ userId, documentType });
+
+    // Enregistrer en base
+    const document = new ContractualDocument({
+      userId,
+      documentType,
+      fileName: firebasePath.split('/').pop(),
+      originalName: originalName || null,
+      fileSize: fileSize || null,
+      mimeType: mimeType || null,
+      firebaseUrl,
+      firebasePath,
+    });
+
+    await document.save();
+    res.status(201).json(document);
+  } catch (error) {
+    console.error('Erreur uploadDocumentFromUrl:', error);
+    res.status(500).json({ message: error.message || 'Erreur serveur' });
+  }
+};

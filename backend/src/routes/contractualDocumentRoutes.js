@@ -12,6 +12,9 @@ router.post('/upload',
   contractualDocumentController.uploadDocument
 );
 
+// POST /api/contractual-documents/upload-url - Enregistrer un document déjà uploadé côté client (Firebase)
+router.post('/upload-url', contractualDocumentController.uploadDocumentFromUrl);
+
 // GET /api/contractual-documents - Récupérer les documents de l'utilisateur connecté
 router.get('/', contractualDocumentController.getUserDocuments);
 

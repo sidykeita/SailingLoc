@@ -271,12 +271,13 @@ const RegisterOwner = () => {
       // 1) Créer le compte pour obtenir le token (AuthContext enregistre token + user)
       const user = await register(userData, recaptchaToken);
 
-      // 2) Une fois connecté, uploader les documents (route protégée)
+      // 2) Une fois connecté, uploader les documents (pattern client Firebase -> backend URL)
       try {
         const contractualDocumentService = (await import('../../services/contractualDocument.service')).default;
+        const userId = (user && (user._id || user.id)) || JSON.parse(localStorage.getItem('user'))?._id;
         for (const [docType, file] of Object.entries(documents)) {
           if (file) {
-            await contractualDocumentService.uploadDocument(docType, file);
+            await contractualDocumentService.uploadViaFirebase(docType, file, userId);
           }
         }
       } catch (uploadError) {
