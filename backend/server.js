@@ -60,6 +60,9 @@ app.use('/api/favorites', favoriteRoutes);
 const blockedDateRoutes = require('./src/routes/blockedDate.routes');
 app.use('/api/blocks', blockedDateRoutes);
 
+const contractualDocumentRoutes = require('./src/routes/contractualDocumentRoutes');
+app.use('/api/contractual-documents', contractualDocumentRoutes);
+
 
 app.get('/', (req, res) => {
     res.send('API SailingLoc fonctionne ! 🚀');

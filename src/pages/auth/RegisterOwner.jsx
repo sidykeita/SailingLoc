@@ -268,14 +268,18 @@ const RegisterOwner = () => {
       userData.phone = userData.phoneNumber;
       delete userData.phoneNumber;
 
-      // TODO: Upload des documents vers le serveur
-      // Pour l'instant, on simule l'upload réussi
-      userData.documents = {
-        contratLocation: 'uploaded',
-        attestationAssurance: 'uploaded',
-        cvMarin: 'uploaded',
-        permisBateau: 'uploaded'
-      };
+      // Upload des documents vers Firebase/MongoDB
+      const contractualDocumentService = (await import('../../services/contractualDocument.service')).default;
+      
+      for (const [docType, file] of Object.entries(documents)) {
+        if (file) {
+          try {
+            await contractualDocumentService.uploadDocument(docType, file);
+          } catch (uploadError) {
+            throw new Error(`Erreur lors de l'upload du document ${docType}: ${uploadError.message}`);
+          }
+        }
+      }
 
       // Appel de la fonction register du contexte d'authentification avec le token reCAPTCHA
       const user = await register(userData, recaptchaToken);
@@ -312,6 +316,38 @@ const RegisterOwner = () => {
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Statut du propriétaire */}
+            <div className="form-group">
+              <label className="form-label">
+                <FontAwesomeIcon icon={faHome} className="mr-2" />
+                Statut du propriétaire
+              </label>
+              <div className="radio-group">
+                <div className="radio-option">
+                  <input
+                    type="radio"
+                    id="particulier"
+                    name="ownerStatus"
+                    value="particulier"
+                    checked={ownerStatus === 'particulier'}
+                    onChange={(e) => setOwnerStatus(e.target.value)}
+                  />
+                  <label htmlFor="particulier">Particulier</label>
+                </div>
+                <div className="radio-option">
+                  <input
+                    type="radio"
+                    id="professionnel"
+                    name="ownerStatus"
+                    value="professionnel"
+                    checked={ownerStatus === 'professionnel'}
+                    onChange={(e) => setOwnerStatus(e.target.value)}
+                  />
+                  <label htmlFor="professionnel">Professionnel</label>
+                </div>
+              </div>
+            </div>
+
             <div className="form-group">
               <label htmlFor="name" className="form-label">Nom complet</label>
               <input
@@ -346,38 +382,6 @@ const RegisterOwner = () => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
-            </div>
-
-            {/* Statut du propriétaire */}
-            <div className="form-group">
-              <label className="form-label">
-                <FontAwesomeIcon icon={faHome} className="mr-2" />
-                Statut du propriétaire
-              </label>
-              <div className="radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="particulier"
-                    name="ownerStatus"
-                    value="particulier"
-                    checked={ownerStatus === 'particulier'}
-                    onChange={(e) => setOwnerStatus(e.target.value)}
-                  />
-                  <label htmlFor="particulier">Particulier</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="professionnel"
-                    name="ownerStatus"
-                    value="professionnel"
-                    checked={ownerStatus === 'professionnel'}
-                    onChange={(e) => setOwnerStatus(e.target.value)}
-                  />
-                  <label htmlFor="professionnel">Professionnel</label>
-                </div>
-              </div>
             </div>
 
             {/* Informations professionnelles (si professionnel) */}

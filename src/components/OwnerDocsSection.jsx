@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import ownerDocsService from '../services/ownerDocs.service';
+import contractualDocumentService from '../services/contractualDocument.service';
 
 const docLabels = {
-  contract: 'Contrat de location',
-  insurance: 'Attestation d’assurance',
-  cv: 'CV de marin',
-  permit: 'Permis bateau',
+  contratLocation: 'Contrat de location',
+  attestationAssurance: 'Attestation d’assurance',
+  cvMarin: 'CV de marin',
+  permisBateau: 'Permis bateau',
 };
 
 const OwnerDocsSection = ({ ownerId, token }) => {
@@ -18,8 +18,13 @@ const OwnerDocsSection = ({ ownerId, token }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await ownerDocsService.getDocs(ownerId, token);
-      setDocs(data || {});
+      const documents = await contractualDocumentService.getUserDocuments();
+      // Convertir le tableau en objet avec les types comme clés
+      const docsMap = {};
+      documents.forEach(doc => {
+        docsMap[doc.documentType] = doc.firebaseUrl;
+      });
+      setDocs(docsMap);
     } catch (err) {
       setError("Erreur lors du chargement des documents.");
     } finally {
@@ -28,29 +33,32 @@ const OwnerDocsSection = ({ ownerId, token }) => {
   };
 
   useEffect(() => {
-    if (ownerId && token) fetchDocs();
-    // eslint-disable-next-line
-  }, [ownerId, token]);
+    fetchDocs();
+  }, []);
 
   const handleUpload = async (type, file) => {
     setLoading(true);
     setError(null);
     try {
-      await ownerDocsService.uploadDoc(type, file, token, ownerId);
+      await contractualDocumentService.uploadDocument(type, file);
       fetchDocs();
     } catch (err) {
-      setError("Erreur lors de l’upload du fichier.");
+      setError("Erreur lors de l'upload du fichier.");
       setLoading(false);
     }
   };
-
 
   const handleDelete = async (type) => {
     setLoading(true);
     setError(null);
     try {
-      await ownerDocsService.deleteDoc(ownerId, type, token);
-      fetchDocs();
+      // Trouver le document à supprimer
+      const documents = await contractualDocumentService.getUserDocuments();
+      const docToDelete = documents.find(doc => doc.documentType === type);
+      if (docToDelete) {
+        await contractualDocumentService.deleteDocument(docToDelete._id);
+        fetchDocs();
+      }
     } catch (err) {
       setError("Erreur lors de la suppression du fichier.");
       setLoading(false);

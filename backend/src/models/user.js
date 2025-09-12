@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema({
     enum: ['locataire', 'propriétaire', 'admin'], 
     default: 'locataire' 
   },
+  // Statut propriétaire et informations professionnelles
+  ownerStatus: {
+    type: String,
+    enum: ['particulier', 'professionnel'],
+    default: 'particulier'
+  },
+  siret: { type: String, sparse: true }, // 14 chiffres pour les professionnels
+  siren: { type: String, sparse: true }, // 9 chiffres pour les professionnels
   createdAt: { type: Date, default: Date.now },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Boat' }],
   // Soft delete
