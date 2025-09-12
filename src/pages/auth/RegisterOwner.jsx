@@ -268,23 +268,24 @@ const RegisterOwner = () => {
       userData.phone = userData.phoneNumber;
       delete userData.phoneNumber;
 
-      // Upload des documents vers Firebase/MongoDB
-      const contractualDocumentService = (await import('../../services/contractualDocument.service')).default;
-      
-      for (const [docType, file] of Object.entries(documents)) {
-        if (file) {
-          try {
-            await contractualDocumentService.uploadDocument(docType, file);
-          } catch (uploadError) {
-            throw new Error(`Erreur lors de l'upload du document ${docType}: ${uploadError.message}`);
-          }
-        }
-      }
-
-      // Appel de la fonction register du contexte d'authentification avec le token reCAPTCHA
+      // 1) Créer le compte pour obtenir le token (AuthContext enregistre token + user)
       const user = await register(userData, recaptchaToken);
 
-      // Redirection vers le dashboard propriétaire
+      // 2) Une fois connecté, uploader les documents (route protégée)
+      try {
+        const contractualDocumentService = (await import('../../services/contractualDocument.service')).default;
+        for (const [docType, file] of Object.entries(documents)) {
+          if (file) {
+            await contractualDocumentService.uploadDocument(docType, file);
+          }
+        }
+      } catch (uploadError) {
+        // Ne bloque pas la création du compte mais informe l'utilisateur
+        console.error('Erreur upload documents:', uploadError);
+        setError(`Votre compte a été créé mais certains documents n'ont pas été téléversés: ${uploadError.message}. Vous pourrez les ajouter depuis votre tableau de bord.`);
+      }
+
+      // 3) Redirection vers le dashboard propriétaire
       navigate('/owner/dashboard');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);

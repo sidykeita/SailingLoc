@@ -1,5 +1,5 @@
 const ContractualDocument = require('../models/contractualDocument');
-const admin = require('firebase-admin');
+const admin = require('../config/firebaseAdmin');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
