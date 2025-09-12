@@ -29,10 +29,19 @@ exports.createReservation = async (req, res) => {
     // Spécifique propriétaires: ils peuvent créer une réservation pour n'importe quel bateau
     // et éventuellement au nom d'un client (onBehalfOfUserId) sans contrainte de propriété.
 
-    // Vérifier les dates
+    // Vérifier les dates (autoriser une réservation d'une seule journée)
     const s = new Date(startDate);
-    const e = new Date(endDate);
-    if (isNaN(s) || isNaN(e) || s >= e) {
+    const eInput = new Date(endDate);
+    if (isNaN(s) || isNaN(eInput)) {
+      return res.status(400).json({ message: 'Dates invalides' });
+    }
+    // Si même jour sélectionné, considérer une réservation d'1 jour
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    let e = eInput;
+    if (s.getTime() === eInput.getTime()) {
+      e = new Date(s.getTime() + MS_PER_DAY);
+    }
+    if (s > e) {
       return res.status(400).json({ message: 'La date de fin doit être après la date de début' });
     }
 
@@ -80,7 +89,6 @@ exports.createReservation = async (req, res) => {
     }
 
     // Calcul serveur du prix pour cohérence
-    const MS_PER_DAY = 1000 * 60 * 60 * 24;
     const days = Math.max(1, Math.floor((e - s) / MS_PER_DAY));
     const daily = Number(boat.dailyPrice) || 0;
     const computedPrice = daily * days;
@@ -161,8 +169,16 @@ exports.updateReservation = async (req, res) => {
 
     const payload = { ...req.body };
     const startDate = payload.startDate ? new Date(payload.startDate) : new Date(existing.startDate);
-    const endDate = payload.endDate ? new Date(payload.endDate) : new Date(existing.endDate);
-    if (isNaN(startDate) || isNaN(endDate) || startDate >= endDate) {
+    const endDateInput = payload.endDate ? new Date(payload.endDate) : new Date(existing.endDate);
+    if (isNaN(startDate) || isNaN(endDateInput)) {
+      return res.status(400).json({ message: 'Plage de dates invalide' });
+    }
+    // Autoriser une durée d'un jour si même date
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const endDate = (startDate.getTime() === endDateInput.getTime())
+      ? new Date(startDate.getTime() + MS_PER_DAY)
+      : endDateInput;
+    if (startDate > endDate) {
       return res.status(400).json({ message: 'Plage de dates invalide' });
     }
 
@@ -202,7 +218,6 @@ exports.updateReservation = async (req, res) => {
     existing.endDate = endDate;
     if (payload.status) existing.status = payload.status;
     // Recalculate price based on boat.dailyPrice and number of days
-    const MS_PER_DAY = 1000 * 60 * 60 * 24;
     const days = Math.max(1, Math.floor((endDate - startDate) / MS_PER_DAY));
     const daily = Number(boat.dailyPrice) || 0;
     existing.price = daily * days;

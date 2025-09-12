@@ -37,15 +37,18 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// PATCH /api/users/:id — met à jour email, téléphone et URLs de fichiers
+// PATCH /api/users/:id — met à jour email, téléphone, infos pro et URLs de fichiers
 exports.updateProfile = async (req, res) => {
   try {
-    const { email, phone, profilePhotoUrl, idCardUrl } = req.body;
+    const { email, phone, profilePhotoUrl, idCardUrl, siret, siren, ownerStatus } = req.body;
     const updates = {};
     if (email) updates.email = email;
     if (phone) updates.phone = phone;
     if (profilePhotoUrl) updates.profilePhotoUrl = profilePhotoUrl;
     if (idCardUrl) updates.idCardUrl = idCardUrl;
+    if (typeof siret !== 'undefined') updates.siret = siret;
+    if (typeof siren !== 'undefined') updates.siren = siren;
+    if (ownerStatus && ['particulier','professionnel'].includes(ownerStatus)) updates.ownerStatus = ownerStatus;
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { $set: updates },

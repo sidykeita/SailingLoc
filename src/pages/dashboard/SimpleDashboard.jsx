@@ -304,13 +304,17 @@ const SimpleDashboard = () => {
         onClose={() => setEditModalOpen(false)}
         currentEmail={currentUser?.email}
         currentPhone={currentUser?.phone}
-        onSave={async ({ email, phone, idCardUrl }) => {
-          await userService.updateProfile(currentUser._id, { email, phone, idCardUrl });
+        currentSiret={currentUser?.siret}
+        currentSiren={currentUser?.siren}
+        onSave={async ({ email, phone, idCardUrl, siret, siren }) => {
+          await userService.updateProfile(currentUser._id, { email, phone, idCardUrl, siret, siren });
           // Option: mettre à jour l'affichage localement
           if (currentUser) {
             currentUser.email = email;
             currentUser.phone = phone;
             if (idCardUrl) currentUser.idCardUrl = idCardUrl;
+            if (typeof siret !== 'undefined') currentUser.siret = siret;
+            if (typeof siren !== 'undefined') currentUser.siren = siren;
           }
         }}
       />

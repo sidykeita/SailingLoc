@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { uploadIdCard } from '../services/idCardUpload';
 
-export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, onSave }) {
+export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, currentSiret, currentSiren, onSave }) {
   const [email, setEmail] = useState(currentEmail || '');
   const [phone, setPhone] = useState(currentPhone || '');
+  const [siret, setSiret] = useState(currentSiret || '');
+  const [siren, setSiren] = useState(currentSiren || '');
   const [idCard, setIdCard] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -13,6 +15,15 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
     setLoading(true);
     setError(null);
     try {
+      // Validation simple SIRET/SIREN si fournis
+      const cleanedSiret = (siret || '').replace(/\s/g, '');
+      const cleanedSiren = (siren || '').replace(/\s/g, '');
+      if (cleanedSiret && !/^\d{14}$/.test(cleanedSiret)) {
+        throw new Error('SIRET invalide (14 chiffres requis)');
+      }
+      if (cleanedSiren && !/^\d{9}$/.test(cleanedSiren)) {
+        throw new Error('SIREN invalide (9 chiffres requis)');
+      }
       let idCardUrl = null;
       
       // Upload de la carte d'identité si un fichier est sélectionné
@@ -21,7 +32,7 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
         idCardUrl = uploadResult.url;
       }
       
-      await onSave({ email, phone, idCardUrl });
+      await onSave({ email, phone, idCardUrl, siret: cleanedSiret || undefined, siren: cleanedSiren || undefined });
       onClose();
     } catch (err) {
       setError(err?.message || 'Erreur lors de la modification.');
@@ -57,6 +68,32 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
               onChange={e => setPhone(e.target.value)}
               required
             />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-600 mb-1">SIRET</label>
+              <input
+                type="text"
+                className="w-full border rounded px-3 py-2"
+                value={siret}
+                onChange={e => setSiret(e.target.value)}
+                placeholder="14 chiffres"
+                maxLength={14}
+              />
+              <p className="text-xs text-gray-500 mt-1">Optionnel. 14 chiffres sans espaces</p>
+            </div>
+            <div>
+              <label className="block text-gray-600 mb-1">SIREN</label>
+              <input
+                type="text"
+                className="w-full border rounded px-3 py-2"
+                value={siren}
+                onChange={e => setSiren(e.target.value)}
+                placeholder="9 chiffres"
+                maxLength={9}
+              />
+              <p className="text-xs text-gray-500 mt-1">Optionnel. 9 chiffres sans espaces</p>
+            </div>
           </div>
           <div>
             <label className="block text-gray-600 mb-1">Carte d'identité</label>
