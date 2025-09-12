@@ -62,9 +62,21 @@ exports.uploadDocument = async (req, res) => {
 
       stream.on('finish', async () => {
         try {
-          // Rendre le fichier accessible publiquement
-          await fileUpload.makePublic();
-          const firebaseUrl = `https://storage.googleapis.com/${bucket.name}/${firebasePath}`;
+          let firebaseUrl;
+          // Tenter de rendre le fichier public, sinon générer une URL signée
+          try {
+            await fileUpload.makePublic();
+            firebaseUrl = `https://storage.googleapis.com/${bucket.name}/${firebasePath}`;
+          } catch (pubErr) {
+            console.warn('[contractualDocumentController] makePublic failed, fallback to signed URL:', pubErr?.message || pubErr);
+            try {
+              const [url] = await fileUpload.getSignedUrl({ action: 'read', expires: '2099-01-01' });
+              firebaseUrl = url;
+            } catch (signErr) {
+              console.error('[contractualDocumentController] getSignedUrl failed:', signErr);
+              return resolve(res.status(500).json({ message: 'Echec accès fichier (public/signed URL)' }));
+            }
+          }
 
           // Supprimer l'ancien document du même type s'il existe
           await ContractualDocument.findOneAndDelete({ userId, documentType });

@@ -9,7 +9,7 @@ class ContractualDocumentService {
       formData.append('documentType', documentType);
 
       const token = localStorage.getItem('token');
-      const headers = { 'Content-Type': 'multipart/form-data' };
+      const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
       const { data } = await apiClient.post('/contractual-documents/upload', formData, { headers });
       return data;
