@@ -19,6 +19,9 @@ const upload = multer({
   }
 });
 
+// Middleware multer pour l'upload
+exports.uploadMiddleware = upload.single('document');
+
 // Upload d'un document contractuel
 exports.uploadDocument = async (req, res) => {
   try {
