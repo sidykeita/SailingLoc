@@ -8,11 +8,10 @@ class ContractualDocumentService {
       formData.append('document', file);
       formData.append('documentType', documentType);
 
-      const { data } = await apiClient.post('/contractual-documents/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'multipart/form-data' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const { data } = await apiClient.post('/contractual-documents/upload', formData, { headers });
       return data;
     } catch (error) {
       throw this.handleError(error);
