@@ -283,8 +283,8 @@ const RegisterOwner = () => {
       // 2) Créer le compte (le backend refusera si des documents manquent)
       const user = await register(userData, recaptchaToken);
 
-      // 3) Redirection vers le dashboard propriétaire
-      navigate('/owner/dashboard');
+      // 3) Redirection vers la page de connexion
+      navigate('/login');
     } catch (err) {
       console.error('Erreur d\'inscription:', err);
       if (!networkConnected) {
@@ -347,42 +347,6 @@ const RegisterOwner = () => {
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="name" className="form-label">Nom complet</label>
-              <input
-                type="text"
-                id="name"
-                className="form-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input
-                type="email"
-                id="email"
-                className="form-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                className="form-input"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
-            </div>
-
             {/* Informations professionnelles (si professionnel) */}
             {ownerStatus === 'professionnel' && (
               <>
@@ -421,6 +385,42 @@ const RegisterOwner = () => {
                 </div>
               </>
             )}
+
+            <div className="form-group">
+              <label htmlFor="name" className="form-label">Nom complet</label>
+              <input
+                type="text"
+                id="name"
+                className="form-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                type="email"
+                id="email"
+                className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phoneNumber" className="form-label">Numéro de téléphone</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                className="form-input"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
 
             <div className="form-group">
               <label htmlFor="password" className="form-label">Mot de passe</label>

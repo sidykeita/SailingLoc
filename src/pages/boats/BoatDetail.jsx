@@ -616,28 +616,6 @@ const BoatDetail = () => {
               })()}
             </div>
             <div>
-              {(() => {
-                const myPastConfirmed = reservations.find(r => (
-                  (r.user?._id || r.user) === (currentUser?._id) &&
-                  r.status === 'confirmed' &&
-                  new Date(r.endDate) < new Date()
-                ));
-                const alreadyLeft = myPastConfirmed && reviews.some(rv => (
-                  (rv.user?._id || rv.user) === (currentUser?._id) &&
-                  (rv.reservation?._id || rv.reservation) === (myPastConfirmed?._id)
-                ));
-                const canLeave = Boolean(currentUser && myPastConfirmed && !alreadyLeft);
-                return (
-                  <button
-                    className="booking-button booking-button-available"
-                    onClick={() => setIsReviewModalOpen(true)}
-                    disabled={!canLeave}
-                    title={canLeave ? 'Laisser un avis' : (alreadyLeft ? 'Avis déjà laissé pour cette réservation' : 'Une réservation passée est requise pour laisser un avis')}
-                  >
-                    Laisser un avis
-                  </button>
-                );
-              })()}
             </div>
           </div>
 
@@ -708,43 +686,6 @@ const BoatDetail = () => {
           )}
         </div>
 
-        {/* Modale Laisser un avis */}
-        {isReviewModalOpen && (
-          <LeaveReviewModal
-            open={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
-            boat={{
-              boatId: boat?._id,
-              id: boat?._id,
-              name: boat?.name,
-              type: boat?.type,
-              locationId: (reservations.find(r => (r.user?._id || r.user) === (currentUser?._id))?._id) || undefined,
-              reservationId: (reservations.find(r => (r.user?._id || r.user) === (currentUser?._id))?._id) || undefined,
-            }}
-            userId={currentUser?._id}
-            onSubmit={() => {}}
-            onSuccess={async () => {
-              // rafraîchir la liste
-              try {
-                const resp = await reviewService.getReviewsByBoat(id).catch(() => []);
-                const pickArray = (obj) => {
-                  if (!obj) return [];
-                  if (Array.isArray(obj)) return obj;
-                  if (Array.isArray(obj.data)) return obj.data;
-                  if (Array.isArray(obj.reviews)) return obj.reviews;
-                  if (obj.data && Array.isArray(obj.data.reviews)) return obj.data.reviews;
-                  if (Array.isArray(obj.items)) return obj.items;
-                  if (obj.data && Array.isArray(obj.data.items)) return obj.data.items;
-                  if (obj.results && Array.isArray(obj.results)) return obj.results;
-                  return [];
-                };
-                const list = pickArray(resp);
-                setReviews(list);
-              } catch (_) {}
-              setIsReviewModalOpen(false);
-            }}
-          />
-        )}
 
         {/* Informations supplémentaires (optionnel, mock) */}
         <div className="why-choose">

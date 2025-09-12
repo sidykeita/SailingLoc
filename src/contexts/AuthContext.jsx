@@ -115,19 +115,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setError('');
       const data = await authService.register(userData, recaptchaToken);
-      
-      // Connecter automatiquement l'utilisateur après inscription pour avoir le token
-      let userObj = data.user;
-      try {
-        const uid = userObj?._id || userObj?.id;
-        const persisted = uid ? localStorage.getItem(`profilePhotoUrl:${uid}`) : null;
-        if (!userObj?.profilePhotoUrl && persisted) {
-          userObj = { ...userObj, profilePhotoUrl: persisted };
-        }
-      } catch(_) {}
-      setCurrentUser(userObj);
-      setUserRole(userObj.role);
-      
+      // Ne pas connecter automatiquement l'utilisateur après inscription
+      // On laisse l'utilisateur se connecter manuellement depuis la page de connexion
       return data.user;
     } catch (err) {
       console.error('Erreur d\'inscription:', err);

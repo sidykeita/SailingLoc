@@ -62,6 +62,17 @@ export default {
   getUserById,
   getPublicUserById,
   deleteUser,
+  deleteAccount: async (userId, currentPassword) => {
+    const token = localStorage.getItem('token');
+    const res = await axios.delete(`${API_URL}/users/me`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : undefined,
+        'Content-Type': 'application/json',
+      },
+      data: { currentPassword },
+    });
+    return res.data;
+  },
   // Supprimer le compte courant (soft delete) avec confirmation de mot de passe
   async deleteMe(currentPassword) {
     const token = localStorage.getItem('token');

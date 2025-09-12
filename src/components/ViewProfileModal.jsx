@@ -22,6 +22,22 @@ export default function ViewProfileModal({ isOpen, onClose, user }) {
             <p className="text-gray-600 text-sm">Téléphone</p>
             <p className="font-medium">{user?.phone || 'Non renseigné'}</p>
           </div>
+          {user?.role === 'propriétaire' && user?.ownerStatus === 'professionnel' && (
+            <>
+              {user?.siret && (
+                <div>
+                  <p className="text-gray-600 text-sm">SIRET</p>
+                  <p className="font-medium">{user.siret}</p>
+                </div>
+              )}
+              {user?.siren && (
+                <div>
+                  <p className="text-gray-600 text-sm">SIREN</p>
+                  <p className="font-medium">{user.siren}</p>
+                </div>
+              )}
+            </>
+          )}
           {user?.idCardUrl && (
             <div>
               <p className="text-gray-600 text-sm">Carte d'identité</p>
