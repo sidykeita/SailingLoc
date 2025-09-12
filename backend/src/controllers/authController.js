@@ -34,7 +34,7 @@ exports.protect = async (req, res, next) => {
 // Inscription
 exports.register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, phone, role } = req.body;
+    const { firstName, lastName, email, password, phone, role, ownerStatus, siret, siren } = req.body;
 
     // Vérifier si l'email existe déjà
     const existingUser = await User.findOne({ email });
@@ -42,15 +42,27 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Email déjà utilisé' });
     }
 
-    // Créer l'utilisateur
-    const user = await User.create({
+    // Préparer les données utilisateur
+    const userData = {
       firstName,
       lastName,
       email,
       password,
       phone,
       role: role || 'locataire'
-    });
+    };
+
+    // Ajouter les champs propriétaire si nécessaire
+    if (role === 'propriétaire') {
+      userData.ownerStatus = ownerStatus || 'particulier';
+      if (ownerStatus === 'professionnel') {
+        userData.siret = siret;
+        userData.siren = siren;
+      }
+    }
+
+    // Créer l'utilisateur
+    const user = await User.create(userData);
 
     // Créer le token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -58,12 +70,12 @@ exports.register = async (req, res) => {
     });
 
     // Ne pas envoyer le mot de passe dans la réponse
-    const userData = { ...user.toObject() };
-    delete userData.password;
+    const userResponse = { ...user.toObject() };
+    delete userResponse.password;
 
     res.status(201).json({
       token,
-      user: userData
+      user: userResponse
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
