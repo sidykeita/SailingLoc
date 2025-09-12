@@ -20,6 +20,28 @@ class ContractualDocumentService {
     }
   }
 
+  // Upload avant inscription: envoie vers un dossier pre-register en utilisant un identifiant (email)
+  async uploadPreRegister(documentType, file, emailKey) {
+    try {
+      const safeName = file.name.replace(/\s+/g, '_');
+      const safeKey = String(emailKey || 'unknown').replace(/[^a-zA-Z0-9_.-]/g, '_');
+      const firebasePath = `contractual-documents/pre-register/${safeKey}/${documentType}_${Date.now()}_${safeName}`;
+      const storageRef = ref(storage, firebasePath);
+      await uploadBytes(storageRef, file);
+      const firebaseUrl = await getDownloadURL(storageRef);
+      return {
+        documentType,
+        firebaseUrl,
+        firebasePath,
+        originalName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+      };
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
   // Upload via Firebase client, puis enregistrement URL côté backend
   async uploadViaFirebase(documentType, file, userId) {
     try {

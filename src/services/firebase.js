@@ -1,6 +1,7 @@
 // Ce fichier configure Firebase Storage pour upload de fichiers
 import { initializeApp, getApps } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 // Utilise les variables d'environnement VITE_ avec fallback local
 const firebaseConfig = {
@@ -23,5 +24,14 @@ const gsBucket = (import.meta.env.VITE_FIREBASE_STORAGE_GS)
   : (configuredBucket && configuredBucket.startsWith('gs://') ? configuredBucket : (configuredBucket ? `gs://${configuredBucket}` : undefined));
 
 const storage = gsBucket ? getStorage(app, gsBucket) : getStorage(app);
+
+// Anonymous auth to satisfy Storage rules that require request.auth
+try {
+  const auth = getAuth(app);
+  // Only attempt if not already signed in
+  signInAnonymously(auth).catch(() => {
+    // Do not block flows if anonymous auth fails or is disabled
+  });
+} catch (_) {}
 
 export { storage };

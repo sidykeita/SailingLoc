@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const ContractualDocument = require('../models/contractualDocument');
 
 // Middleware de protection
 exports.protect = async (req, res, next) => {
@@ -31,15 +33,29 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// Inscription
+// Inscription (atomique avec documents contractuels)
 exports.register = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const { firstName, lastName, email, password, phone, role, ownerStatus, siret, siren } = req.body;
+    const { firstName, lastName, email, password, phone, role, ownerStatus, siret, siren, documents } = req.body;
 
     // Vérifier si l'email existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email déjà utilisé' });
+    }
+
+    // Vérifier la présence des 4 documents (obligatoires à l'inscription propriétaire)
+    if (role === 'propriétaire') {
+      const requiredTypes = ['contratLocation', 'attestationAssurance', 'cvMarin', 'permisBateau'];
+      const provided = Array.isArray(documents) ? documents.map(d => d.documentType) : [];
+      const missing = requiredTypes.filter(t => !provided.includes(t));
+      if (missing.length > 0) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({ message: `Documents manquants: ${missing.join(', ')}` });
+      }
     }
 
     // Préparer les données utilisateur
@@ -62,15 +78,34 @@ exports.register = async (req, res) => {
     }
 
     // Créer l'utilisateur
-    const user = await User.create(userData);
+    const user = await User.create([userData], { session });
+    const createdUser = Array.isArray(user) ? user[0] : user;
+
+    // Créer les documents contractuels s'il s'agit d'un propriétaire
+    if (role === 'propriétaire' && Array.isArray(documents) && documents.length > 0) {
+      const docsToInsert = documents.map(d => ({
+        userId: createdUser._id,
+        documentType: d.documentType,
+        fileName: (d.firebasePath || '').split('/').pop(),
+        originalName: d.originalName,
+        fileSize: d.fileSize,
+        mimeType: d.mimeType,
+        firebaseUrl: d.firebaseUrl,
+        firebasePath: d.firebasePath,
+      }));
+      await ContractualDocument.insertMany(docsToInsert, { session });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
 
     // Créer le token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: createdUser._id }, process.env.JWT_SECRET, {
       expiresIn: '90d'
     });
 
     // Ne pas envoyer le mot de passe dans la réponse
-    const userResponse = { ...user.toObject() };
+    const userResponse = { ...createdUser.toObject() };
     delete userResponse.password;
 
     res.status(201).json({
@@ -78,6 +113,8 @@ exports.register = async (req, res) => {
       user: userResponse
     });
   } catch (err) {
+    try { await session.abortTransaction(); } catch(_) {}
+    session.endSession();
     res.status(400).json({ message: err.message });
   }
 };
