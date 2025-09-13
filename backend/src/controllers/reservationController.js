@@ -88,19 +88,6 @@ exports.createReservation = async (req, res) => {
       if (guestEmail) meta.guestEmail = guestEmail;
     }
 
-    // Idempotency: éviter doublon exact même (boat,user,startDate,endDate) non annulé
-    const existingSame = await Reservation.findOne({
-      boat: boatId,
-      user: reservationUser,
-      startDate: s,
-      endDate: e,
-      status: { $ne: 'cancelled' }
-    });
-    if (existingSame) {
-      // Retourner l'existant pour éviter duplication
-      return res.status(200).json(existingSame);
-    }
-
     // Calcul serveur du prix pour cohérence
     const days = Math.max(1, Math.floor((e - s) / MS_PER_DAY));
     const daily = Number(boat.dailyPrice) || 0;
@@ -115,25 +102,8 @@ exports.createReservation = async (req, res) => {
       ...meta
     });
 
-    try {
-      await reservation.save();
-      return res.status(201).json(reservation);
-    } catch (errSave) {
-      // Gestion d'une collision d'unicité (double clic, doublon concurrent)
-      if (errSave && (errSave.code === 11000 || String(errSave.message || '').includes('E11000'))) {
-        const existingDup = await Reservation.findOne({
-          boat: boatId,
-          user: reservationUser,
-          startDate: s,
-          endDate: e,
-          status: { $ne: 'cancelled' }
-        });
-        if (existingDup) {
-          return res.status(200).json(existingDup);
-        }
-      }
-      throw errSave;
-    }
+    await reservation.save();
+    res.status(201).json(reservation);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

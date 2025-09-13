@@ -45,25 +45,25 @@ import applepayIcon from '../../assets/images/applepay.png';
 
 const BoatDetail = () => {
   // ...
-  // Fonction utilitaire pour savoir si une date est réservée (bord supérieur exclusif)
+  // Fonction utilitaire pour savoir si une date est réservée
   function isDateReserved(dateStr) {
     if (!dateStr) return false;
     const d = new Date(dateStr);
     return reservations.some(r => {
       const rStart = new Date(r.startDate);
       const rEnd = new Date(r.endDate);
-      return d >= rStart && d < rEnd; // exclusif sur la fin
+      return d >= rStart && d <= rEnd;
     });
   }
 
-  // Fonction utilitaire pour savoir si une date est bloquée (bord supérieur exclusif)
+  // Fonction utilitaire pour savoir si une date est bloquée
   function isDateBlocked(dateStr) {
     if (!dateStr) return false;
     const d = new Date(dateStr);
     return blockedDates.some(b => {
       const bStart = new Date(b.startDate);
       const bEnd = new Date(b.endDate);
-      return d >= bStart && d < bEnd; // exclusif sur la fin
+      return d >= bStart && d <= bEnd;
     });
   }
 
@@ -76,7 +76,6 @@ const BoatDetail = () => {
   const [dateRange, setDateRange] = useState([{ startDate: null, endDate: null, key: 'selection' }]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [success, setSuccess] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
@@ -124,12 +123,11 @@ const BoatDetail = () => {
   }, [id]);
 
   // Utilitaires calendrier
-  const enumerateDates = (start, endInclusive) => {
-    // Helper conservé pour compat : itère de start à endInclusive (inclus)
+  const enumerateDates = (start, end) => {
     const list = [];
-    if (!start || !endInclusive) return list;
+    if (!start || !end) return list;
     const cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-    const last = new Date(endInclusive.getFullYear(), endInclusive.getMonth(), endInclusive.getDate());
+    const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
     while (cur <= last) {
       list.push(new Date(cur));
       cur.setDate(cur.getDate() + 1);
@@ -138,19 +136,8 @@ const BoatDetail = () => {
   };
   // Dates désactivées : réservations + blocages
   const disabledDates = [
-    // rendre la fin exclusive visuellement: endExclusive - 1 jour comme borne incluse
-    ...reservations.flatMap(r => {
-      const rs = new Date(r.startDate);
-      const re = new Date(r.endDate);
-      const endMinusOne = new Date(re.getFullYear(), re.getMonth(), re.getDate() - 1);
-      return enumerateDates(rs, endMinusOne);
-    }),
-    ...blockedDates.flatMap(b => {
-      const bs = new Date(b.startDate);
-      const be = new Date(b.endDate);
-      const endMinusOne = new Date(be.getFullYear(), be.getMonth(), be.getDate() - 1);
-      return enumerateDates(bs, endMinusOne);
-    })
+    ...reservations.flatMap(r => enumerateDates(new Date(r.startDate), new Date(r.endDate))),
+    ...blockedDates.flatMap(b => enumerateDates(new Date(b.startDate), new Date(b.endDate)))
   ];
 
   // Fonction pour désactiver un jour (utilisée par react-date-range)
@@ -180,7 +167,7 @@ const BoatDetail = () => {
       const s = new Date(b.startDate); const e = new Date(b.endDate);
       const ds = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
       const de = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
-      return ds <= d0 && d0 < de; // fin exclusive
+      return ds <= d0 && d0 <= de;
     });
   };
   const isDayReserved = (date) => {
@@ -190,16 +177,12 @@ const BoatDetail = () => {
       const s = new Date(r.startDate); const e = new Date(r.endDate);
       const ds = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
       const de = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
-      return ds <= d0 && d0 < de; // fin exclusive
+      return ds <= d0 && d0 <= de;
     });
   };
 
   const handleRangeChange = (item) => {
-    const next = { ...item.selection };
-    // si un seul jour est choisi, finaliser la plage avec endDate = startDate
-    if (next.startDate && !next.endDate) {
-      next.endDate = next.startDate;
-    }
+    const next = item.selection;
     if (selectionContainsDisabled(next)) {
       setError("Plage indisponible: dates réservées ou bloquées.");
       // Ne pas mettre à jour la sélection
@@ -345,23 +328,16 @@ const BoatDetail = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    if (bookingLoading) return; // éviter double clic
-    setBookingLoading(true);
     const sel = dateRange[0] || {};
     const startDate = sel.startDate ? new Date(sel.startDate) : null;
     const endDate = sel.endDate ? new Date(sel.endDate) : null;
     if (!startDate || !endDate) {
       setError("Veuillez sélectionner une date de début et de fin.");
-      setBookingLoading(false);
       return;
     }
     // Vérifier la disponibilité (réservations + blocages)
     const s = new Date(startDate);
-    const eRaw = new Date(endDate);
-    // Adapter à la logique de fin exclusive pour les vérifications
-    const eD = (s.getFullYear()===eRaw.getFullYear() && s.getMonth()===eRaw.getMonth() && s.getDate()===eRaw.getDate())
-      ? new Date(eRaw.getFullYear(), eRaw.getMonth(), eRaw.getDate() + 1)
-      : eRaw;
+    const eD = new Date(endDate);
     const isOverlap = reservations.some(r => {
       const rStart = new Date(r.startDate);
       const rEnd = new Date(r.endDate);
@@ -395,7 +371,6 @@ const BoatDetail = () => {
           userId: currentUser._id,
           startDate: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).toISOString().slice(0,10),
           endDate: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).toISOString().slice(0,10),
-          // prix cohérent avec la fin exclusive eD
           price: boat.dailyPrice * Math.max(1, Math.floor((eD - s) / (1000 * 60 * 60 * 24)))
         }),
       });
@@ -408,8 +383,6 @@ const BoatDetail = () => {
       await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
-    } finally {
-      setBookingLoading(false);
     }
   };
 
@@ -605,9 +578,9 @@ const BoatDetail = () => {
                     ? 'booking-button-available'
                     : 'booking-button-unavailable'
                 }`}
-                disabled={bookingLoading || !canBook || selectionContainsDisabled((dateRange && dateRange[0]) || {})}
+                disabled={!canBook || selectionContainsDisabled((dateRange && dateRange[0]) || {})}
               >
-                {bookingLoading ? 'Réservation…' : (canBook ? 'Réserver maintenant' : 'Non disponible')}
+                {canBook ? 'Réserver maintenant' : 'Non disponible'}
               </button>
               {boat.status !== 'disponible' && (
                 <p className="text-red-500 text-center mt-2">Ce bateau n'est pas disponible actuellement</p>

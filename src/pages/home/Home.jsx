@@ -135,11 +135,8 @@ const Home = () => {
     setShowResults(false);
     const r = dateRange[0] || {};
     const toIso = (d) => (d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10) : '');
-    const startNormRaw = r.startDate ? toIso(r.startDate) : (selectedDate || (selectedEndDate ? selectedEndDate : ''));
-    let endNormRaw = r.endDate ? toIso(r.endDate) : selectedEndDate;
-    // Si une seule date est choisie, considérer end = start pour une période d'un jour
-    const startNorm = startNormRaw;
-    const endNorm = endNormRaw || startNormRaw || '';
+    const startNorm = r.startDate ? toIso(r.startDate) : (selectedDate || (selectedEndDate ? selectedEndDate : ''));
+    const endNorm = r.endDate ? toIso(r.endDate) : selectedEndDate;
     if (selectedPort) {
       const params = new URLSearchParams();
       params.set('location', selectedPort.name);
@@ -287,13 +284,7 @@ const Home = () => {
                         .rdrInputRanges { display: none !important; }
                       `}</style>
                       <DateRange
-                        onChange={(item) => {
-                          const next = { ...item.selection };
-                          if (next.startDate && !next.endDate) {
-                            next.endDate = next.startDate; // considérer une sélection d'un seul jour comme valide
-                          }
-                          setDateRange([next]);
-                        }}
+                        onChange={(item) => setDateRange([item.selection])}
                         moveRangeOnFirstSelection={false}
                         ranges={dateRange}
                         months={1}

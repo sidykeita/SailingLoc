@@ -501,28 +501,14 @@ const [deleteDone, setDeleteDone] = useState(false);
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {(() => {
-                            const sd = new Date(reservation.startDate);
-                            const ed = new Date(reservation.endDate);
-                            const days = Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24)));
-                            return days === 1
-                              ? `Le ${sd.toLocaleDateString('fr-FR')} (journée)`
-                              : `Du ${sd.toLocaleDateString('fr-FR')} au ${ed.toLocaleDateString('fr-FR')}`;
-                          })()}
+                          {new Date(reservation.startDate).toLocaleDateString('fr-FR')} - {new Date(reservation.endDate).toLocaleDateString('fr-FR')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {(() => {
-                            const explicit = Number(reservation.totalPrice || reservation.price);
-                            if (!isNaN(explicit) && explicit > 0) return `${explicit} €`;
-                            const daily = Number(reservation.boat?.dailyPrice || 0);
-                            if (!daily || !reservation.startDate || !reservation.endDate) return '-';
-                            const sd = new Date(reservation.startDate);
-                            const ed = new Date(reservation.endDate);
-                            const days = Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24)));
-                            return `${daily * days} €`;
-                          })()}
+                          {reservation.totalPrice || reservation.price || (reservation.boat?.dailyPrice && reservation.startDate && reservation.endDate ?
+                            ((Math.ceil((new Date(reservation.endDate) - new Date(reservation.startDate)) / (1000*60*60*24))) * reservation.boat.dailyPrice) : '-')
+                          } €
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
