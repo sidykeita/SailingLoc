@@ -451,7 +451,7 @@ const TenantReviews = () => {
                       </div>
                       <div className="reviewer-details">
                         <h4>{review.owner.name}</h4>
-                        <span>Membre depuis {review.owner.memberSince}</span>
+                        <span>Membre depuis {review.reviewer.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
