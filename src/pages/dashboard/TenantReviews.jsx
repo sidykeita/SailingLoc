@@ -450,7 +450,7 @@ const TenantReviews = () => {
                         </div>
                       </div>
                       <div className="reviewer-details">
-                        <h4>{review.owner.name}</h4>
+                        <h4>{review.reviewer.name}</h4>
                         <span>Membre depuis {review.reviewer.memberSince}</span>
                       </div>
                     </div>
