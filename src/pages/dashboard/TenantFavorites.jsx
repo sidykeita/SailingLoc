@@ -294,38 +294,6 @@ const TenantFavorites = () => {
               </Link>
             </div>
           )}
-
-          {/* Quick Actions */}
-          {favorites.length > 0 && (
-            <div className="quick-actions">
-              <h3>Actions rapides</h3>
-              <div className="actions-grid">
-                <button className="quick-action-btn">
-                  <FontAwesomeIcon icon={faShare} />
-                  <span>Partager ma liste</span>
-                </button>
-                <button className="quick-action-btn">
-                  <FontAwesomeIcon icon={faCalendar} />
-                  <span>Planifier un voyage</span>
-                </button>
-                <button className="quick-action-btn">
-                  <FontAwesomeIcon icon={faFilter} />
-                  <span>Recherche avancée</span>
-                </button>
-                <button 
-                  className="quick-action-btn danger"
-                  onClick={() => {
-                    if (window.confirm('Êtes-vous sûr de vouloir supprimer tous vos favoris ?')) {
-                      setFavorites([]);
-                    }
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTrash} />
-                  <span>Vider la liste</span>
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
