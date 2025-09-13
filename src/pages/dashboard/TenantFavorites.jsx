@@ -49,37 +49,11 @@ const TenantFavorites = () => {
     locations: []
   };
 
-  // Normalise un favori quelle que soit la forme renvoyée par l'API
-  const normalizeFavorite = (fav) => {
-    const boat = fav?.boat || {};
-    const photos = Array.isArray(fav?.photos) && fav.photos.length > 0
-      ? fav.photos
-      : (Array.isArray(fav?.images) && fav.images.length > 0
-        ? fav.images
-        : (Array.isArray(boat?.photos) && boat.photos.length > 0
-          ? boat.photos
-          : (Array.isArray(boat?.images) && boat.images.length > 0 ? boat.images : [])));
-
-    return {
-      ...fav,
-      _id: fav?._id || fav?.id || boat?._id || boat?.id,
-      name: fav?.name || boat?.name || fav?.model || fav?.title || 'Bateau',
-      type: fav?.type || boat?.type || 'bateau',
-      photos,
-      dailyPrice: (fav?.dailyPrice ?? fav?.price ?? boat?.dailyPrice ?? 0),
-      capacity: fav?.capacity ?? boat?.capacity,
-      location: fav?.location || fav?.port || fav?.city || boat?.location || boat?.port || '',
-      owner: fav?.owner || boat?.owner || fav?.user || null,
-    };
-  };
-
   useEffect(() => {
     setLoading(true);
     getFavorites()
       .then(res => {
-        const data = Array.isArray(res?.data) ? res.data : [];
-        const normalized = data.map(normalizeFavorite);
-        setFavorites(normalized);
+        setFavorites(res.data);
         setLoading(false);
       })
       .catch(() => {
@@ -220,7 +194,7 @@ const TenantFavorites = () => {
             {filteredFavorites().map(favorite => (
               <div key={favorite._id || favorite.id} className="favorite-card">
                 <div className="card-image">
-                  <img src={Array.isArray(favorite.photos) && favorite.photos.length > 0 ? favorite.photos[0] : (Array.isArray(favorite.images) && favorite.images.length > 0 ? favorite.images[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop')} alt={(favorite.name || (favorite.boat && favorite.boat.name) || favorite.model || favorite.title || 'Bateau')} />
+                  <img src={Array.isArray(favorite.photos) && favorite.photos.length > 0 ? favorite.photos[0] : (Array.isArray(favorite.images) && favorite.images.length > 0 ? favorite.images[0] : 'https://images.unsplash.com/photo-1506947411487-a56738267384?q=80&w=2070&auto=format&fit=crop')} alt={favorite.name} />
                   <div className="card-overlay">
                     <button 
                       className="favorite-btn active"
@@ -241,13 +215,20 @@ const TenantFavorites = () => {
                 <div className="card-content">
                   <div className="card-header">
                     <div className="boat-type">
-                      <FontAwesomeIcon icon={getTypeIcon(favorite.type || (favorite.boat && favorite.boat.type))} />
-                      <span>{getTypeLabel(favorite.type || (favorite.boat && favorite.boat.type))}</span>
+                      <FontAwesomeIcon icon={getTypeIcon(favorite.type)} />
+                      <span>{getTypeLabel(favorite.type)}</span>
                     </div>
-                   
+                    <div className="rating">
+                      <div className="stars">
+                        {renderStars(favorite.rating)}
+                      </div>
+                      <span className="rating-text">
+                        {favorite.rating} ({favorite.reviewCount})
+                      </span>
+                    </div>
                   </div>
 
-                  <h3 className="boat-name">{favorite.name || (favorite.boat && favorite.boat.name) || favorite.model || favorite.title || 'Bateau'}</h3>
+                  <h3 className="boat-name">{favorite.name}</h3>
 
                   <div className="location">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -314,6 +295,37 @@ const TenantFavorites = () => {
             </div>
           )}
 
+          {/* Quick Actions */}
+          {favorites.length > 0 && (
+            <div className="quick-actions">
+              <h3>Actions rapides</h3>
+              <div className="actions-grid">
+                <button className="quick-action-btn">
+                  <FontAwesomeIcon icon={faShare} />
+                  <span>Partager ma liste</span>
+                </button>
+                <button className="quick-action-btn">
+                  <FontAwesomeIcon icon={faCalendar} />
+                  <span>Planifier un voyage</span>
+                </button>
+                <button className="quick-action-btn">
+                  <FontAwesomeIcon icon={faFilter} />
+                  <span>Recherche avancée</span>
+                </button>
+                <button 
+                  className="quick-action-btn danger"
+                  onClick={() => {
+                    if (window.confirm('Êtes-vous sûr de vouloir supprimer tous vos favoris ?')) {
+                      setFavorites([]);
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                  <span>Vider la liste</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
