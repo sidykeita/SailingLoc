@@ -478,6 +478,7 @@ const TenantReviews = () => {
                     <div className="review-response">
                       <div className="response-header">
                         <FontAwesomeIcon icon={faReply} />
+                        <span>réponse propriétaire</span>
                         <span>{formatDate(review.response.date)}</span>
                       </div>
                       <p>{review.response.text}</p>
@@ -544,7 +545,6 @@ const TenantReviews = () => {
                   </div>
 
                   <div className="review-actions">
-                    <span>Réponse propriétaire</span>
                     <Link className="action-btn" to={review.booking.boatId ? `/boats/${review.booking.boatId}` : '#'}>
                       <FontAwesomeIcon icon={faEye} />
                       Voir l'annonce
