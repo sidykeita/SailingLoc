@@ -36,6 +36,7 @@ exports.getReviews = async (req, res) => {
           { path: 'user' }
         ]
       })
+      .populate('ownerResponse.author')
       .exec();
 
     // Filtrer par locataire (avis reçus par un utilisateur)

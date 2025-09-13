@@ -147,7 +147,19 @@ const TenantReviews = () => {
         // Avis reçus = réponses du propriétaire à mes avis
         const receivedCards = givenRaw
           .filter(r => r.ownerResponse && r.ownerResponse.text)
-          .map(r => mapToCard(r, 'received'));
+          .map(r => {
+            // Pour les avis reçus, on veut afficher les infos du propriétaire qui a répondu
+            const ownerResponseAuthor = r.ownerResponse.author || {};
+            const modifiedReview = {
+              ...r,
+              // Remplacer les infos du propriétaire par celles de l'auteur de la réponse
+              boat: {
+                ...r.boat,
+                owner: ownerResponseAuthor
+              }
+            };
+            return mapToCard(modifiedReview, 'received');
+          });
 
         // Calcul des stats à partir de mes avis donnés
         const total = givenCards.length;
@@ -407,7 +419,7 @@ const TenantReviews = () => {
                       </div>
                       <div className="reviewer-details">
                         <h4>{review.owner.name}</h4>
-                        <span>Membre depuis {review.owner.memberSince}</span>
+                        <span>Propriétaire depuis {review.owner.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
