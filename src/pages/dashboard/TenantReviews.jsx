@@ -89,7 +89,7 @@ const TenantReviews = () => {
             reviewer: {
               id: reviewer._id || reviewer.id || r.user || r.author || null,
               name: reviewer.firstName ? `${reviewer.firstName} ${reviewer.lastName || ''}`.trim() : (reviewer.name || 'Utilisateur'),
-              avatar: reviewer.avatar || reviewer.photo || profileImage,
+              avatar: reviewer.profilePhotoUrl || reviewer.avatar || reviewer.photo || profileImage,
               memberSince: (reviewer.createdAt ? new Date(reviewer.createdAt).toLocaleDateString('fr-FR') : '—')
             },
             owner: {
@@ -132,7 +132,7 @@ const TenantReviews = () => {
               if (uid) acc[uid] = u;
               return acc;
             }, {});
-            // Remplacer nom et date d'inscription du locataire
+            // Remplacer nom, avatar et date d'inscription du locataire
             givenCards = givenCards.map(c => {
               const uid = c.reviewer?.id;
               const u = uid ? usersMap[uid] : null;
@@ -144,6 +144,7 @@ const TenantReviews = () => {
                 reviewer: {
                   ...c.reviewer,
                   name: fullName,
+                  avatar: u.profilePhotoUrl || u.avatar || u.photo || c.reviewer?.avatar || profileImage,
                   memberSince: signupDate,
                 }
               };
@@ -254,7 +255,7 @@ const TenantReviews = () => {
         reviewer: {
           id: r.user?._id || r.user || null,
           name: (r.user?.firstName ? `${r.user.firstName} ${r.user.lastName || ''}`.trim() : (r.user?.name || 'Utilisateur')),
-          avatar: r.user?.avatar || r.user?.photo || profileImage,
+          avatar: r.user?.profilePhotoUrl || r.user?.avatar || r.user?.photo || profileImage,
           memberSince: (r.user?.createdAt ? new Date(r.user.createdAt).toLocaleDateString('fr-FR') : '—')
         },
         booking: {

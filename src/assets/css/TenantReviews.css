@@ -234,11 +234,22 @@
     gap: 12px;
   }
   
+  /* Avatar container to control size */
+  .reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f1f3f5;
+    flex: 0 0 40px;
+  }
+  
   .reviewer-info img {
-    width: 48px;
-    height: 48px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
+    display: block;
   }
   
   .reviewer-info h4 {
@@ -477,9 +488,10 @@
       justify-content: flex-start;
     }
   
-    .reviewer-info img {
-      width: 40px;
-      height: 40px;
+    .reviewer-avatar {
+      width: 36px;
+      height: 36px;
+      flex-basis: 36px;
     }
   
     .review-actions {
