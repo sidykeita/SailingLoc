@@ -88,7 +88,7 @@ const TenantReviews = () => {
             owner: {
               name: owner.firstName ? `${owner.firstName} ${owner.lastName || ''}`.trim() : (owner.name || 'Propriétaire'),
               avatar: owner.avatar || owner.photo || profileImage,
-              memberSince: (owner.createdAt ? new Date(owner.createdAt).toLocaleDateString('fr-FR') : '—')
+              memberSince: (owner.createdAt ? new Date(owner.createdAt).getFullYear() : '—')
             },
             booking: {
               boat: boat?.name || 'Bateau',
@@ -147,19 +147,7 @@ const TenantReviews = () => {
         // Avis reçus = réponses du propriétaire à mes avis
         const receivedCards = givenRaw
           .filter(r => r.ownerResponse && r.ownerResponse.text)
-          .map(r => {
-            // Pour les avis reçus, on veut afficher les infos du propriétaire qui a répondu
-            const ownerResponseAuthor = r.ownerResponse.author || {};
-            const modifiedReview = {
-              ...r,
-              // Remplacer les infos du propriétaire par celles de l'auteur de la réponse
-              boat: {
-                ...r.boat,
-                owner: ownerResponseAuthor
-              }
-            };
-            return mapToCard(modifiedReview, 'received');
-          });
+          .map(r => mapToCard(r, 'received'));
 
         // Calcul des stats à partir de mes avis donnés
         const total = givenCards.length;
@@ -418,8 +406,8 @@ const TenantReviews = () => {
                         </div>
                       </div>
                       <div className="reviewer-details">
-                        <h4>{review.owner.name}</h4>
-                        <span>Propriétaire depuis {review.owner.memberSince}</span>
+                        <h4>{review.reviewer.name}</h4>
+                        <span>Locataire depuis {review.reviewer.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">

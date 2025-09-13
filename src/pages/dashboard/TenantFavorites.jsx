@@ -218,14 +218,6 @@ const TenantFavorites = () => {
                       <FontAwesomeIcon icon={getTypeIcon(favorite.type)} />
                       <span>{getTypeLabel(favorite.type)}</span>
                     </div>
-                    <div className="rating">
-                      <div className="stars">
-                        {renderStars(favorite.rating)}
-                      </div>
-                      <span className="rating-text">
-                        {favorite.rating} ({favorite.reviewCount})
-                      </span>
-                    </div>
                   </div>
 
                   <h3 className="boat-name">{favorite.name}</h3>
