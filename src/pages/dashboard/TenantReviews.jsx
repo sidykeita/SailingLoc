@@ -176,7 +176,7 @@ const TenantReviews = () => {
               const oid = c.owner?.id;
               const u = oid ? ownersMap[oid] : null;
               if (!u) return c;
-              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Propriétaire';
+              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name;
               const memberSince = u.createdAt ? new Date(u.createdAt).getFullYear() : '—';
               return {
                 ...c,
