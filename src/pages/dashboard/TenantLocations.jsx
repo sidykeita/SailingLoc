@@ -327,49 +327,6 @@ const TenantLocations = () => {
             <p>Gérez toutes vos réservations de bateaux</p>
           </div>
 
-          {/* Barre de recherche & filtres */}
-          <div className="search-filters-section">
-            <div className="search-bar-locations">
-              <input
-                type="text"
-                placeholder="Rechercher par nom de bateau, destination..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            </div>
-
-            <button className="filters-toggle" onClick={() => setShowFilters(!showFilters)}>
-              <FontAwesomeIcon icon={faFilter} />
-              Filtres
-            </button>
-          </div>
-
-          {/* Panneau filtres */}
-          {showFilters && (
-            <div className="filters-panel">
-              <div className="filter-group">
-                <label>Statut</label>
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                  <option value="all">Tous les statuts</option>
-                  <option value="confirmed">Confirmées</option>
-                  <option value="pending">En attente</option>
-                  <option value="completed">Terminées</option>
-                  <option value="cancelled">Annulées</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Période</label>
-                <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
-                  <option value="all">Toutes les périodes</option>
-                  <option value="upcoming">À venir</option>
-                  <option value="current">En cours</option>
-                  <option value="past">Passées</option>
-                </select>
-              </div>
-            </div>
-          )}
 
           {/* Stats */}
           <div className="stats-cards">

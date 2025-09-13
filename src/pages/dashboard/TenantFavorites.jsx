@@ -188,48 +188,6 @@ const TenantFavorites = () => {
             </div>
           </div>
 
-          {/* Filters and Sort */}
-          <div className="favorites-controls">
-            <div className="filter-group">
-              <FontAwesomeIcon icon={faFilter} />
-              <select 
-                value={filterType} 
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                <option value="all">Tous les types</option>
-                <option value="voilier">Voiliers</option>
-                <option value="catamaran">Catamarans</option>
-                <option value="yacht">Yachts</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <FontAwesomeIcon icon={faMapMarkerAlt} />
-              <select 
-                value={filterLocation} 
-                onChange={(e) => setFilterLocation(e.target.value)}
-              >
-                <option value="all">Toutes les destinations</option>
-                <option value="Marseille">Marseille</option>
-                <option value="Cannes">Cannes</option>
-                <option value="Monaco">Monaco</option>
-                <option value="Nice">Nice</option>
-                <option value="Saint-Tropez">Saint-Tropez</option>
-              </select>
-            </div>
-            <div className="sort-group">
-              <FontAwesomeIcon icon={faSort} />
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="recent">Plus récents</option>
-                <option value="oldest">Plus anciens</option>
-                <option value="price-low">Prix croissant</option>
-                <option value="price-high">Prix décroissant</option>
-                <option value="rating">Mieux notés</option>
-              </select>
-            </div>
-          </div>
 
           {/* Favorites Grid */}
           <div className="favorites-grid">

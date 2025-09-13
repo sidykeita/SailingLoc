@@ -195,7 +195,6 @@ const OwnerReserve = () => {
                     <option value="all">Tous</option>
                     <option value="confirmed">Confirmées</option>
                     <option value="pending">En attente</option>
-                    <option value="cancelled">Annulées</option>
                   </select>
                 </div>
                 <div>

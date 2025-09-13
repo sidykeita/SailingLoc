@@ -185,36 +185,6 @@ const SimpleDashboard = () => {
         
         {/* Content Section */}
         <div className="content-section">
-          {/* Notifications Card */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Notifications</h3>
-              <a href="#" className="card-action">Tout marquer comme lu</a>
-            </div>
-            <div className="card-body">
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Confirmez votre email et votre numéro de téléphone pour compléter votre profil</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Renseignez votre date d'anniversaire pour recevoir un coupon de réduction !</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-              <div className="notification-item">
-                <div className="notification-icon">!</div>
-                <div className="notification-content">
-                  <p className="notification-text">Bienvenue sur Sailing Loc</p>
-                  <p className="notification-date">{formattedDate}</p>
-                </div>
-              </div>
-            </div>
-          </div>
           
           {/* Messages Card */}
           <div className="card">
@@ -222,7 +192,7 @@ const SimpleDashboard = () => {
               <h3 className="card-title">Mes derniers messages</h3>
             </div>
             <div className="card-body">
-              <p className="message-empty">Vous n'avez pas de messages pour le moment</p>
+              <p className="message-empty">Aucune réponse de propriétaire pour le moment</p>
             </div>
           </div>
           
@@ -232,7 +202,7 @@ const SimpleDashboard = () => {
               <h3 className="card-title">Locations à venir</h3>
             </div>
             <div className="card-body">
-              <p className="location-empty">Aucune location à venir pour le moment</p>
+              <p className="location-empty">Vos 2 prochaines réservations apparaîtront ici</p>
             </div>
           </div>
           

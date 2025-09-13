@@ -380,18 +380,6 @@ const TenantReviews = () => {
                 <option value="1">1 étoile</option>
               </select>
             </div>
-            <div className="sort-group">
-              <FontAwesomeIcon icon={faSort} />
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="recent">Plus récents</option>
-                <option value="oldest">Plus anciens</option>
-                <option value="rating-high">Note décroissante</option>
-                <option value="rating-low">Note croissante</option>
-              </select>
-            </div>
           </div>
 
           {/* Reviews List */}
