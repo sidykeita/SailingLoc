@@ -68,7 +68,14 @@ const TenantReviews = () => {
         // Mapper pour l'UI
         const mapToCard = (r, direction = 'received') => {
           const reviewer = r.user || r.author || r.reviewer || {};
-          const owner = (r.owner && typeof r.owner === 'object') ? r.owner : (r.boat?.owner || {});
+          // owner peut être un objet (peuplé) ou un id (string/objectId) via boat.owner
+          const ownerRef = (typeof r.owner === 'object' && r.owner)
+            ? r.owner
+            : (r.owner || r.boat?.owner || {});
+          const ownerObj = (typeof ownerRef === 'object' && ownerRef) ? ownerRef : {};
+          const ownerId = (typeof ownerRef === 'string' || typeof ownerRef === 'number')
+            ? ownerRef
+            : (ownerObj._id || ownerObj.id || null);
           const reservation = r.reservation || r.booking || {};
           const boat = r.boat || reservation?.boat || {};
           const createdAt = r.createdAt || r.date || new Date().toISOString();
@@ -86,9 +93,10 @@ const TenantReviews = () => {
               memberSince: (reviewer.createdAt ? new Date(reviewer.createdAt).toLocaleDateString('fr-FR') : '—')
             },
             owner: {
-              name: owner.firstName ? `${owner.firstName} ${owner.lastName || ''}`.trim() : (owner.name || 'Propriétaire'),
-              avatar: owner.avatar || owner.photo || profileImage,
-              memberSince: (owner.createdAt ? new Date(owner.createdAt).getFullYear() : '—')
+              id: ownerId,
+              name: ownerObj.firstName ? `${ownerObj.firstName} ${ownerObj.lastName || ''}`.trim() : (ownerObj.name || 'Propriétaire'),
+              avatar: ownerObj.avatar || ownerObj.photo || profileImage,
+              memberSince: (ownerObj.createdAt ? new Date(ownerObj.createdAt).getFullYear() : '—')
             },
             booking: {
               boat: boat?.name || 'Bateau',
@@ -149,6 +157,42 @@ const TenantReviews = () => {
           .filter(r => r.ownerResponse && r.ownerResponse.text)
           .map(r => mapToCard(r, 'received'));
 
+        // Enrichir les infos du propriétaire (owner) des avis reçus si on a des IDs
+        const ownerIds = Array.from(new Set(
+          receivedCards.map(c => c.owner?.id).filter(Boolean)
+        ));
+        let receivedEnriched = receivedCards;
+        if (ownerIds.length > 0) {
+          try {
+            const owners = await Promise.all(
+              ownerIds.map(id => userService.getPublicUserById(id).catch(() => null))
+            );
+            const ownersMap = owners.filter(Boolean).reduce((acc, u) => {
+              const uid = u._id || u.id;
+              if (uid) acc[uid] = u;
+              return acc;
+            }, {});
+            receivedEnriched = receivedCards.map(c => {
+              const oid = c.owner?.id;
+              const u = oid ? ownersMap[oid] : null;
+              if (!u) return c;
+              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Propriétaire';
+              const memberSince = u.createdAt ? new Date(u.createdAt).getFullYear() : '—';
+              return {
+                ...c,
+                owner: {
+                  ...c.owner,
+                  name: fullName,
+                  avatar: u.avatar || u.photo || c.owner?.avatar || profileImage,
+                  memberSince,
+                }
+              };
+            });
+          } catch (_) {
+            // ignore fetch errors silently
+          }
+        }
+
         // Calcul des stats à partir de mes avis donnés
         const total = givenCards.length;
         const sum = givenCards.reduce((acc, r) => acc + (r.rating || 0), 0);
@@ -163,7 +207,7 @@ const TenantReviews = () => {
         // Avis donnés = mes avis
         setReviewsGiven(givenCards);
         // Avis reçus = réponses à mes avis
-        setReviewsReceived(receivedCards);
+        setReviewsReceived(receivedEnriched);
         setStats({ averageRating: average, totalReviews: total, ratingDistribution: distribution });
       } catch (e) {
         console.error('[TenantReviews] load error', e);
@@ -406,8 +450,8 @@ const TenantReviews = () => {
                         </div>
                       </div>
                       <div className="reviewer-details">
-                        <h4>{review.reviewer.name}</h4>
-                        <span>Locataire depuis {review.reviewer.memberSince}</span>
+                        <h4>{review.owner.name}</h4>
+                        <span>Locataire depuis {review.owner.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
@@ -475,8 +519,8 @@ const TenantReviews = () => {
                         </div>
                       </div>
                       <div className="reviewer-details">
-                        <h4>{review.reviewer.name}</h4>
-                        <span>Locataire depuis {review.reviewer.memberSince}</span>
+                        <h4>{review.owner.name}</h4>
+                        <span>Propriétaire depuis {review.owner.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
