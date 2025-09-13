@@ -267,16 +267,6 @@ const TenantFavorites = () => {
                       <span className="price-amount">{favorite.dailyPrice || favorite.price || 0}€</span>
                       <span className="price-unit">/jour</span>
                     </div>
-                    <div className="card-actions">
-                      <button className="action-btn secondary">
-                        <FontAwesomeIcon icon={faShare} />
-                        Partager
-                      </button>
-                      <button className="action-btn primary">
-                        <FontAwesomeIcon icon={faEye} />
-                        Voir détails
-                      </button>
-                    </div>
                   </div>
 
                   <div className="added-date">

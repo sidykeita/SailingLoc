@@ -371,7 +371,7 @@ const BoatDetail = () => {
           userId: currentUser._id,
           startDate: new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).toISOString().slice(0,10),
           endDate: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).toISOString().slice(0,10),
-          price: boat.dailyPrice * Math.max(1, Math.floor((eD - s) / (1000 * 60 * 60 * 24)))
+          price: boat.dailyPrice * Math.max(1, Math.floor((eD - s) / (1000 * 60 * 60 * 24)) + 1)
         }),
       });
       if (!res.ok) {
@@ -560,14 +560,14 @@ const BoatDetail = () => {
                   <div className="flex justify-between text-gray-700 mb-2">
                     <span>Durée:</span>
                     <span className="font-bold">
-                      {(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24))); })()} jours
+                      {(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24)) + 1); })()} jours
                     </span>
                   </div>
                 )}
                 {(() => { const sel = dateRange[0] || {}; return sel.startDate && sel.endDate; })() && (
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total:</span>
-                    <span>{(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return boat.dailyPrice * Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24))); })()}€</span>
+                    <span>{(() => { const sel = dateRange[0] || {}; const sd = new Date(sel.startDate); const ed = new Date(sel.endDate); return boat.dailyPrice * Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24)) + 1); })()}€</span>
                   </div>
                 )}
               </div>
