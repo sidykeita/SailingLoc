@@ -441,7 +441,15 @@ const TenantLocations = () => {
                       </div>
                       <div className="info-row">
                         <FontAwesomeIcon icon={faCalendarAlt} />
-                        <span>{formatDate(location.startDate)} - {formatDate(location.endDate)}</span>
+                        <span>
+                          {(() => {
+                            const sd = new Date(location.startDate);
+                            const ed = new Date(location.endDate);
+                            const days = Math.max(1, Math.floor((ed - sd) / (1000 * 60 * 60 * 24)));
+                            if (days === 1) return `Le ${formatDate(sd)} (journée)`;
+                            return `Du ${formatDate(sd)} au ${formatDate(ed)}`;
+                          })()}
+                        </span>
                       </div>
                       <div className="info-row">
                         <FontAwesomeIcon icon={faEuroSign} />

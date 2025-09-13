@@ -76,6 +76,7 @@ const BoatDetail = () => {
   const [dateRange, setDateRange] = useState([{ startDate: null, endDate: null, key: 'selection' }]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [success, setSuccess] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
@@ -344,11 +345,14 @@ const BoatDetail = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (bookingLoading) return; // éviter double clic
+    setBookingLoading(true);
     const sel = dateRange[0] || {};
     const startDate = sel.startDate ? new Date(sel.startDate) : null;
     const endDate = sel.endDate ? new Date(sel.endDate) : null;
     if (!startDate || !endDate) {
       setError("Veuillez sélectionner une date de début et de fin.");
+      setBookingLoading(false);
       return;
     }
     // Vérifier la disponibilité (réservations + blocages)
@@ -404,6 +408,8 @@ const BoatDetail = () => {
       await payReservation(created._id);
     } catch (err) {
       setError(err.message || "Erreur lors de la réservation.");
+    } finally {
+      setBookingLoading(false);
     }
   };
 
@@ -599,9 +605,9 @@ const BoatDetail = () => {
                     ? 'booking-button-available'
                     : 'booking-button-unavailable'
                 }`}
-                disabled={!canBook || selectionContainsDisabled((dateRange && dateRange[0]) || {})}
+                disabled={bookingLoading || !canBook || selectionContainsDisabled((dateRange && dateRange[0]) || {})}
               >
-                {canBook ? 'Réserver maintenant' : 'Non disponible'}
+                {bookingLoading ? 'Réservation…' : (canBook ? 'Réserver maintenant' : 'Non disponible')}
               </button>
               {boat.status !== 'disponible' && (
                 <p className="text-red-500 text-center mt-2">Ce bateau n'est pas disponible actuellement</p>
