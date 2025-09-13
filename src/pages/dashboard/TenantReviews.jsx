@@ -88,7 +88,7 @@ const TenantReviews = () => {
             owner: {
               name: owner.firstName ? `${owner.firstName} ${owner.lastName || ''}`.trim() : (owner.name || 'Propriétaire'),
               avatar: owner.avatar || owner.photo || profileImage,
-              memberSince: (owner.createdAt ? new Date(owner.createdAt).getFullYear() : '—')
+              memberSince: (owner.createdAt ? new Date(owner.createdAt).toLocaleDateString('fr-FR') : '—')
             },
             booking: {
               boat: boat?.name || 'Bateau',

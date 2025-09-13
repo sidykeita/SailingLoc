@@ -12,6 +12,7 @@ import ViewProfileModal from '../../components/ViewProfileModal';
 import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
 import reservationService from '../../backup/reservationService.js';
 import reviewService from '../../services/review.service.js';
+import messageService from '../../services/message.service.js';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -86,8 +87,9 @@ const SimpleDashboard = () => {
         
         setUpcomingReservations(upcoming);
         
-        // For now, keep messages empty as per previous implementation
-        setRecentMessages([]);
+        // Fetch owner replies
+        const replies = await messageService.getOwnerReplies(currentUser._id || currentUser.id);
+        setRecentMessages(replies);
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -232,7 +234,60 @@ const SimpleDashboard = () => {
               <h3 className="card-title">Mes derniers messages</h3>
             </div>
             <div className="card-body">
-              <p className="message-empty">Aucune réponse de propriétaire pour le moment</p>
+              {loading ? (
+                <p className="message-empty">Chargement...</p>
+              ) : recentMessages.length > 0 ? (
+                <div className="messages-list">
+                  {recentMessages.map((message, index) => (
+                    <div key={message.id} className="message-item" style={{
+                      display: 'flex',
+                      padding: '12px 0',
+                      borderBottom: index < recentMessages.length - 1 ? '1px solid #f0f0f0' : 'none'
+                    }}>
+                      <div className="message-avatar" style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ff6600',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '12px',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                      }}>
+                        {message.ownerName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="message-content" style={{ flex: 1 }}>
+                        <div className="message-header" style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '4px'
+                        }}>
+                          <span style={{ fontWeight: '600', fontSize: '14px' }}>
+                            {message.ownerName} - {message.boatName}
+                          </span>
+                          <span style={{ fontSize: '12px', color: '#666' }}>
+                            {new Date(message.replyDate).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                        <p style={{ 
+                          margin: '0', 
+                          fontSize: '14px', 
+                          color: '#333',
+                          lineHeight: '1.4'
+                        }}>
+                          {message.ownerReply}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="message-empty">Aucune réponse de propriétaire pour le moment</p>
+              )}
             </div>
           </div>
           
@@ -247,11 +302,49 @@ const SimpleDashboard = () => {
               ) : upcomingReservations.length > 0 ? (
                 <div className="reservations-list">
                   {upcomingReservations.map((reservation, index) => (
-                    <div key={reservation._id || index} className="reservation-item">
-                      <div className="reservation-info">
-                        <h4>{reservation.boat?.name || 'Bateau'}</h4>
-                        <p>{new Date(reservation.startDate).toLocaleDateString('fr-FR')} - {new Date(reservation.endDate).toLocaleDateString('fr-FR')}</p>
-                        <p className="price">{reservation.price || reservation.totalPrice}€</p>
+                    <div key={reservation._id || index} className="reservation-item" style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px 0',
+                      borderBottom: index < upcomingReservations.length - 1 ? '1px solid #f0f0f0' : 'none'
+                    }}>
+                      <div className="reservation-image" style={{
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '8px',
+                        backgroundColor: '#f8f9fa',
+                        marginRight: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px'
+                      }}>
+                        ⛵
+                      </div>
+                      <div className="reservation-info" style={{ flex: 1 }}>
+                        <h4 style={{ 
+                          margin: '0 0 4px 0', 
+                          fontSize: '16px', 
+                          fontWeight: '600',
+                          color: '#333'
+                        }}>
+                          {reservation.boat?.name || 'Bateau'}
+                        </h4>
+                        <p style={{ 
+                          margin: '0 0 4px 0', 
+                          fontSize: '14px', 
+                          color: '#666'
+                        }}>
+                          {new Date(reservation.startDate).toLocaleDateString('fr-FR')} - {new Date(reservation.endDate).toLocaleDateString('fr-FR')}
+                        </p>
+                        <p className="price" style={{ 
+                          margin: '0', 
+                          fontSize: '14px', 
+                          fontWeight: '600',
+                          color: '#ff6600'
+                        }}>
+                          {reservation.price || reservation.totalPrice}€
+                        </p>
                       </div>
                     </div>
                   ))}
