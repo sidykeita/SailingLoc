@@ -300,7 +300,7 @@ const BoatDetail = () => {
             || source.username
             || (source.email ? String(source.email).split('@')[0] : '')
             || 'Utilisateur';
-          const avatar = source.avatar || source.photo || source.picture || null;
+          const avatar = source.profilePhotoUrl || source.avatar || source.photo || source.picture || null;
           const baseUser = (typeof r.user === 'object' && r.user !== null) ? r.user : {};
           return {
             ...r,
@@ -545,7 +545,7 @@ const BoatDetail = () => {
                   </div>
                 )}
                 {disabledDates?.length > 0 && (
-                  <p className="text-sm text-gray-500 mt-2">Les dates grisées / barrées sont indisponibles.</p>
+                  <p className="text-sm text-gray-500 mt-2">Les dates grisées sont indisponibles.</p>
                 )}
                 {selectionContainsDisabled((dateRange && dateRange[0]) || {}) && (
                   <p className="text-sm text-red-600 mt-1">Votre sélection inclut des jours indisponibles (réservés ou bloqués).</p>
@@ -641,8 +641,8 @@ const BoatDetail = () => {
                       || (r.user?.email ? String(r.user.email).split('@')[0] : '')
                       || 'Utilisateur';
                     const avatar = r.reviewerAvatar 
-                      || r.reservation?.user?.avatar || r.reservation?.user?.photo || r.reservation?.user?.picture
-                      || r.user?.avatar || r.user?.photo || r.user?.picture 
+                      || r.reservation?.user?.profilePhotoUrl || r.reservation?.user?.avatar || r.reservation?.user?.photo || r.reservation?.user?.picture
+                      || r.user?.profilePhotoUrl || r.user?.avatar || r.user?.photo || r.user?.picture 
                       || null;
                     const initials = name.split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0,2).toUpperCase();
                     const created = new Date(r.createdAt || r.date || Date.now()).toLocaleDateString('fr-FR');
