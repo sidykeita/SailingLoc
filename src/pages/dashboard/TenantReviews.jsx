@@ -544,6 +544,7 @@ const TenantReviews = () => {
                   </div>
 
                   <div className="review-actions">
+                    <span>Réponse propriétaire</span>
                     <Link className="action-btn" to={review.booking.boatId ? `/boats/${review.booking.boatId}` : '#'}>
                       <FontAwesomeIcon icon={faEye} />
                       Voir l'annonce
