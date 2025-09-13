@@ -157,34 +157,34 @@ const TenantReviews = () => {
           .filter(r => r.ownerResponse && r.ownerResponse.text)
           .map(r => mapToCard(r, 'received'));
 
-        // Enrichir les infos du propriétaire (owner) des avis reçus en s'inspirant des avis donnés
-        const ownerIds = Array.from(new Set(
-          receivedCards.map(c => c.owner?.id).filter(Boolean)
+        // Enrichir les infos du locataire (reviewer) des avis reçus en s'inspirant des avis donnés
+        const reviewerIdsReceived = Array.from(new Set(
+          receivedCards.map(c => c.reviewer?.id).filter(Boolean)
         ));
         let receivedEnriched = receivedCards;
-        if (ownerIds.length > 0) {
+        if (reviewerIdsReceived.length > 0) {
           try {
-            const owners = await Promise.all(
-              ownerIds.map(id => userService.getUserById(id).catch(() => null))
+            const users = await Promise.all(
+              reviewerIdsReceived.map(id => userService.getUserById(id).catch(() => null))
             );
-            const ownersMap = owners.filter(Boolean).reduce((acc, u) => {
+            const usersMap = users.filter(Boolean).reduce((acc, u) => {
               const uid = u._id || u.id;
               if (uid) acc[uid] = u;
               return acc;
             }, {});
             receivedEnriched = receivedCards.map(c => {
-              const oid = c.owner?.id;
-              const u = oid ? ownersMap[oid] : null;
+              const uid = c.reviewer?.id;
+              const u = uid ? usersMap[uid] : null;
               if (!u) return c;
-              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name;
-              const memberSince = u.createdAt ? new Date(u.createdAt).getFullYear() : '—';
+              const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.name || 'Utilisateur';
+              const signupDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('fr-FR') : '—';
               return {
                 ...c,
-                owner: {
-                  ...c.owner,
+                reviewer: {
+                  ...c.reviewer,
                   name: fullName,
-                  avatar: u.profilePhotoUrl || u.avatar || u.photo || c.owner?.avatar || profileImage,
-                  memberSince,
+                  avatar: u.profilePhotoUrl || u.avatar || u.photo || c.reviewer?.avatar || profileImage,
+                  memberSince: signupDate,
                 }
               };
             });
@@ -434,10 +434,10 @@ const TenantReviews = () => {
                   <div className="review-header">
                     <div className="reviewer-info">
                       <div className="reviewer-avatar" style={{overflow: 'hidden'}}>
-                        {review.owner.avatar ? (
+                        {review.reviewer.avatar ? (
                           <img 
-                            src={review.owner.avatar} 
-                            alt={review.owner.name}
+                            src={review.reviewer.avatar} 
+                            alt={review.reviewer.name}
                             style={{width: '100%', height: '100%', objectFit: 'cover'}}
                             onError={(e) => {
                               e.target.style.display = 'none';
@@ -445,13 +445,13 @@ const TenantReviews = () => {
                             }}
                           />
                         ) : null}
-                        <div style={{display: review.owner.avatar ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
-                          {review.owner.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        <div style={{display: review.reviewer.avatar ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+                          {review.reviewer.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </div>
                       </div>
                       <div className="reviewer-details">
                         <h4>{review.reviewer.name}</h4>
-                        <span>Membre depuis {review.reviewer.memberSince}</span>
+                        <span>Locataire depuis {review.reviewer.memberSince}</span>
                       </div>
                     </div>
                     <div className="review-meta">
