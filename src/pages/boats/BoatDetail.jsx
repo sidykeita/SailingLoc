@@ -352,8 +352,8 @@ const BoatDetail = () => {
     const isBlocked = blockedDates.some(b => {
       const bStart = new Date(b.startDate);
       const bEnd = new Date(b.endDate);
-      // Logique stricte identique (adjacent autorisé)
-      return (s < bEnd && eD > bStart);
+      // Logique inclusive pour les dates bloquées (aucune réservation autorisée sur les dates bloquées)
+      return (s <= bEnd && eD >= bStart);
     });
     if (isBlocked) {
       setError("Ces dates sont bloquées par le propriétaire. Veuillez choisir d'autres dates.");

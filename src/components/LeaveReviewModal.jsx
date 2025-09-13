@@ -186,10 +186,6 @@ const LeaveReviewModal = ({ open, onClose, boat, onSubmit, userId, onSuccess }) 
               <div className="text-xs text-gray-400">{comment.length}/1000 caractères</div>
             </div>
 
-            <div className="mb-4">
-              <label className="font-medium">Ajouter des photos (optionnel)</label>
-              <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="block mt-1" />
-            </div>
 
             {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
             {success && <div className="text-green-600 text-sm mb-2">{success}</div>}

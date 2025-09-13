@@ -10,6 +10,8 @@ import userService from '../../services/user.service';
 import EditProfileModal from '../../components/EditProfileModal';
 import ViewProfileModal from '../../components/ViewProfileModal';
 import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
+import reservationService from '../../backup/reservationService.js';
+import reviewService from '../../services/review.service.js';
 
 const SimpleDashboard = () => {
   const { currentUser, logout, userRole, switchRole } = useAuth();
@@ -51,6 +53,11 @@ const SimpleDashboard = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   
+  // Dashboard data
+  const [upcomingReservations, setUpcomingReservations] = useState([]);
+  const [recentMessages, setRecentMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   // Initialiser l'URL de photo depuis l'utilisateur ou le localStorage pour persister après refresh
   useEffect(() => {
     const uid = currentUser?._id || currentUser?.id;
@@ -58,6 +65,39 @@ const SimpleDashboard = () => {
     const initial = currentUser?.profilePhotoUrl || stored || null;
     setPhotoUrl(initial);
   }, [currentUser?._id, currentUser?.profilePhotoUrl]);
+
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!currentUser) return;
+      
+      setLoading(true);
+      try {
+        // Fetch upcoming reservations
+        const reservations = await reservationService.getMyReservations();
+        const upcoming = reservations
+          .filter(res => {
+            const startDate = new Date(res.startDate);
+            const now = new Date();
+            return startDate > now && res.status === 'confirmed';
+          })
+          .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+          .slice(0, 2);
+        
+        setUpcomingReservations(upcoming);
+        
+        // For now, keep messages empty as per previous implementation
+        setRecentMessages([]);
+        
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [currentUser]);
 
   // Fonction pour gérer la déconnexion
   const handleLogout = async () => {
@@ -202,7 +242,23 @@ const SimpleDashboard = () => {
               <h3 className="card-title">Locations à venir</h3>
             </div>
             <div className="card-body">
-              <p className="location-empty">Vos 2 prochaines réservations apparaîtront ici</p>
+              {loading ? (
+                <p className="location-empty">Chargement...</p>
+              ) : upcomingReservations.length > 0 ? (
+                <div className="reservations-list">
+                  {upcomingReservations.map((reservation, index) => (
+                    <div key={reservation._id || index} className="reservation-item">
+                      <div className="reservation-info">
+                        <h4>{reservation.boat?.name || 'Bateau'}</h4>
+                        <p>{new Date(reservation.startDate).toLocaleDateString('fr-FR')} - {new Date(reservation.endDate).toLocaleDateString('fr-FR')}</p>
+                        <p className="price">{reservation.price || reservation.totalPrice}€</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="location-empty">Vos 2 prochaines réservations apparaîtront ici</p>
+              )}
             </div>
           </div>
           

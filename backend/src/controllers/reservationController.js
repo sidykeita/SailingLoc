@@ -60,14 +60,14 @@ exports.createReservation = async (req, res) => {
       return res.status(409).json({ message: 'Chevauchement avec une autre réservation confirmée' });
     }
 
-    // 2) Conflit avec des périodes bloquées (logique stricte; adjacent autorisé)
+    // 2) Conflit avec des périodes bloquées (logique inclusive pour les dates bloquées)
     const BlockedDate = require('../models/blockedDate');
     const overlappingBlock = await BlockedDate.findOne({
       boat: boatId,
       $expr: {
         $and: [
-          { $lt: ['$startDate', e] },
-          { $gt: ['$endDate', s] }
+          { $lte: ['$startDate', e] },
+          { $gte: ['$endDate', s] }
         ]
       }
     });

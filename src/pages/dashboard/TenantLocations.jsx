@@ -328,6 +328,24 @@ const TenantLocations = () => {
           </div>
 
 
+          {/* Filtre de statut */}
+          <div className="filter-section">
+            <div className="filter-group">
+              <label htmlFor="status-filter">Filtrer par statut :</label>
+              <select 
+                id="status-filter"
+                value={statusFilter} 
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">Tous les statuts</option>
+                <option value="pending">En attente</option>
+                <option value="confirmed">Confirmées</option>
+                <option value="cancelled">Annulées</option>
+              </select>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="stats-cards">
             <div className="stat-card">
