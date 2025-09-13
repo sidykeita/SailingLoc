@@ -86,19 +86,85 @@ exports.getAvailableBoats = async (req, res) => {
     // N'afficher que les bateaux louables
     boatFilters.status = 'disponible';
 
-    // Réservations qui se chevauchent avec la période demandée
-    // Overlap si: startDate <= end ET endDate >= start
-    const overlapping = await Reservation.find({
+    // Récupérer toutes les réservations confirmées pour calculer les jours occupés
+    const reservations = await Reservation.find({
       status: 'confirmed',
       startDate: { $lte: endDate },
       endDate: { $gte: startDate },
-    }).select('boat');
+    }).select('boat startDate endDate');
 
-    const excluded = new Set(overlapping.map(r => String(r.boat)));
+    // Grouper les réservations par bateau
+    const reservationsByBoat = {};
+    reservations.forEach(r => {
+      const boatId = String(r.boat);
+      if (!reservationsByBoat[boatId]) reservationsByBoat[boatId] = [];
+      reservationsByBoat[boatId].push(r);
+    });
 
     const boats = await Boat.find(boatFilters).populate('owner', 'firstName lastName');
-    // Exclure les bateaux ayant des réservations qui se chevauchent
-    let available = boats.filter(b => !excluded.has(String(b._id)));
+    
+    // Fonction pour vérifier si un bateau a des jours disponibles dans la période
+    const hasAvailableDays = (boat) => {
+      const boatId = String(boat._id);
+      const boatReservations = reservationsByBoat[boatId] || [];
+      
+      // Générer tous les jours de la période demandée
+      const requestedDays = [];
+      const current = new Date(startDate);
+      while (current <= endDate) {
+        requestedDays.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+      }
+      
+      // Vérifier chaque jour
+      for (const day of requestedDays) {
+        let dayAvailable = true;
+        
+        // Vérifier si le jour est réservé
+        for (const res of boatReservations) {
+          const resStart = new Date(res.startDate);
+          const resEnd = new Date(res.endDate);
+          if (day >= resStart && day <= resEnd) {
+            dayAvailable = false;
+            break;
+          }
+        }
+        
+        // Vérifier les unavailableDates du bateau
+        if (dayAvailable && boat.unavailableDates) {
+          const dayStr = day.toISOString().slice(0, 10);
+          const ud = boat.unavailableDates;
+          
+          if (Array.isArray(ud)) {
+            for (const entry of ud) {
+              if (typeof entry === 'string' && entry === dayStr) {
+                dayAvailable = false;
+                break;
+              } else if (entry && typeof entry === 'object') {
+                if (entry.startDate && entry.endDate) {
+                  const s = new Date(entry.startDate);
+                  const e = new Date(entry.endDate);
+                  if (day >= s && day <= e) {
+                    dayAvailable = false;
+                    break;
+                  }
+                } else if (entry.date === dayStr) {
+                  dayAvailable = false;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        
+        // Si au moins un jour est disponible, le bateau est disponible
+        if (dayAvailable) return true;
+      }
+      
+      return false; // Aucun jour disponible
+    };
+    
+    let available = boats.filter(hasAvailableDays);
 
     // Exclure également selon unavailableDates définies sur le bateau
     const overlaps = (aStart, aEnd, bStart, bEnd) => (aStart <= bEnd && aEnd >= bStart);

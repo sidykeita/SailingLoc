@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { uploadIdCard } from '../services/idCardUpload';
 
-export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, currentSiret, currentSiren, onSave }) {
+export default function EditProfileModal({ isOpen, onClose, currentEmail, currentPhone, currentSiret, currentSiren, ownerStatus, onSave }) {
   const [email, setEmail] = useState(currentEmail || '');
   const [phone, setPhone] = useState(currentPhone || '');
   const [siret, setSiret] = useState(currentSiret || '');
@@ -69,32 +69,34 @@ export default function EditProfileModal({ isOpen, onClose, currentEmail, curren
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-600 mb-1">SIRET</label>
-              <input
-                type="text"
-                className="w-full border rounded px-3 py-2"
-                value={siret}
-                onChange={e => setSiret(e.target.value)}
-                placeholder="14 chiffres"
-                maxLength={14}
-              />
-              <p className="text-xs text-gray-500 mt-1">Optionnel. 14 chiffres sans espaces</p>
+          {ownerStatus === 'professionnel' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-600 mb-1">SIRET</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={siret}
+                  onChange={e => setSiret(e.target.value)}
+                  placeholder="14 chiffres"
+                  maxLength={14}
+                />
+                <p className="text-xs text-gray-500 mt-1">Optionnel. 14 chiffres sans espaces</p>
+              </div>
+              <div>
+                <label className="block text-gray-600 mb-1">SIREN</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={siren}
+                  onChange={e => setSiren(e.target.value)}
+                  placeholder="9 chiffres"
+                  maxLength={9}
+                />
+                <p className="text-xs text-gray-500 mt-1">Optionnel. 9 chiffres sans espaces</p>
+              </div>
             </div>
-            <div>
-              <label className="block text-gray-600 mb-1">SIREN</label>
-              <input
-                type="text"
-                className="w-full border rounded px-3 py-2"
-                value={siren}
-                onChange={e => setSiren(e.target.value)}
-                placeholder="9 chiffres"
-                maxLength={9}
-              />
-              <p className="text-xs text-gray-500 mt-1">Optionnel. 9 chiffres sans espaces</p>
-            </div>
-          </div>
+          )}
           <div>
             <label className="block text-gray-600 mb-1">Carte d'identité</label>
             <input
