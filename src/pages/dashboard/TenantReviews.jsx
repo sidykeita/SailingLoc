@@ -94,7 +94,7 @@ const TenantReviews = () => {
             },
             owner: {
               id: ownerId,
-              name: ownerObj.firstName ? `${ownerObj.firstName} ${ownerObj.lastName || ''}`.trim() : (ownerObj.name ),
+              name: ownerObj.firstName ? `${ownerObj.firstName} ${ownerObj.lastName || ''}`.trim() : (ownerObj.name || 'Locataire'),
               avatar: ownerObj.avatar || ownerObj.photo || profileImage,
               memberSince: (ownerObj.createdAt ? new Date(ownerObj.createdAt).getFullYear() : '—')
             },
