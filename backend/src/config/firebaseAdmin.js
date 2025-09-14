@@ -1,3 +1,22 @@
+// Mock firebase-admin in test environment
+if (process.env.NODE_ENV === 'test') {
+  module.exports = {
+    initializeApp: () => {},
+    apps: [],
+    credential: { cert: () => {} },
+    storage: () => ({
+      bucket: () => ({
+        file: () => ({
+          save: () => Promise.resolve(),
+          delete: () => Promise.resolve(),
+          getSignedUrl: () => Promise.resolve(['https://example.com/file.pdf'])
+        })
+      })
+    })
+  };
+  return;
+}
+
 const admin = require('firebase-admin');
 
 // Avoid re-initialization in dev/hot-reload

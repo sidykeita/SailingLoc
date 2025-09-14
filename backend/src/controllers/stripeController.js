@@ -2,15 +2,17 @@ const Stripe = require('stripe');
 const Reservation = require('../models/reservation');
 const Payment = require('../models/payment');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
-});
+// Resolve Stripe instance at call time (ensures tests can inject global.__stripeMock)
+function resolveStripe() {
+  if (process.env.NODE_ENV === 'test' && global.__stripeMock) return global.__stripeMock;
+  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
+}
 
 // Create a Checkout Session for a reservation/boat payment
 // Expects: { amount, currency, description, metadata }
 exports.createCheckoutSession = async (req, res) => {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
+    if (process.env.NODE_ENV !== 'test' && !process.env.STRIPE_SECRET_KEY) {
       console.error('[Stripe] STRIPE_SECRET_KEY manquante');
       return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
     }
@@ -27,6 +29,7 @@ exports.createCheckoutSession = async (req, res) => {
     const successRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=cancel`;
 
+    const stripe = resolveStripe();
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -60,7 +63,7 @@ exports.createCheckoutSession = async (req, res) => {
 // Route: POST /api/stripe/reservations/:id/checkout
 exports.createReservationCheckoutSession = async (req, res) => {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
+    if (process.env.NODE_ENV !== 'test' && !process.env.STRIPE_SECRET_KEY) {
       console.error('[Stripe] STRIPE_SECRET_KEY manquante');
       return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
     }
@@ -128,6 +131,7 @@ exports.createReservationCheckoutSession = async (req, res) => {
 // Confirm payment manually using session_id (alternative to webhook)
 exports.confirmPayment = async (req, res) => {
   try {
+    const stripe = resolveStripe();
     const { session_id } = req.query;
     if (!session_id) return res.status(400).json({ message: 'session_id requis' });
 
@@ -205,6 +209,7 @@ exports.confirmPayment = async (req, res) => {
 
 // Stripe Webhook handler (must use express.raw on the route)
 exports.webhook = async (req, res) => {
+  const stripe = resolveStripe();
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
