@@ -1,3 +1,4 @@
+// Fichier supprimé - ownerDocs remplacé par contractual-documents
 // const express = require('express');
 // const router = express.Router();
 // const ownerDocsController = require('../controllers/ownerDocs.controller');

@@ -1,30 +1,7 @@
 const ContractualDocument = require('../models/contractualDocument');
 const admin = require('../config/firebaseAdmin');
-let multer;
-try {
-  // eslint-disable-next-line global-require
-  multer = require('multer');
-} catch (e) {
-  if (process.env.NODE_ENV === 'test') {
-    // Minimal stub for tests to avoid installing multer
-    multer = function () {
-      return {
-        single: () => (req, res, next) => next(),
-      };
-    };
-    multer.memoryStorage = () => ({ /* noop storage */ });
-  } else {
-    throw e;
-  }
-}
-let uuidv4;
-try {
-  // eslint-disable-next-line global-require
-  uuidv4 = require('uuid').v4;
-} catch (e) {
-  // Lightweight fallback for tests when uuid is not installed
-  uuidv4 = () => `uuid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-}
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 // Configuration multer pour l'upload en mémoire
 const upload = multer({

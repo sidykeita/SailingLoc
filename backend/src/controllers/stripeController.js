@@ -2,17 +2,9 @@ const Stripe = require('stripe');
 const Reservation = require('../models/reservation');
 const Payment = require('../models/payment');
 
-// Lazily resolve Stripe client. In tests, set global.__stripeMock to bypass real SDK
-const getStripe = () => {
-  const g = typeof globalThis !== 'undefined' ? globalThis : global;
-  if (process.env.NODE_ENV === 'test' && g.__stripeMock) return g.__stripeMock;
-  if (!g.__stripeReal) {
-    g.__stripeReal = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-06-20',
-    });
-  }
-  return g.__stripeReal;
-};
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-06-20',
+});
 
 // Create a Checkout Session for a reservation/boat payment
 // Expects: { amount, currency, description, metadata }
@@ -35,7 +27,7 @@ exports.createCheckoutSession = async (req, res) => {
     const successRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelRedirect = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=cancel`;
 
-    const session = await getStripe().checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -96,7 +88,7 @@ exports.createReservationCheckoutSession = async (req, res) => {
     const successTenant = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelTenant = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/locations?status=cancel`;
 
-    const session = await getStripe().checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -140,7 +132,7 @@ exports.confirmPayment = async (req, res) => {
     if (!session_id) return res.status(400).json({ message: 'session_id requis' });
 
     // 1) Récupérer la session Stripe
-    const session = await getStripe().checkout.sessions.retrieve(session_id);
+    const session = await stripe.checkout.sessions.retrieve(session_id);
     if (session.payment_status !== 'paid') {
       return res.status(400).json({ message: 'Paiement non confirmé' });
     }
@@ -149,7 +141,7 @@ exports.confirmPayment = async (req, res) => {
     let reservationId = session.metadata?.reservationId;
     if (!reservationId && session.payment_intent) {
       try {
-        const intent = await getStripe().paymentIntents.retrieve(session.payment_intent);
+        const intent = await stripe.paymentIntents.retrieve(session.payment_intent);
         reservationId = intent?.metadata?.reservationId || reservationId;
       } catch (_) {}
     }
@@ -218,7 +210,7 @@ exports.webhook = async (req, res) => {
 
   let event;
   try {
-    event = getStripe().webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
     console.error('Webhook signature verification failed.', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -271,7 +263,7 @@ exports.webhook = async (req, res) => {
           // Fallback: si pas de reservationId dans le PaymentIntent, tenter de récupérer la Checkout Session liée
           if (!reservationId) {
             try {
-              const sessions = await getStripe().checkout.sessions.list({ payment_intent: intent.id, limit: 1 });
+              const sessions = await stripe.checkout.sessions.list({ payment_intent: intent.id, limit: 1 });
               const linkedSession = sessions?.data?.[0];
               if (linkedSession?.metadata?.reservationId) {
                 reservationId = linkedSession.metadata.reservationId;

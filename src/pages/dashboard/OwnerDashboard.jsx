@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import ReservationDetailModal from '../../components/ReservationDetailModal';
 import EditProfileModal from '../../components/EditProfileModal';
 import ViewProfileModal from '../../components/ViewProfileModal';
-import OwnerDocsSection from '../../components/OwnerDocsSection';
 import userService from '../../services/user.service';
 import { uploadProfilePhoto } from '../../services/profilePhotoUpload';
 import HeaderDashboard from '../../components/HeaderDashboard';
@@ -457,10 +456,7 @@ const [deleteDone, setDeleteDone] = useState(false);
           </div>
         </div>
 
-        {/* Section documents contractuels */}
-        <div className="md:col-span-2">
-          <OwnerDocsSection ownerId={currentUser?._id} token={localStorage.getItem('token')} />
-        </div>
+        {/* Section documents contractuels - maintenant géré par contractual-documents */}
 
         {/* Demandes de réservation */}
         <div className="card p-6 mt-8">

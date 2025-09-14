@@ -1,31 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-
-// Mocks (avant import de App)
-vi.mock('../config/recaptcha', () => ({ RECAPTCHA_SITE_KEY: 'test-key', isRecaptchaEnabled: false }));
-vi.mock('../lib/api', () => ({ API_URL: 'http://localhost:5000/api' }));
-vi.mock('../services/firebase.js', () => ({ storage: {} }));
-vi.mock('../firebase', () => ({ storage: {} }));
-vi.mock('firebase/storage', () => ({ ref: vi.fn(), uploadBytes: vi.fn(), getDownloadURL: vi.fn() }));
-vi.mock('../pages/auth/Login.jsx', () => ({ default: () => null }));
-vi.mock('../pages/boats/AddBoat.jsx', () => ({ default: () => null }));
-vi.mock('../pages/boats/EditBoat.jsx', () => ({ default: () => null }));
-vi.mock('../pages/dashboard/SimpleDashboard.jsx', () => ({ default: () => null }));
-vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ currentUser: null, userRole: 'tenant', loading: false, logout: vi.fn(), switchRole: vi.fn() }),
-}));
-
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import App from '../App';
 
 // Test simple pour vérifier que l'App se charge correctement
 describe('App Component', () => {
   it('devrait se rendre sans erreur', () => {
+    // Envelopper App dans BrowserRouter car il utilise probablement des routes
     render(
-      <MemoryRouter initialEntries={["/"]}>
+      <BrowserRouter>
         <App />
-      </MemoryRouter>
+      </BrowserRouter>
     );
+    
+    // Vérification simple que l'application se charge
     expect(document.body).toBeDefined();
   });
 });

@@ -31,4 +31,4 @@ const contractualDocumentSchema = new mongoose.Schema({
 // Index composé pour éviter les doublons (un seul document par type par utilisateur)
 contractualDocumentSchema.index({ userId: 1, documentType: 1 }, { unique: true });
 
-module.exports = mongoose.models.ContractualDocument || mongoose.model('ContractualDocument', contractualDocumentSchema);
+module.exports = mongoose.model('ContractualDocument', contractualDocumentSchema);
