@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
+<<<<<<< HEAD
 // In-memory favorites state and mocked User model
 const state = { favorites: [] };
 vi.mock('../../src/models/user', () => {
@@ -27,6 +28,9 @@ vi.mock('../../src/models/user', () => {
   };
   return { default: api, ...api };
 });
+=======
+const userId = '507f1f77bcf86cd799439011';
+>>>>>>> acbb43b (update test)
 
 let app;
 let token;

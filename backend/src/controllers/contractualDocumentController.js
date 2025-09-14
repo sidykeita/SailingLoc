@@ -1,5 +1,54 @@
-const ContractualDocument = require('../models/contractualDocument');
+let ContractualDocument;
 const admin = require('../config/firebaseAdmin');
+
+// In test environment, replace ContractualDocument model with an in-memory stub
+if (process.env.NODE_ENV === 'test') {
+  const store = [];
+  let seq = 1;
+  class InMemoryContractualDocument {
+    constructor(data) {
+      Object.assign(this, data);
+      this._id = this._id || `doc${seq++}`;
+      this.uploadedAt = this.uploadedAt || new Date();
+    }
+    async save() {
+      const idx = store.findIndex(d => d._id === this._id);
+      if (idx >= 0) store[idx] = this; else store.push(this);
+      return this;
+    }
+    static find(query = {}) {
+      const filtered = store.filter(d =>
+        (query.userId ? (d.userId?.toString?.() || d.userId) == (query.userId?.toString?.() || query.userId) : true)
+      );
+      return {
+        sort: (_spec) => filtered.sort((a, b) => (b.uploadedAt?.getTime?.() || 0) - (a.uploadedAt?.getTime?.() || 0))
+      };
+    }
+    static async findOne(query = {}) {
+      return store.find(d =>
+        (query._id ? (d._id?.toString?.() || d._id) == (query._id?.toString?.() || query._id) : true) &&
+        (query.userId ? (d.userId?.toString?.() || d.userId) == (query.userId?.toString?.() || query.userId) : true) &&
+        (query.documentType ? d.documentType === query.documentType : true)
+      ) || null;
+    }
+    static async findOneAndDelete(query = {}) {
+      const idx = store.findIndex(d =>
+        (query.userId ? (d.userId?.toString?.() || d.userId) == (query.userId?.toString?.() || query.userId) : true) &&
+        (query.documentType ? d.documentType === query.documentType : true)
+      );
+      if (idx >= 0) { const [removed] = store.splice(idx, 1); return removed; }
+      return null;
+    }
+    static async findByIdAndDelete(id) {
+      const idx = store.findIndex(d => (d._id?.toString?.() || d._id) == (id?.toString?.() || id));
+      if (idx >= 0) { const [removed] = store.splice(idx, 1); return removed; }
+      return null;
+    }
+  }
+  ContractualDocument = InMemoryContractualDocument;
+} else {
+  ContractualDocument = require('../models/contractualDocument');
+}
 
 // Multer (real or test-friendly mock)
 let multer;

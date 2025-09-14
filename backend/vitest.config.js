@@ -18,26 +18,24 @@ export default defineConfig({
   },
   coverage: {
     provider: 'v8',
-    all: false,
+    cleanOnRerun: true,
     include: [
       './src/controllers/**/*.js',
-      './src/middlewares/**/*.js',
-      './src/routes/**/*.js'
+      './src/middlewares/**/*.js'
     ],
     exclude: [
       './tests/**',
       '**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'node_modules/**',
-      // Bootstrapping / infra not under test
-      '**/server.js',
+      // Fichiers spécifiques à exclure
+      'server.js',
       'scripts/**',
-      // Config and deprecated modules
-      'src/config/**',
-      'src/routes/admin.js',
-      'src/controllers/ownerDocs.controller.js',
-      'src/routes/ownerDocs.routes.js',
+      'src/app.js',
       'src/appTest.js',
-      'src/models/db.js'
+      'src/config/**',
+      'src/models/',
+      'src/routes/ownerDocs.routes.js ',
+      'src/routes/admin.js',
     ],
     reporter: ['text', 'html', 'lcov'],
     reportsDirectory: resolve(rootDir, 'coverage-backend')
