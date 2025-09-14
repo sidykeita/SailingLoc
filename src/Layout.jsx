@@ -264,7 +264,7 @@ const Layout = ({ children }) => {
               <a href="https://www.instagram.com/sailingloc2025/" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={instaIcon} alt="Instagram" />
               </a>
-              <a href="#" className="social-icon" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.tiktok.com/@sailingloc23?_t=ZN-8zj9oECL8VS&_r=1" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={tiktokIcon} alt="TikTok" />
               </a>
             </div>
