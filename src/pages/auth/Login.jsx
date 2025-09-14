@@ -9,7 +9,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { RECAPTCHA_SITE_KEY, isRecaptchaEnabled } from '../../config/recaptcha';
 
 const Login = () => {
-  const [email, setEmail] = useState('c.line2110@hotmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

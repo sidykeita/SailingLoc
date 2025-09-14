@@ -24,4 +24,4 @@ technicalSpecs: {             // caractéristiques techniques
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
-module.exports = mongoose.model('Boat', boatSchema);
+module.exports = mongoose.models.Boat || mongoose.model('Boat', boatSchema);

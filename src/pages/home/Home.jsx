@@ -423,8 +423,8 @@ const Home = () => {
                 <div className="testimonial-header">
                   <img src={profileImg1} alt="Jean" className="profile-image" />
                   <div className="profile-info">
-                    <h3>Jean</h3>
-                    <p>Paris<br />Location voilier Beneteau Oceanis 45 à Marseille</p>
+                    <h3>Jean michel</h3>
+                    <p>Bastia<br />Location voilier Beneteau Oceanis 30.1</p>
                   </div>
                 </div>
                 <div className="testimonial-content">
@@ -447,8 +447,8 @@ const Home = () => {
                 <div className="testimonial-header">
                   <img src={profileImg2} alt="Fanny" className="profile-image" />
                   <div className="profile-info">
-                    <h3>Fanny</h3>
-                    <p>Marseille<br />Location bateau Bayliner E42 Cuddy à Cavalaire-sur-Mer</p>
+                    <h3>Fanny Chancelle</h3>
+                    <p>Alicante<br/>Location bateau Princess V40 à Alicante</p>
                   </div>
                 </div>
                 <div className="testimonial-content">
@@ -471,8 +471,8 @@ const Home = () => {
                 <div className="testimonial-header">
                   <img src={profileImg3} alt="Mathieu" className="profile-image" />
                   <div className="profile-info">
-                    <h3>Mathieu</h3>
-                    <p>Lille<br />Location voilier Jeanneau Dufay à La Seyne-sur-Mer</p>
+                    <h3>Mathieu lucet</h3>
+                    <p>Bastia<br />Location voilier Beneteau Oceanis 30.1</p>
                   </div>
                 </div>
                 <div className="testimonial-content">

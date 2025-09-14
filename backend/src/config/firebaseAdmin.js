@@ -1,4 +1,20 @@
-const admin = require('firebase-admin');
+// Provide a lightweight mock during tests to avoid requiring the real SDK
+let admin;
+if (process.env.NODE_ENV === 'test') {
+  admin = {
+    apps: [],
+    initializeApp() {
+      this.apps.push({ name: 'mock-app' });
+      return this.apps[0];
+    },
+    credential: { cert() { return {}; } },
+    storage() { return { bucket() { return {}; } }; },
+  };
+} else {
+  // Only require the heavy SDK outside of tests
+  // eslint-disable-next-line global-require
+  admin = require('firebase-admin');
+}
 
 // Avoid re-initialization in dev/hot-reload
 if (!admin.apps || !admin.apps.length) {

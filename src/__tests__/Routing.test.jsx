@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mocks (avant import de App)
+// Mocks avant import d'App
 vi.mock('../config/recaptcha', () => ({ RECAPTCHA_SITE_KEY: 'test-key', isRecaptchaEnabled: false }));
 vi.mock('../lib/api', () => ({ API_URL: 'http://localhost:5000/api' }));
 vi.mock('../services/firebase.js', () => ({ storage: {} }));
@@ -12,20 +12,28 @@ vi.mock('../pages/auth/Login.jsx', () => ({ default: () => null }));
 vi.mock('../pages/boats/AddBoat.jsx', () => ({ default: () => null }));
 vi.mock('../pages/boats/EditBoat.jsx', () => ({ default: () => null }));
 vi.mock('../pages/dashboard/SimpleDashboard.jsx', () => ({ default: () => null }));
-vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ currentUser: null, userRole: 'tenant', loading: false, logout: vi.fn(), switchRole: vi.fn() }),
-}));
+vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ currentUser: null, userRole: 'tenant', loading: false }) }));
+// Mock Home pour une assertion simple
+vi.mock('../pages/home/Home.jsx', () => ({ default: () => <div>Accueil</div> }));
 
 import App from '../App';
 
-// Test simple pour vérifier que l'App se charge correctement
-describe('App Component', () => {
-  it('devrait se rendre sans erreur', () => {
+describe('Routing (smoke)', () => {
+  it('affiche Accueil sur la route /', () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
       </MemoryRouter>
     );
-    expect(document.body).toBeDefined();
+    expect(screen.getByText('Accueil')).toBeInTheDocument();
+  });
+
+  it('redirige les routes inconnues vers / (Accueil)', () => {
+    render(
+      <MemoryRouter initialEntries={["/route-inconnue"]}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('Accueil')).toBeInTheDocument();
   });
 });

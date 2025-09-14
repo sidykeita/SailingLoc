@@ -156,3 +156,16 @@ dist-ssr
 *.sln
 *.sw?
 >>>>>>> feat/reservation
+
+# Playwright / E2E artifacts
+playwright-report/
+test-results/
+
+# Backend coverage artifacts
+coverage-backend/
+
+# Vite cache (if generated)
+.vite/
+
+# Local test fixtures not needed in VCS
+tests/fixtures/*.pdf
