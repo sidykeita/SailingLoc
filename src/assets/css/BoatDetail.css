@@ -2,7 +2,7 @@
 
 /* Style général de la page */
 .boat-detail-container {
-  background-color: #e1e1e1; /* Gris légèrement plus foncé */
+  background-color: #d7d7d7; /* Gris légèrement plus foncé */
   min-height: 100vh;
   padding-top: 100px !important; /* Ajout d'un padding-top pour éviter le chevauchement avec le menu */
 }
