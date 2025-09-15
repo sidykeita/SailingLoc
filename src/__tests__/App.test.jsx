@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '../contexts/AuthContext';
 import App from '../App';
 
 // Test simple pour vérifier que l'App se charge correctement
@@ -10,7 +11,9 @@ describe('App Component', () => {
     // Envelopper App dans BrowserRouter car il utilise probablement des routes
     render(
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>
     );
     

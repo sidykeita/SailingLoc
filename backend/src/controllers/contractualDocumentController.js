@@ -82,13 +82,22 @@ if (process.env.NODE_ENV === 'test') {
   }
 }
 
-// Mock uuid in test environment
+// UUID generation helper resilient to missing deps
 let uuidv4;
 if (process.env.NODE_ENV === 'test') {
   uuidv4 = () => 'test-uuid-123';
 } else {
-  const { v4 } = require('uuid');
-  uuidv4 = v4;
+  try {
+    const { v4 } = require('uuid');
+    uuidv4 = v4;
+  } catch (_e) {
+    try {
+      const { randomUUID } = require('crypto');
+      uuidv4 = () => randomUUID();
+    } catch (_e2) {
+      uuidv4 = () => Math.random().toString(36).slice(2);
+    }
+  }
 }
 
 // Configuration middleware d'upload

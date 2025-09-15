@@ -11,6 +11,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.js'],
     include: ['./tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    exclude: ['../tests/e2e/**', '../../tests/e2e/**', '../src/**', '../../src/**', 'node_modules/**'],
     watchExclude: ['**/e2e/**', '../tests/e2e/**'],
     env: {
       NODE_ENV: 'test'

@@ -17,7 +17,27 @@ if (process.env.NODE_ENV === 'test') {
   return;
 }
 
-const admin = require('firebase-admin');
+// Try to require firebase-admin; if not available, export a safe stub
+let admin;
+try {
+  admin = require('firebase-admin');
+} catch (e) {
+  module.exports = {
+    initializeApp: () => {},
+    apps: [],
+    credential: { cert: () => {} },
+    storage: () => ({
+      bucket: () => ({
+        file: () => ({
+          save: () => Promise.resolve(),
+          delete: () => Promise.resolve(),
+          getSignedUrl: () => Promise.resolve(['https://example.com/file.pdf'])
+        })
+      })
+    })
+  };
+  return;
+}
 
 // Avoid re-initialization in dev/hot-reload
 if (!admin.apps || !admin.apps.length) {

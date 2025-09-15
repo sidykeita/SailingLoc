@@ -1,6 +1,14 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import request from 'supertest';
 
+// Ensure Stripe mock exists even if setup timing differs
+if (!global.__stripeMock) {
+  global.__stripeMock = {
+    checkout: { sessions: { create: vi.fn(), retrieve: vi.fn() } },
+    paymentIntents: { create: vi.fn() }
+  };
+}
+
 // Ensure Stripe mock returns a session with metadata so confirmPayment doesn't need DB fallback
 global.__stripeMock.checkout.sessions.retrieve.mockResolvedValue({
   id: 'cs_test_123',
