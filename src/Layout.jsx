@@ -12,7 +12,8 @@ import {
   faAngleDown, 
   faChevronRight,
   faBars,
-  faTimes
+  faTimes,
+  faCreditCard
 } from '@fortawesome/free-solid-svg-icons';
 
 // Import des images
@@ -258,7 +259,7 @@ const Layout = ({ children }) => {
           </div>
 
           <div className="footer-section">
-            <h3>Réseaux sociaux</h3>
+            <h3>SUIVEZ-NOUS</h3>
             <div className="social-icons">
               <a href="https://www.facebook.com/profile.php?id=61579044514425" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={facebookIcon} alt="Facebook" />
@@ -270,15 +271,23 @@ const Layout = ({ children }) => {
                 <img src={tiktokIcon} alt="TikTok" />
               </a>
             </div>
+            <div className="newsletter">
+              <label htmlFor="newsletter-email" className="newsletter-label">NEWSLETTER</label>
+              <div className="newsletter-row">
+                <input id="newsletter-email" type="email" placeholder="Votre email" className="newsletter-input" />
+                <button className="newsletter-button" type="button">S'abonner</button>
+              </div>
+            </div>
           </div>
 
           <div className="footer-section">
-            <h3>Paiement vérifié par</h3>
-            <div className="payment-icons">
-              <img src={mastercardIcon} alt="Mastercard" className="payment-icon" />
-              <img src={visaIcon} alt="Visa" className="payment-icon" />
-              <img src={applepayIcon} alt="Apple Pay" className="payment-icon" />
-            </div>
+            <h3>MODE DE PAIEMENT</h3>
+            <ul className="payment-list">
+              <li>
+                <FontAwesomeIcon icon={faCreditCard} />
+                <span>Carte bancaire</span>
+              </li>
+            </ul>
           </div>
         </div>
         {/* Site map links */}
