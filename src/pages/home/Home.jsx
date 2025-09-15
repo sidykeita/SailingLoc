@@ -316,12 +316,12 @@ const Home = () => {
                   <span>Voilier</span>
                 </Link>
                 <Link 
-                  to="/boats/motor"
-                  className={`boat-type-btn ${selectedBoatType === 'moteur' ? 'active' : ''}`}
-                  onClick={() => setSelectedBoatType('moteur')}
+                  to="/boats/catamaran"
+                  className={`boat-type-btn ${selectedBoatType === 'catamaran' ? 'active' : ''}`}
+                  onClick={() => setSelectedBoatType('catamaran')}
                 >
-                  <img src={moteurImg} alt="Bateau à moteur" className="boat-type-icon" />
-                  <span>Bateau à moteur</span>
+                  <img src={moteurImg} alt="Catamarans" className="boat-type-icon" />
+                  <span>Catamarans</span>
                 </Link>
 
               </div>

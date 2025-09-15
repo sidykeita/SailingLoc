@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import reservationService from '../../services/reservation.service';
 import api from '../../services/api.service';
-import HeaderDashboard from '../../components/HeaderDashboard';
+import Layout from '../../Layout';
 import LeaveReviewModal from '../../components/LeaveReviewModal';
 import reviewService from '../../services/review.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -156,190 +156,180 @@ const OwnerReserve = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header unifié */}
-      <HeaderDashboard />
-
-      {/* Main content */}
-      <main className="bg-background min-h-screen">
-        <div className="container mx-auto px-4 py-8">
-          {flash && (
-            <div className={`mb-6 p-4 rounded ${flash.type==='success' ? 'bg-green-50 text-green-700 border border-green-200' : flash.type==='warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' : 'bg-red-50 text-red-700 border border-red-200' }`}>
-              {flash.message}
-            </div>
-          )}
-          <h1 className="font-pacifico text-primary text-3xl mb-6">Mes locations</h1>
-
-          {/* Barre de recherche & filtres */}
-          <div className="card p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1 flex gap-4 items-center">
-                <div className="search-bar-locations w-full max-w-md">
-                  <input
-                    type="text"
-                    placeholder="Rechercher par nom de bateau, destination..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                </div>
+    <Layout>
+      <div className="min-h-screen bg-background">
+        {/* Main content */}
+        <div className="bg-background min-h-screen">
+          <div className="container mx-auto px-4 py-8">
+            {flash && (
+              <div className={`mb-6 p-4 rounded ${flash.type==='success' ? 'bg-green-50 text-green-700 border border-green-200' : flash.type==='warning' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' : 'bg-red-50 text-red-700 border border-red-200' }`}>
+                {flash.message}
               </div>
-              <div className="flex gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-                  <select 
-                    value={statusFilter} 
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2"
-                  >
-                    <option value="all">Tous</option>
-                    <option value="confirmed">Confirmées</option>
-                    <option value="pending">En attente</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Période</label>
-                  <select 
-                    value={dateFilter} 
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2"
-                  >
-                    <option value="all">Toutes</option>
-                    <option value="upcoming">À venir</option>
-                    <option value="current">En cours</option>
-                    <option value="past">Passées</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Liste des réservations (style TenantLocations) */}
-          <div className="locations-list">
-            {filteredReservations.length === 0 ? (
-              <div className="empty-state">
-                <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
-                <h3>Aucune réservation trouvée</h3>
-                <p>Il n'y a pas de réservation correspondant à vos critères.</p>
-              </div>
-            ) : (
-              filteredReservations.map((r) => (
-                <div key={r.id} className="location-card">
-                  <div className="location-image">
-                    <img src={r.imageUrl} alt={r.boatName} />
-                    <div className="status-badge">
-                      {getStatusIcon(r.status)}
-                      <span>{getStatusText(r.status)}</span>
-                    </div>
-                  </div>
-
-                  <div className="location-details">
-                    <div className="location-header">
-                      <h3>{r.boatName}</h3>
-                      <span className="boat-type">{r.boatType}</span>
-                    </div>
-                    <div className="location-info">
-                      <div className="info-row">
-                        <FontAwesomeIcon icon={faMapMarkerAlt} />
-                        <span>{r.port || 'Port inconnu'}</span>
-                      </div>
-                      <div className="info-row">
-                        <FontAwesomeIcon icon={faCalendarAlt} />
-                        <span>{new Date(r.startDate).toLocaleDateString('fr-FR')} - {new Date(r.endDate).toLocaleDateString('fr-FR')}</span>
-                      </div>
-                      <div className="info-row">
-                        <FontAwesomeIcon icon={faEuroSign} />
-                        <span>{Number(r.price || 0).toLocaleString()}€ (total)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="location-actions">
-                    <Link to={`/boats/${r.boatId || ''}`} className="action-btn primary">
-                      <FontAwesomeIcon icon={faEye} />
-                      Voir détails
-                    </Link>
-                    {r.status === 'confirmed' && (
-                      <button
-                        className="action-btn secondary"
-                        onClick={() => {
-                          setReviewBoat({
-                            locationId: r.id,
-                            boatId: r.boatId,
-                            name: r.boatName,
-                            type: r.boatType,
-                            imageUrl: r.imageUrl,
-                            existingReview: r.review || null,
-                          });
-                          setReviewModalOpen(true);
-                        }}
-                      >
-                        {r.review ? 'Modifier mon avis' : 'Laisser un avis'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
             )}
-          </div>
+            <h1 className="font-pacifico text-primary text-3xl mb-6">Mes locations</h1>
 
-          {/* Modale d'avis */}
-          <LeaveReviewModal
-            open={reviewModalOpen}
-            onClose={() => { setReviewModalOpen(false); setReviewBoat(null); }}
-            boat={reviewBoat}
-            userId={currentUser?._id || currentUser?.id}
-            onSuccess={(createdReview) => {
-              // Marquer localement la réservation comme commentée
-              setReservations((prev) => prev.map((res) =>
-                res.id === (reviewBoat?._id || reviewBoat?.locationId || res.id)
-                  ? { ...res, review: createdReview || { _id: 'temp', rating: 5 } }
-                  : res
-              ));
-              // Notifier le reste de l'app (Mes avis -> onglet Avis donnés)
-              try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'created', review: createdReview } })); } catch (_) {}
-            }}
-            onSubmit={async (reviewData) => {
-              if (!reviewBoat?.locationId) return;
-              try {
-                const result = await reviewService.createReview({
-                  boat: reviewBoat.boatId,
-                  reservation: reviewBoat.locationId,
-                  rating: reviewData.rating,
-                  comment: reviewData.comment
-                });
+            {/* Barre de recherche & filtres */}
+            <div className="card p-6 mb-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex-1 flex gap-4 items-center">
+                  <div className="search-bar-locations w-full max-w-md">
+                    <input
+                      type="text"
+                      placeholder="Rechercher par nom de bateau, destination..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+                    <select 
+                      value={statusFilter} 
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="all">Tous</option>
+                      <option value="confirmed">Confirmées</option>
+                      <option value="pending">En attente</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Période</label>
+                    <select 
+                      value={dateFilter} 
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2"
+                    >
+                      <option value="all">Toutes</option>
+                      <option value="upcoming">À venir</option>
+                      <option value="current">En cours</option>
+                      <option value="past">Passées</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Liste des réservations (style TenantLocations) */}
+            <div className="locations-list">
+              {filteredReservations.length === 0 ? (
+                <div className="empty-state">
+                  <FontAwesomeIcon icon={faExclamationTriangle} size="3x" />
+                  <h3>Aucune réservation trouvée</h3>
+                  <p>Il n'y a pas de réservation correspondant à vos critères.</p>
+                </div>
+              ) : (
+                filteredReservations.map((r) => (
+                  <div key={r.id} className="location-card">
+                    <div className="location-image">
+                      <img src={r.imageUrl} alt={r.boatName} />
+                      <div className="status-badge">
+                        {getStatusIcon(r.status)}
+                        <span>{getStatusText(r.status)}</span>
+                      </div>
+                    </div>
+
+                    <div className="location-details">
+                      <div className="location-header">
+                        <h3>{r.boatName}</h3>
+                        <span className="boat-type">{r.boatType}</span>
+                      </div>
+                      <div className="location-info">
+                        <div className="info-row">
+                          <FontAwesomeIcon icon={faMapMarkerAlt} />
+                          <span>{r.port || 'Port inconnu'}</span>
+                        </div>
+                        <div className="info-row">
+                          <FontAwesomeIcon icon={faCalendarAlt} />
+                          <span>{new Date(r.startDate).toLocaleDateString('fr-FR')} - {new Date(r.endDate).toLocaleDateString('fr-FR')}</span>
+                        </div>
+                        <div className="info-row">
+                          <FontAwesomeIcon icon={faEuroSign} />
+                          <span>{Number(r.price || 0).toLocaleString()}€ (total)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="location-actions">
+                      <Link to={`/boats/${r.boatId || ''}`} className="action-btn primary">
+                        <FontAwesomeIcon icon={faEye} />
+                        Voir détails
+                      </Link>
+                      {r.status === 'confirmed' && (
+                        <button
+                          className="action-btn secondary"
+                          onClick={() => {
+                            setReviewBoat({
+                              locationId: r.id,
+                              boatId: r.boatId,
+                              name: r.boatName,
+                              type: r.boatType,
+                              imageUrl: r.imageUrl,
+                              existingReview: r.review || null,
+                            });
+                            setReviewModalOpen(true);
+                          }}
+                        >
+                          {r.review ? 'Modifier mon avis' : 'Laisser un avis'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Modale d'avis */}
+            <LeaveReviewModal
+              open={reviewModalOpen}
+              onClose={() => { setReviewModalOpen(false); setReviewBoat(null); }}
+              boat={reviewBoat}
+              userId={currentUser?._id || currentUser?.id}
+              onSuccess={(createdReview) => {
+                // Marquer localement la réservation comme commentée
                 setReservations((prev) => prev.map((res) =>
                   res.id === (reviewBoat?._id || reviewBoat?.locationId || res.id)
-                    ? { ...res, review: result }
+                    ? { ...res, review: createdReview || { _id: 'temp', rating: 5 } }
                     : res
                 ));
-                try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'saved', review: result } })); } catch (_) {}
-                setReviewModalOpen(false);
-                setReviewBoat(null);
-              } catch (error) {
-                alert('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
-              }
-            }}
-          />
+                // Notifier le reste de l'app (Mes avis -> onglet Avis donnés)
+                try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'created', review: createdReview } })); } catch (_) {}
+              }}
+              onSubmit={async (reviewData) => {
+                if (!reviewBoat?.locationId) return;
+                try {
+                  const result = await reviewService.createReview({
+                    boat: reviewBoat.boatId,
+                    reservation: reviewBoat.locationId,
+                    rating: reviewData.rating,
+                    comment: reviewData.comment
+                  });
+                  setReservations((prev) => prev.map((res) =>
+                    res.id === (reviewBoat?._id || reviewBoat?.locationId || res.id)
+                      ? { ...res, review: result }
+                      : res
+                  ));
+                  try { window.dispatchEvent(new CustomEvent('review:updated', { detail: { type: 'saved', review: result } })); } catch (_) {}
+                  setReviewModalOpen(false);
+                  setReviewBoat(null);
+                } catch (error) {
+                  alert('Erreur lors de l\'envoi de l\'avis : ' + (error?.message || 'Erreur inconnue'));
+                }
+              }}
+            />
 
-          {/* Bouton retour au tableau de bord */}
-          <div className="flex justify-center mt-10">
-            <Link to="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">
-              Retour au tableau de bord
-            </Link>
+            {/* Bouton retour au tableau de bord */}
+            <div className="flex justify-center mt-10">
+              <Link to="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">
+                Retour au tableau de bord
+              </Link>
+            </div>
           </div>
         </div>
-      </main>
-
-      {/* Footer simplifié comme pages owner */}
-      <footer className="bg-primary text-white mt-12 py-8">
-        <div className="container mx-auto px-4">
-          <div className="mt-8 pt-8 border-t border-blue-700 text-center">
-            <p>&copy; 2025 SailingLoc. Tous droits réservés.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </Layout>
   );
 };
 

@@ -425,7 +425,7 @@ const [deleteDone, setDeleteDone] = useState(false);
                                 </div>
                               ) : (
                                 <button
-                                  className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
+                                  className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-md transition-colors"
                                   onClick={() => setDeleteConfirmId(boat._id || boat.id)}
                                 >
                                   Supprimer

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import HeaderDashboard from '../../components/HeaderDashboard';
+import Layout from '../../Layout';
 import reviewService from '../../services/review.service';
 import userService from '../../services/user.service';
 import { useAuth } from '../../contexts/AuthContext';
@@ -244,190 +244,191 @@ const OwnerReviews = () => {
   const listToRender = activeTab === 'received' ? applyFilters(received) : applyFilters(given);
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderDashboard />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="font-pacifico text-primary text-3xl mb-6">Mes avis</h1>
+    <Layout>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="font-pacifico text-primary text-3xl mb-6">Mes avis</h1>
 
-        {/* Stats rapides */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="card p-4 text-center">
-            <div className="text-3xl font-semibold">{stats.averageRating}</div>
-            <div className="flex justify-center mt-1">{renderStars(stats.averageRating)}</div>
-            <div className="text-gray-600 mt-1">Note moyenne</div>
+          {/* Stats rapides */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="card p-4 text-center">
+              <div className="text-3xl font-semibold">{stats.averageRating}</div>
+              <div className="flex justify-center mt-1">{renderStars(stats.averageRating)}</div>
+              <div className="text-gray-600 mt-1">Note moyenne</div>
+            </div>
+            <div className="card p-4 text-center">
+              <div className="text-3xl font-semibold">{stats.total}</div>
+              <div className="text-gray-600 mt-1">Avis reçus</div>
+            </div>
+            <div className="card p-4 text-center">
+              <div className="text-3xl font-semibold">{given.length}</div>
+              <div className="text-gray-600 mt-1">Avis donnés</div>
+            </div>
           </div>
-          <div className="card p-4 text-center">
-            <div className="text-3xl font-semibold">{stats.total}</div>
-            <div className="text-gray-600 mt-1">Avis reçus</div>
-          </div>
-          <div className="card p-4 text-center">
-            <div className="text-3xl font-semibold">{given.length}</div>
-            <div className="text-gray-600 mt-1">Avis donnés</div>
-          </div>
-        </div>
 
-        {/* Répartition des notes */}
-        <div className="card p-6 mb-6">
-          <h3 className="font-semibold text-lg mb-4">Répartition des notes</h3>
-          {[5,4,3,2,1].map((k) => {
-            const count = stats.distribution[k] || 0;
-            const pct = stats.total ? Math.round((count / stats.total) * 100) : 0;
-            return (
-              <div key={k} className="flex items-center gap-3 mb-2">
-                <div className="w-24 text-sm text-gray-700">{k} étoiles</div>
-                <div className="flex-1 h-2 bg-gray-200 rounded">
-                  <div className="h-2 bg-yellow-400 rounded" style={{ width: `${pct}%` }}></div>
-                </div>
-                <div className="w-6 text-right text-sm text-gray-700">{count}</div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Onglets */}
-        <div className="flex mb-4 gap-2">
-          <button className={`px-4 py-2 rounded ${activeTab==='received' ? 'bg-primary text-white' : 'bg-white border'}`} onClick={()=>setActiveTab('received')}>Avis reçus ({received.length})</button>
-          <button className={`px-4 py-2 rounded ${activeTab==='given' ? 'bg-primary text-white' : 'bg-white border'}`} onClick={()=>setActiveTab('given')}>Avis donnés ({given.length})</button>
-        </div>
-
-        {/* Filtres & tri */}
-        <div className="card p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center">
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faFilter} />
-            <select value={filterRating} onChange={(e)=>setFilterRating(e.target.value)} className="border rounded px-2 py-1">
-              <option value="all">Toutes les notes</option>
-              <option value="5">5 étoiles</option>
-              <option value="4">4 étoiles</option>
-              <option value="3">3 étoiles</option>
-              <option value="2">2 étoiles</option>
-              <option value="1">1 étoile</option>
-            </select>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <FontAwesomeIcon icon={faSort} />
-            <select value={sortBy} onChange={(e)=>setSortBy(e.target.value)} className="border rounded px-2 py-1">
-              <option value="recent">Plus récents</option>
-              <option value="oldest">Plus anciens</option>
-              <option value="rating-high">Note décroissante</option>
-              <option value="rating-low">Note croissante</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Liste des avis */}
-        {loading ? (
-          <div className="card p-6">Chargement des avis…</div>
-        ) : error ? (
-          <div className="card p-6 text-red-600">{error}</div>
-        ) : listToRender.length === 0 ? (
-          <div className="card p-6">Aucun avis à afficher.</div>
-        ) : (
-          <div className="space-y-4">
-            {listToRender.map((rev) => {
-              const id = rev._id || rev.id;
-              const rating = Number(rev.rating || 0);
-              const boat = rev.boat || rev?.reservation?.boat || {};
-              const boatName = boat?.name || 'Bateau';
-              const port = boat?.port || rev?.reservation?.port || rev?.reservation?.location || '';
-              const reviewerRaw = rev.user || rev.author || rev.reviewer || {};
-              const createdAt = rev.createdAt || rev.date;
-              const isGivenTab = activeTab === 'given';
-              // Construire un nom d'affichage robuste (même logique pour reçus et donnés)
-              const currentName = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || currentUser?.username || currentUser?.pseudo || currentUser?.displayName || (currentUser?.email ? String(currentUser.email).split('@')[0] : '');
-              const reviewerNameFromObj = (typeof reviewerRaw === 'object' && reviewerRaw) ? ([reviewerRaw.firstName, reviewerRaw.lastName].filter(Boolean).join(' ').trim() || reviewerRaw.name || reviewerRaw.username || reviewerRaw.pseudo || reviewerRaw.displayName || (reviewerRaw.email ? String(reviewerRaw.email).split('@')[0] : '')) : '';
-              const displayName = rev.reviewerName || (isGivenTab ? (currentName || reviewerNameFromObj || 'Moi') : (reviewerNameFromObj || 'Utilisateur'));
-              const initials = (displayName || 'U').split(' ').map(s => s.charAt(0)).slice(0,2).join('').toUpperCase();
-              // Dates de réservation si présentes
-              const start = rev?.reservation?.startDate ? new Date(rev.reservation.startDate) : null;
-              const end = rev?.reservation?.endDate ? new Date(rev.reservation.endDate) : null;
-              const datesStr = (start && end) ? `${start.toLocaleDateString('fr-FR')} - ${end.toLocaleDateString('fr-FR')}` : '';
-              const boatId = boat?._id || boat?.id || rev?.reservation?.boat?._id || rev?.reservation?.boat?.id || null;
+          {/* Répartition des notes */}
+          <div className="card p-6 mb-6">
+            <h3 className="font-semibold text-lg mb-4">Répartition des notes</h3>
+            {[5,4,3,2,1].map((k) => {
+              const count = stats.distribution[k] || 0;
+              const pct = stats.total ? Math.round((count / stats.total) * 100) : 0;
               return (
-                <div key={id} className="card p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-200 grid place-items-center text-gray-500 font-semibold overflow-hidden">
-                          {reviewerRaw?.avatar || reviewerRaw?.photo ? (
-                            <img 
-                              src={reviewerRaw.avatar || reviewerRaw.photo} 
-                              alt={displayName}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'grid';
-                              }}
-                            />
-                          ) : null}
-                          <div className="w-full h-full grid place-items-center text-gray-500 font-semibold" style={{display: reviewerRaw?.avatar || reviewerRaw?.photo ? 'none' : 'grid'}}>
-                            {initials}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="font-semibold">{displayName}</div>
-                          <div className="text-xs text-gray-400">Membre depuis {rev.reviewerSince ? new Date(rev.reviewerSince).toLocaleDateString('fr-FR') : '—'}</div>
-                          <div className="text-sm text-gray-500">{port || '—'}</div>
-                        </div>
-                      </div>
-                      <div className="mt-3 inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded">
-                        <span className="font-semibold">{boatName}</span>
-                        {port && <span>{' '}</span>}
-                        {port && <span>• {port}</span>}
-                        {datesStr && <span>{' '}</span>}
-                        {datesStr && <span>• {datesStr}</span>}
-                      </div>
-                      <p className="mt-3">{rev.comment || rev.text || rev.content || ''}</p>
-                      {boatId && (
-                        <div className="mt-3">
-                          <Link className="text-primary hover:underline" to={`/boats/${boatId}`}>Voir l'annonce</Link>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="flex justify-end">{renderStars(rating)}</div>
-                      <div className="text-sm text-gray-500 mt-1 flex items-center gap-2 justify-end">
-                        <FontAwesomeIcon icon={faCalendar} />
-                        {createdAt ? new Date(createdAt).toLocaleDateString('fr-FR') : ''}
-                      </div>
-                    </div>
+                <div key={k} className="flex items-center gap-3 mb-2">
+                  <div className="w-24 text-sm text-gray-700">{k} étoiles</div>
+                  <div className="flex-1 h-2 bg-gray-200 rounded">
+                    <div className="h-2 bg-yellow-400 rounded" style={{ width: `${pct}%` }}></div>
                   </div>
-
-                  {activeTab==='received' && !rev.ownerResponse && (
-                    <div className="mt-4">
-                      <label className="block text-sm text-gray-700 mb-1">Répondre à cet avis</label>
-                      <textarea
-                        className="w-full border rounded p-2"
-                        rows={3}
-                        value={responding[id] || ''}
-                        onChange={(e) => onChangeResponse(id, e.target.value)}
-                        placeholder="Merci pour votre avis !"
-                      />
-                      <button
-                        className="btn-primary mt-2"
-                        onClick={() => submitResponse(id)}
-                        disabled={saving || !(responding[id] || '').trim()}
-                      >{saving ? 'Envoi…' : 'Publier la réponse'}</button>
-                    </div>
-                  )}
-
-                  {activeTab==='received' && rev.ownerResponse && (
-                    <div className="mt-4 p-3 bg-gray-50 rounded border">
-                      <div className="text-sm text-gray-500">Votre réponse</div>
-                      <div>{rev.ownerResponse.text}</div>
-                    </div>
-                  )}
+                  <div className="w-6 text-right text-sm text-gray-700">{count}</div>
                 </div>
               );
             })}
           </div>
-        )}
 
-        {/* Retour tableau de bord */}
-        <div className="flex justify-center mt-10">
-          <a href="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">Retour au tableau de bord</a>
+          {/* Onglets */}
+          <div className="flex mb-4 gap-2">
+            <button className={`px-4 py-2 rounded ${activeTab==='received' ? 'bg-primary text-white' : 'bg-white border'}`} onClick={()=>setActiveTab('received')}>Avis reçus ({received.length})</button>
+            <button className={`px-4 py-2 rounded ${activeTab==='given' ? 'bg-primary text-white' : 'bg-white border'}`} onClick={()=>setActiveTab('given')}>Avis donnés ({given.length})</button>
+          </div>
+
+          {/* Filtres & tri */}
+          <div className="card p-4 mb-6 flex flex-col md:flex-row gap-4 md:items-center">
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faFilter} />
+              <select value={filterRating} onChange={(e)=>setFilterRating(e.target.value)} className="border rounded px-2 py-1">
+                <option value="all">Toutes les notes</option>
+                <option value="5">5 étoiles</option>
+                <option value="4">4 étoiles</option>
+                <option value="3">3 étoiles</option>
+                <option value="2">2 étoiles</option>
+                <option value="1">1 étoile</option>
+              </select>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <FontAwesomeIcon icon={faSort} />
+              <select value={sortBy} onChange={(e)=>setSortBy(e.target.value)} className="border rounded px-2 py-1">
+                <option value="recent">Plus récents</option>
+                <option value="oldest">Plus anciens</option>
+                <option value="rating-high">Note décroissante</option>
+                <option value="rating-low">Note croissante</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Liste des avis */}
+          {loading ? (
+            <div className="card p-6">Chargement des avis…</div>
+          ) : error ? (
+            <div className="card p-6 text-red-600">{error}</div>
+          ) : listToRender.length === 0 ? (
+            <div className="card p-6">Aucun avis à afficher.</div>
+          ) : (
+            <div className="space-y-4">
+              {listToRender.map((rev) => {
+                const id = rev._id || rev.id;
+                const rating = Number(rev.rating || 0);
+                const boat = rev.boat || rev?.reservation?.boat || {};
+                const boatName = boat?.name || 'Bateau';
+                const port = boat?.port || rev?.reservation?.port || rev?.reservation?.location || '';
+                const reviewerRaw = rev.user || rev.author || rev.reviewer || {};
+                const createdAt = rev.createdAt || rev.date;
+                const isGivenTab = activeTab === 'given';
+                // Construire un nom d'affichage robuste (même logique pour reçus et donnés)
+                const currentName = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ').trim() || currentUser?.name || currentUser?.username || currentUser?.pseudo || currentUser?.displayName || (currentUser?.email ? String(currentUser.email).split('@')[0] : '');
+                const reviewerNameFromObj = (typeof reviewerRaw === 'object' && reviewerRaw) ? ([reviewerRaw.firstName, reviewerRaw.lastName].filter(Boolean).join(' ').trim() || reviewerRaw.name || reviewerRaw.username || reviewerRaw.pseudo || reviewerRaw.displayName || (reviewerRaw.email ? String(reviewerRaw.email).split('@')[0] : '')) : '';
+                const displayName = rev.reviewerName || (isGivenTab ? (currentName || reviewerNameFromObj || 'Moi') : (reviewerNameFromObj || 'Utilisateur'));
+                const initials = (displayName || 'U').split(' ').map(s => s.charAt(0)).slice(0,2).join('').toUpperCase();
+                // Dates de réservation si présentes
+                const start = rev?.reservation?.startDate ? new Date(rev.reservation.startDate) : null;
+                const end = rev?.reservation?.endDate ? new Date(rev.reservation.endDate) : null;
+                const datesStr = (start && end) ? `${start.toLocaleDateString('fr-FR')} - ${end.toLocaleDateString('fr-FR')}` : '';
+                const boatId = boat?._id || boat?.id || rev?.reservation?.boat?._id || rev?.reservation?.boat?.id || null;
+                return (
+                  <div key={id} className="card p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gray-200 grid place-items-center text-gray-500 font-semibold overflow-hidden">
+                            {reviewerRaw?.avatar || reviewerRaw?.photo ? (
+                              <img 
+                                src={reviewerRaw.avatar || reviewerRaw.photo} 
+                                alt={displayName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'grid';
+                                }}
+                              />
+                            ) : null}
+                            <div className="w-full h-full grid place-items-center text-gray-500 font-semibold" style={{display: reviewerRaw?.avatar || reviewerRaw?.photo ? 'none' : 'grid'}}>
+                              {initials}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-semibold">{displayName}</div>
+                            <div className="text-xs text-gray-400">Membre depuis {rev.reviewerSince ? new Date(rev.reviewerSince).toLocaleDateString('fr-FR') : '—'}</div>
+                            <div className="text-sm text-gray-500">{port || '—'}</div>
+                          </div>
+                        </div>
+                        <div className="mt-3 inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded">
+                          <span className="font-semibold">{boatName}</span>
+                          {port && <span>{' '}</span>}
+                          {port && <span>• {port}</span>}
+                          {datesStr && <span>{' '}</span>}
+                          {datesStr && <span>• {datesStr}</span>}
+                        </div>
+                        <p className="mt-3">{rev.comment || rev.text || rev.content || ''}</p>
+                        {boatId && (
+                          <div className="mt-3">
+                            <Link className="text-primary hover:underline" to={`/boats/${boatId}`}>Voir l'annonce</Link>
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="flex justify-end">{renderStars(rating)}</div>
+                        <div className="text-sm text-gray-500 mt-1 flex items-center gap-2 justify-end">
+                          <FontAwesomeIcon icon={faCalendar} />
+                          {createdAt ? new Date(createdAt).toLocaleDateString('fr-FR') : ''}
+                        </div>
+                      </div>
+                    </div>
+
+                    {activeTab==='received' && !rev.ownerResponse && (
+                      <div className="mt-4">
+                        <label className="block text-sm text-gray-700 mb-1">Répondre à cet avis</label>
+                        <textarea
+                          className="w-full border rounded p-2"
+                          rows={3}
+                          value={responding[id] || ''}
+                          onChange={(e) => onChangeResponse(id, e.target.value)}
+                          placeholder="Merci pour votre avis !"
+                        />
+                        <button
+                          className="btn-primary mt-2"
+                          onClick={() => submitResponse(id)}
+                          disabled={saving || !(responding[id] || '').trim()}
+                        >{saving ? 'Envoi…' : 'Publier la réponse'}</button>
+                      </div>
+                    )}
+
+                    {activeTab==='received' && rev.ownerResponse && (
+                      <div className="mt-4 p-3 bg-gray-50 rounded border">
+                        <div className="text-sm text-gray-500">Votre réponse</div>
+                        <div>{rev.ownerResponse.text}</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Retour tableau de bord */}
+          <div className="flex justify-center mt-10">
+            <a href="/owner/dashboard" className="px-6 py-3 rounded bg-gray-500 hover:bg-gray-600 text-white">Retour au tableau de bord</a>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 };
 

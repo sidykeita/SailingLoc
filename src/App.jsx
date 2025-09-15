@@ -62,6 +62,7 @@ import Contact from './pages/contact/Contact';
 import PaymentSuccess from './pages/payments/PaymentSuccess';
 import PaymentCancel from './pages/payments/PaymentCancel';
 import PaymentTest from './pages/payments/PaymentTest';
+import Sitemap from './pages/legal/Sitemap';
 
 import Calendrier from './pages/dashboard/Calendrier';
 import Reservations from './pages/dashboard/Reservations';
@@ -112,6 +113,7 @@ function App() {
           {/* Pages légales - avec Layout */}
           <Route path="/legal-notices" element={<Layout><LegalNotices /></Layout>} />
           <Route path="/cgu-cgv" element={<Layout><CGUCGV /></Layout>} />
+          <Route path="/sitemap" element={<Layout><Sitemap /></Layout>} />
           
           {/* Pages d'aide - avec Layout */}
           <Route path="/help" element={<Layout><Help /></Layout>} />
