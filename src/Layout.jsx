@@ -12,8 +12,7 @@ import {
   faAngleDown, 
   faChevronRight,
   faBars,
-  faTimes,
-  faCreditCard
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
 // Import des images
@@ -29,7 +28,6 @@ import applepayIcon from './assets/images/applepay.png';
 
 // Import du CSS pour le layout
 import './assets/css/Layout.css';
-import { footerLinksPublic } from './components/common/footerLinks';
 
 const Layout = ({ children }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,7 +39,6 @@ const Layout = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const sections = footerLinksPublic;
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -244,17 +241,22 @@ const Layout = ({ children }) => {
       <footer className="site-footer">
         <div className="footer-container">
           <div className="footer-section">
-            <h3>MODE DE PAIEMENT</h3>
-            <ul className="payment-list">
-              <li>
-                <FontAwesomeIcon icon={faCreditCard} />
-                <span>Carte bancaire</span>
-              </li>
-            </ul>
+            <h3>Nous faire confiance</h3>
+            <div className="rating-info">
+              <p><strong>Note : 4.8 / 5</strong> calculée à partir de <br/>5 000 avis</p>
+              <p>Une communauté passionnée</p>
+            </div>
           </div>
 
           <div className="footer-section">
-            <h3>SUIVEZ-NOUS</h3>
+            <h3>Besoin de conseils ?</h3>
+            <p>Nous sommes joignables :</p>
+            <p>Du lundi au vendredi : 9h00 à 20h00</p>
+            <p>Samedi et Dimanche : 10h00 à 18h00</p>
+          </div>
+
+          <div className="footer-section">
+            <h3>Réseaux sociaux</h3>
             <div className="social-icons">
               <a href="https://www.facebook.com/profile.php?id=61579044514425" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <img src={facebookIcon} alt="Facebook" />
@@ -266,43 +268,27 @@ const Layout = ({ children }) => {
                 <img src={tiktokIcon} alt="TikTok" />
               </a>
             </div>
-            <div className="newsletter">
-              <label htmlFor="newsletter-email" className="newsletter-label">NEWSLETTER</label>
-              <div className="newsletter-row">
-                <input id="newsletter-email" type="email" placeholder="Votre email" className="newsletter-input" />
-                <button className="newsletter-button" type="button">S'abonner</button>
-              </div>
-            </div>
           </div>
-        </div>
-        {/* Site map links */}
-        <div className="footer-sitemap">
-          <div className="footer-sitemap-container">
-            <h3 className="footer-sitemap-heading">PLAN DU SITE</h3>
-            {sections.map((group) => (
-              <nav className="footer-sitemap-section" key={group.title} aria-label={`Liens ${group.title}`}>
-                <h4 className="footer-sitemap-title">{group.title}</h4>
-                <ul className="footer-sitemap-list">
-                  {group.links.map((l) => (
-                    <li key={l.to} className="footer-sitemap-item">
-                      <Link to={l.to}>{l.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
+
+          <div className="footer-section">
+            <h3>Paiement vérifié par</h3>
+            <div className="payment-icons">
+              <img src={mastercardIcon} alt="Mastercard" className="payment-icon" />
+              <img src={visaIcon} alt="Visa" className="payment-icon" />
+              <img src={applepayIcon} alt="Apple Pay" className="payment-icon" />
+            </div>
           </div>
         </div>
         <div className="footer-bottom">
           <div className="footer-bottom-container">
-            <p> © 2025 SailingLoc. Tous droits réservés.</p>
+            <p> SailingLoc 2025</p>
             <div className="footer-links">
               <Link to="/legal-notices">Mentions légales</Link>
-              <Link to="/privacy-policy">Politique de confidentialité</Link>
               <Link to="/cgu-cgv">CGU / CGV</Link>
+
+              <Link to="/contact">Contact</Link>
             </div>
           </div>
-          <div className="footer-tagline">SailingLoc - Location de bateaux à La Rochelle et en Europe</div>
         </div>
       </footer>
     </div>
