@@ -2,36 +2,6 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
-<<<<<<< HEAD
-// In-memory favorites state and mocked User model
-const state = { favorites: [] };
-vi.mock('../../src/models/user', () => {
-  const api = {
-    findById: vi.fn(() => ({
-      _id: 'u1',
-      id: 'u1',
-      populate: () => ({ favorites: [...state.favorites] })
-    })),
-    findByIdAndUpdate: vi.fn((_id, update) => {
-      if (update?.$addToSet?.favorites) {
-        const id = update.$addToSet.favorites;
-        if (!state.favorites.includes(id)) state.favorites.push(id);
-      }
-      if (update?.$pull?.favorites) {
-        const id = update.$pull.favorites;
-        state.favorites = state.favorites.filter(x => x !== id);
-      }
-      return {
-        populate: () => ({ favorites: [...state.favorites] })
-      };
-    })
-  };
-  return { default: api, ...api };
-});
-=======
-const userId = '507f1f77bcf86cd799439011';
->>>>>>> acbb43b (update test)
-
 let app;
 let token;
 beforeAll(async () => {
