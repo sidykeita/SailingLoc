@@ -8,7 +8,6 @@ const contractualDocumentSchema = new mongoose.Schema({
   },
   documentType: {
     type: String,
-    enum: ['contratLocation', 'attestationAssurance', 'cvMarin', 'permisBateau'],
     required: true
   },
   fileName: { type: String, required: true },

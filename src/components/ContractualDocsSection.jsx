@@ -80,15 +80,20 @@ const ContractualDocsSection = ({ userId }) => {
         </div>
       )}
 
-      {/* Upload compact */}
-      <div className="mb-4">
-        <h3 className="font-semibold mb-2">Ajouter des documents</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      {/* Upload élégant */}
+      <div className="mb-6">
+        <h3 className="font-semibold text-gray-700 mb-3">Ajouter des documents</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {['contratLocation', 'assurance', 'permisNavigation', 'certificatSecurite'].map(docType => (
-            <div key={docType} className="text-center">
-              <label className="cursor-pointer block p-2 border rounded hover:bg-gray-50">
-                <div className="text-xs font-medium mb-1">{getDocumentTypeLabel(docType)}</div>
-                <div className="text-xs text-primary">+ Fichier</div>
+            <div key={docType} className="relative">
+              <label className="cursor-pointer group block">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-dashed border-blue-200 rounded-lg p-4 text-center hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 transition-all duration-200">
+                  <svg className="w-6 h-6 text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                  </svg>
+                  <div className="text-xs font-medium text-gray-700 mb-1">{getDocumentTypeLabel(docType)}</div>
+                  <div className="text-xs text-blue-600 font-medium">Choisir un fichier</div>
+                </div>
                 <input
                   type="file"
                   onChange={(e) => handleFileUpload(e, docType)}
@@ -99,23 +104,56 @@ const ContractualDocsSection = ({ userId }) => {
             </div>
           ))}
         </div>
-        {uploading && <p className="text-xs text-center mt-2 text-primary">Upload...</p>}
+        {uploading && (
+          <div className="flex items-center justify-center mt-4">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+            <p className="text-sm text-blue-600">Upload en cours...</p>
+          </div>
+        )}
       </div>
 
-      {/* Liste compacte des documents existants */}
+      {/* Liste élégante des documents existants */}
       {documents.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-2">Documents ({documents.length})</h3>
-          <div className="space-y-1">
+          <h3 className="font-semibold text-gray-700 mb-3">Documents uploadés ({documents.length})</h3>
+          <div className="space-y-2">
             {documents.map(doc => (
-              <div key={doc._id} className="flex items-center justify-between p-2 text-sm border rounded">
-                <div className="flex-1">
-                  <span className="font-medium">{getDocumentTypeLabel(doc.documentType)}</span>
-                  <span className="text-gray-500 ml-2">{doc.originalName}</span>
-                </div>
-                <div className="flex gap-2 text-xs">
-                  <a href={doc.firebaseUrl} target="_blank" rel="noopener noreferrer" className="text-primary">Voir</a>
-                  <button onClick={() => handleDelete(doc._id)} className="text-red-600">×</button>
+              <div key={doc._id} className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{getDocumentTypeLabel(doc.documentType)}</p>
+                      <p className="text-xs text-gray-500">{doc.originalName} • {new Date(doc.uploadedAt).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <a 
+                      href={doc.firebaseUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                    >
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      Voir
+                    </a>
+                    <button 
+                      onClick={() => handleDelete(doc._id)}
+                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                    >
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
