@@ -244,18 +244,13 @@ const Layout = ({ children }) => {
       <footer className="site-footer">
         <div className="footer-container">
           <div className="footer-section">
-            <h3>Nous faire confiance</h3>
-            <div className="rating-info">
-              <p><strong>Note : 4.8 / 5</strong> calculée à partir de <br/>5 000 avis</p>
-              <p>Une communauté passionnée</p>
-            </div>
-          </div>
-
-          <div className="footer-section">
-            <h3>Besoin de conseils ?</h3>
-            <p>Nous sommes joignables :</p>
-            <p>Du lundi au vendredi : 9h00 à 20h00</p>
-            <p>Samedi et Dimanche : 10h00 à 18h00</p>
+            <h3>MODE DE PAIEMENT</h3>
+            <ul className="payment-list">
+              <li>
+                <FontAwesomeIcon icon={faCreditCard} />
+                <span>Carte bancaire</span>
+              </li>
+            </ul>
           </div>
 
           <div className="footer-section">
@@ -279,16 +274,6 @@ const Layout = ({ children }) => {
               </div>
             </div>
           </div>
-
-          <div className="footer-section">
-            <h3>MODE DE PAIEMENT</h3>
-            <ul className="payment-list">
-              <li>
-                <FontAwesomeIcon icon={faCreditCard} />
-                <span>Carte bancaire</span>
-              </li>
-            </ul>
-          </div>
         </div>
         {/* Site map links */}
         <div className="footer-sitemap">
@@ -310,14 +295,14 @@ const Layout = ({ children }) => {
         </div>
         <div className="footer-bottom">
           <div className="footer-bottom-container">
-            <p> SailingLoc 2025</p>
+            <p> © 2025 SailingLoc. Tous droits réservés.</p>
             <div className="footer-links">
               <Link to="/legal-notices">Mentions légales</Link>
+              <Link to="/privacy-policy">Politique de confidentialité</Link>
               <Link to="/cgu-cgv">CGU / CGV</Link>
-
-              <Link to="/contact">Contact</Link>
             </div>
           </div>
+          <div className="footer-tagline">SailingLoc - Location de bateaux à La Rochelle et en Europe</div>
         </div>
       </footer>
     </div>

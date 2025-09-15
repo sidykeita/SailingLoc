@@ -44,6 +44,7 @@ import Home from './pages/home/Home';
 // Pages légales
 import LegalNotices from './pages/legal/LegalNotices';
 import CGUCGV from './pages/legal/CGUCGV';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 
 // Pages à propos
 import About from './pages/about/About';
@@ -112,6 +113,7 @@ function App() {
           {/* Pages légales - avec Layout */}
           <Route path="/legal-notices" element={<Layout><LegalNotices /></Layout>} />
           <Route path="/cgu-cgv" element={<Layout><CGUCGV /></Layout>} />
+          <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
           
           {/* Pages d'aide - avec Layout */}
           <Route path="/help" element={<Layout><Help /></Layout>} />
