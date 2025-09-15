@@ -28,8 +28,7 @@ import applepayIcon from './assets/images/applepay.png';
 
 // Import du CSS pour le layout
 import './assets/css/Layout.css';
-import { useAuth } from './contexts/AuthContext';
-import { footerLinksPublic, footerLinksTenant, footerLinksOwner, footerLinksAdmin } from './components/common/footerLinks';
+import { footerLinksPublic } from './components/common/footerLinks';
 
 const Layout = ({ children }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,13 +40,7 @@ const Layout = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { currentUser, userRole } = useAuth();
-  const roleSections = !currentUser
-    ? []
-    : (userRole === 'propriétaire'
-        ? footerLinksOwner
-        : (userRole === 'admin' ? footerLinksAdmin : footerLinksTenant));
-  const sections = [...footerLinksPublic, ...roleSections];
+  const sections = footerLinksPublic;
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -291,6 +284,7 @@ const Layout = ({ children }) => {
         {/* Site map links */}
         <div className="footer-sitemap">
           <div className="footer-sitemap-container">
+            <h3 className="footer-sitemap-heading">PLAN DU SITE</h3>
             {sections.map((group) => (
               <nav className="footer-sitemap-section" key={group.title} aria-label={`Liens ${group.title}`}>
                 <h4 className="footer-sitemap-title">{group.title}</h4>
