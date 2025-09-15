@@ -87,7 +87,7 @@ const ContractualDocsSection = ({ userId }) => {
             <div key={docType}>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{getDocumentTypeLabel(docType)}</h4>
               <label className="cursor-pointer block">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200 shadow-md hover:shadow-lg">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200 shadow-md hover:shadow-lg">
                   <span className="text-sm">Téléverser</span>
                 </div>
                 <input
