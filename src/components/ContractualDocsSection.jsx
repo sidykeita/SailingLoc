@@ -80,66 +80,48 @@ const ContractualDocsSection = ({ userId }) => {
         </div>
       )}
 
-      {/* Upload de nouveaux documents */}
-      <div className="mb-6">
-        <h3 className="font-semibold mb-3">Ajouter des documents</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Upload compact */}
+      <div className="mb-4">
+        <h3 className="font-semibold mb-2">Ajouter des documents</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {['contratLocation', 'assurance', 'permisNavigation', 'certificatSecurite'].map(docType => (
-            <div key={docType} className="border rounded-lg p-4">
-              <label className="block text-sm font-medium mb-2">
-                {getDocumentTypeLabel(docType)}
+            <div key={docType} className="text-center">
+              <label className="cursor-pointer block p-2 border rounded hover:bg-gray-50">
+                <div className="text-xs font-medium mb-1">{getDocumentTypeLabel(docType)}</div>
+                <div className="text-xs text-primary">+ Fichier</div>
+                <input
+                  type="file"
+                  onChange={(e) => handleFileUpload(e, docType)}
+                  disabled={uploading}
+                  className="hidden"
+                />
               </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                onChange={(e) => handleFileUpload(e, docType)}
-                disabled={uploading}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
-              />
             </div>
           ))}
         </div>
-        {uploading && (
-          <p className="text-center mt-4 text-primary">Upload en cours...</p>
-        )}
+        {uploading && <p className="text-xs text-center mt-2 text-primary">Upload...</p>}
       </div>
 
-      {/* Liste des documents existants */}
-      <div>
-        <h3 className="font-semibold mb-3">Documents existants</h3>
-        {documents.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">Aucun document uploadé</p>
-        ) : (
-          <div className="space-y-3">
+      {/* Liste compacte des documents existants */}
+      {documents.length > 0 && (
+        <div>
+          <h3 className="font-semibold mb-2">Documents ({documents.length})</h3>
+          <div className="space-y-1">
             {documents.map(doc => (
-              <div key={doc._id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={doc._id} className="flex items-center justify-between p-2 text-sm border rounded">
                 <div className="flex-1">
-                  <p className="font-medium">{getDocumentTypeLabel(doc.documentType)}</p>
-                  <p className="text-sm text-gray-500">
-                    {doc.originalName} • {new Date(doc.uploadedAt).toLocaleDateString('fr-FR')}
-                  </p>
+                  <span className="font-medium">{getDocumentTypeLabel(doc.documentType)}</span>
+                  <span className="text-gray-500 ml-2">{doc.originalName}</span>
                 </div>
-                <div className="flex gap-2">
-                  <a
-                    href={doc.firebaseUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-primary-dark text-sm"
-                  >
-                    Voir
-                  </a>
-                  <button
-                    onClick={() => handleDelete(doc._id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
-                  >
-                    Supprimer
-                  </button>
+                <div className="flex gap-2 text-xs">
+                  <a href={doc.firebaseUrl} target="_blank" rel="noopener noreferrer" className="text-primary">Voir</a>
+                  <button onClick={() => handleDelete(doc._id)} className="text-red-600">×</button>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

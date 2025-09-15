@@ -131,8 +131,9 @@ exports.uploadDocument = async (req, res) => {
       return res.status(400).json({ message: 'Aucun fichier fourni' });
     }
 
-    if (!documentType || !['contratLocation', 'attestationAssurance', 'cvMarin', 'permisBateau'].includes(documentType)) {
-      return res.status(400).json({ message: 'Type de document invalide' });
+    // Accepter tous les types de documents
+    if (!documentType) {
+      return res.status(400).json({ message: 'Type de document requis' });
     }
 
     // Générer un nom de fichier unique
@@ -259,8 +260,9 @@ exports.uploadDocumentFromUrl = async (req, res) => {
 
     const { documentType, firebaseUrl, firebasePath, originalName, fileSize, mimeType } = req.body;
 
-    if (!documentType || !['contratLocation', 'attestationAssurance', 'cvMarin', 'permisBateau'].includes(documentType)) {
-      return res.status(400).json({ message: 'Type de document invalide' });
+    // Accepter tous les types de documents
+    if (!documentType) {
+      return res.status(400).json({ message: 'Type de document requis' });
     }
     if (!firebaseUrl || !firebasePath) {
       return res.status(400).json({ message: 'URL ou chemin Firebase manquant' });
