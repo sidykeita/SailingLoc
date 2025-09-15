@@ -217,6 +217,7 @@ const Home = () => {
                       const value = e.target.value;
                       if (!value) {
                         setSelectedPort(null);
+             
                         setSearchQuery('');
                         return;
                       }
@@ -316,12 +317,12 @@ const Home = () => {
                   <span>Voilier</span>
                 </Link>
                 <Link 
-                  to="/boats/catamaran"
-                  className={`boat-type-btn ${selectedBoatType === 'catamaran' ? 'active' : ''}`}
-                  onClick={() => setSelectedBoatType('catamaran')}
+                  to="/boats/semi-rigide"
+                  className={`boat-type-btn ${selectedBoatType === 'semi-rigide' ? 'active' : ''}`}
+                  onClick={() => setSelectedBoatType('semi-rigide')}
                 >
-                  <img src={moteurImg} alt="Catamarans" className="boat-type-icon" />
-                  <span>Catamarans</span>
+                  <img src={moteurImg} alt="Semi-rigides" className="boat-type-icon" />
+                  <span>Semi-rigides</span>
                 </Link>
 
               </div>
