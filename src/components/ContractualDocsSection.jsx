@@ -80,19 +80,15 @@ const ContractualDocsSection = ({ userId }) => {
         </div>
       )}
 
-      {/* Upload élégant */}
+      {/* Upload style purple buttons */}
       <div className="mb-6">
-        <h3 className="font-semibold text-gray-700 mb-3">Ajouter des documents</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {['contratLocation', 'assurance', 'permisNavigation', 'certificatSecurite'].map(docType => (
-            <div key={docType} className="relative">
-              <label className="cursor-pointer group block">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-dashed border-blue-200 rounded-lg p-4 text-center hover:from-blue-100 hover:to-blue-200 hover:border-blue-300 transition-all duration-200">
-                  <svg className="w-6 h-6 text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                  </svg>
-                  <div className="text-xs font-medium text-gray-700 mb-1">{getDocumentTypeLabel(docType)}</div>
-                  <div className="text-xs text-blue-600 font-medium">Choisir un fichier</div>
+            <div key={docType}>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">{getDocumentTypeLabel(docType)}</h4>
+              <label className="cursor-pointer block">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200 shadow-md hover:shadow-lg">
+                  <span className="text-sm">Téléverser</span>
                 </div>
                 <input
                   type="file"
@@ -106,8 +102,8 @@ const ContractualDocsSection = ({ userId }) => {
         </div>
         {uploading && (
           <div className="flex items-center justify-center mt-4">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-            <p className="text-sm text-blue-600">Upload en cours...</p>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mr-2"></div>
+            <p className="text-sm text-purple-600">Upload en cours...</p>
           </div>
         )}
       </div>
