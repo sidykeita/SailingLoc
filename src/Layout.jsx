@@ -28,6 +28,8 @@ import applepayIcon from './assets/images/applepay.png';
 
 // Import du CSS pour le layout
 import './assets/css/Layout.css';
+import { useAuth } from './contexts/AuthContext';
+import { footerLinksPublic, footerLinksTenant, footerLinksOwner, footerLinksAdmin } from './components/common/footerLinks';
 
 const Layout = ({ children }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -39,6 +41,13 @@ const Layout = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { currentUser, userRole } = useAuth();
+  const roleSections = !currentUser
+    ? []
+    : (userRole === 'propriétaire'
+        ? footerLinksOwner
+        : (userRole === 'admin' ? footerLinksAdmin : footerLinksTenant));
+  const sections = [...footerLinksPublic, ...roleSections];
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -277,6 +286,23 @@ const Layout = ({ children }) => {
               <img src={visaIcon} alt="Visa" className="payment-icon" />
               <img src={applepayIcon} alt="Apple Pay" className="payment-icon" />
             </div>
+          </div>
+        </div>
+        {/* Site map links */}
+        <div className="footer-sitemap">
+          <div className="footer-sitemap-container">
+            {sections.map((group) => (
+              <nav className="footer-sitemap-section" key={group.title} aria-label={`Liens ${group.title}`}>
+                <h4 className="footer-sitemap-title">{group.title}</h4>
+                <ul className="footer-sitemap-list">
+                  {group.links.map((l) => (
+                    <li key={l.to} className="footer-sitemap-item">
+                      <Link to={l.to}>{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
           </div>
         </div>
         <div className="footer-bottom">
