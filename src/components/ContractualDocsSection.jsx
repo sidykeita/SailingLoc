@@ -64,7 +64,8 @@ const ContractualDocsSection = ({ userId }) => {
   if (loading) {
     return (
       <div className="card p-6">
-        <h2 className="font-montserrat text-xl font-semibold text-dark mb-4">Documents contractuels</h2>
+        <h2 className="font-montserrat text-xl font-semibold text-dark mb-2">Documents contractuels</h2>
+      <div className="w-10 h-1 mb-4 bg-blue-500 rounded"></div>
         <p className="text-center py-4">Chargement des documents...</p>
       </div>
     );
@@ -87,7 +88,7 @@ const ContractualDocsSection = ({ userId }) => {
             <div key={docType}>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{getDocumentTypeLabel(docType)}</h4>
               <label className="cursor-pointer block">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200 shadow-md hover:shadow-lg">
+                <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 hover:from-blue-700 hover:via-blue-600 hover:to-indigo-600 text-white font-medium py-3 px-6 rounded-lg text-center transition-all duration-200 shadow-md hover:shadow-lg">
                   <span className="text-sm">Téléverser</span>
                 </div>
                 <input
@@ -102,8 +103,8 @@ const ContractualDocsSection = ({ userId }) => {
         </div>
         {uploading && (
           <div className="flex items-center justify-center mt-4">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mr-2"></div>
-            <p className="text-sm text-purple-600">Upload en cours...</p>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+            <p className="text-sm text-blue-600">Upload en cours...</p>
           </div>
         )}
       </div>
@@ -132,7 +133,7 @@ const ContractualDocsSection = ({ userId }) => {
                       href={doc.firebaseUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded hover:bg-blue-200 transition-colors"
                     >
                       <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
