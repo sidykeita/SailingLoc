@@ -204,7 +204,6 @@ const Layout = ({ children }) => {
                       {showAboutSubmenu && (
                         <ul className="submenu-list">
                           <li className="submenu-item"><Link to="/about">À propos</Link></li>
-                          <li className="submenu-item"><Link to="/about/reviews">Avis</Link></li>
                           <li className="submenu-item"><Link to="/contact">Contact</Link></li>
                           <li className="submenu-item"><Link to="/help">Aide</Link></li>
                         </ul>

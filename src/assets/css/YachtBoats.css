@@ -1,7 +1,7 @@
 /* Styles spécifiques pour la page des yachts (alignés avec SailingBoats/MotorBoats) */
 
 .yacht-boats-container {
-  background-color: #b3b3b3 !important;
+  background-color: #e1e1e1 !important;
   min-height: 100vh;
   padding-top: 100px !important;
 }

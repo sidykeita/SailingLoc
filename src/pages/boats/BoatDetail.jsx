@@ -391,7 +391,7 @@ const BoatDetail = () => {
       <div className="container mx-auto px-4 py-8 content-container">
         {/* Bouton retour */}
         <div className="mb-6">
-          <Link to="/boats/motor" className="back-button">
+          <Link to="/boats" className="back-button">
             <FontAwesomeIcon icon={faArrowLeft} /> Retour à la liste des bateaux
           </Link>
         </div>
