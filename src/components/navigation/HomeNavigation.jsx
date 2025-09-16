@@ -77,7 +77,7 @@ const HomeNavigation = () => {
                     </div>
                     {showBoatSubmenu && (
                       <div className="submenu-container">
-                        <Link to="/boats/motor" className="submenu-link">Bateaux à moteur</Link>
+                        <Link to="/boats/semi-rigide" className="submenu-link">Semi-rigides</Link>
                         <Link to="/boats/sailing" className="submenu-link">Voiliers</Link>
                       </div>
                     )}

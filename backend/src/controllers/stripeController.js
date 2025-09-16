@@ -28,14 +28,15 @@ if (process.env.NODE_ENV === 'test') {
 // Resolve Stripe instance at call time (ensures tests can inject global.__stripeMock)
 function resolveStripe() {
   if (process.env.NODE_ENV === 'test' && global.__stripeMock) return global.__stripeMock;
-  return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
+  const secret = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SK;
+  return new Stripe(secret, { apiVersion: '2024-06-20' });
 }
 
 // Create a Checkout Session for a reservation/boat payment
 // Expects: { amount, currency, description, metadata }
 exports.createCheckoutSession = async (req, res) => {
   try {
-    if (process.env.NODE_ENV !== 'test' && !process.env.STRIPE_SECRET_KEY) {
+    if (process.env.NODE_ENV !== 'test' && !(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SK)) {
       console.error('[Stripe] STRIPE_SECRET_KEY manquante');
       return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
     }
@@ -94,6 +95,7 @@ exports.createReservationCheckoutSession = async (req, res) => {
       console.warn('[Stripe] FRONTEND_URL manquante - utilisation de http://localhost:5173 par défaut');
     }
     const { id } = req.params;
+    const stripe = resolveStripe();
     const reservation = await Reservation.findById(id).populate('boat user');
     if (!reservation) {
       return res.status(404).json({ message: 'Réservation introuvable' });

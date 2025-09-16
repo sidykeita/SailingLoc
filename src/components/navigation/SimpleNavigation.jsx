@@ -15,7 +15,7 @@ const SimpleNavigation = () => {
         <nav>
           <ul className="flex space-x-6">
             <li><Link to="/" className="text-blue-800 hover:text-blue-600">Accueil</Link></li>
-            <li><Link to="/boats/motor" className="text-blue-800 hover:text-blue-600">Bateaux à moteur</Link></li>
+            <li><Link to="/boats/semi-rigide" className="text-blue-800 hover:text-blue-600">Semi-rigides</Link></li>
             <li><Link to="/boats/sailing" className="text-blue-800 hover:text-blue-600">Voiliers</Link></li>
             <li><Link to="/about" className="text-blue-800 hover:text-blue-600">À propos</Link></li>
             <li><Link to="/contact" className="text-blue-800 hover:text-blue-600">Contact</Link></li>
