@@ -87,7 +87,7 @@ exports.createCheckoutSession = async (req, res) => {
 // Route: POST /api/stripe/reservations/:id/checkout
 exports.createReservationCheckoutSession = async (req, res) => {
   try {
-    if (process.env.NODE_ENV !== 'test' && !process.env.STRIPE_SECRET_KEY) {
+    if (process.env.NODE_ENV !== 'test' && !(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SK)) {
       console.error('[Stripe] STRIPE_SECRET_KEY manquante');
       return res.status(500).json({ message: 'Configuration Stripe manquante (clé secrète)' });
     }
